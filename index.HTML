@@ -3,67 +3,651 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bajo Zero - Expertos en Refrigeración</title>
+    <meta name="description" content="Bajo Zero Panamá - Expertos en aire acondicionado. Entra para conocer nuestros servicios de instalación, mantenimiento y reparación.">
+    <title>Bajo Zero Panamá | Bienvenido</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            background: #000;
+        }
+
+        /* Preloader */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            background: #0066b2;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .preloader-logo {
+            font-size: 4rem;
+            font-weight: 900;
+            color: white;
+            font-style: italic;
+            letter-spacing: -2px;
+            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+        }
+
+        .preloader-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            margin-top: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preloader-progress {
+            height: 100%;
+            background: white;
+            width: 0%;
+            animation: load 2.5s ease-out forwards;
+            box-shadow: 0 0 10px white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        @keyframes load {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* Main Container */
+        #main-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #0066b2 0%, #003d6b 50%, #001a2e 100%);
+            overflow: hidden;
+        }
+
+        /* Animated Background Particles */
+        #particles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Frost Effect Overlay */
+        .frost-overlay {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(0,200,255,0.1) 0%, transparent 50%);
+            z-index: 2;
+            animation: frostMove 20s ease-in-out infinite;
+        }
+
+        @keyframes frostMove {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* Ice Crystals Animation */
+        .ice-crystal {
+            position: absolute;
+            color: rgba(255,255,255,0.3);
+            font-size: 2rem;
+            animation: float-crystal 15s infinite ease-in-out;
+            z-index: 2;
+        }
+
+        @keyframes float-crystal {
+            0%, 100% { 
+                transform: translateY(100vh) rotate(0deg) scale(0.5); 
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { 
+                transform: translateY(-100vh) rotate(720deg) scale(1.2); 
+                opacity: 0;
+            }
+        }
+
+        /* Content Container */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* Logo Animation */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: logoEntry 1.5s ease-out;
+        }
+
+        @keyframes logoEntry {
+            0% { 
+                opacity: 0; 
+                transform: translateY(-50px) scale(0.8); 
+                filter: blur(20px);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+                filter: blur(0);
+            }
+        }
+
+        .main-logo {
+            font-size: 6rem;
+            font-weight: 900;
+            color: white;
+            font-style: italic;
+            letter-spacing: -4px;
+            line-height: 0.9;
+            text-shadow: 
+                0 0 20px rgba(0,0,0,0.3),
+                0 0 40px rgba(0,102,178,0.5),
+                0 0 60px rgba(0,200,255,0.3);
+            position: relative;
+            display: inline-block;
+        }
+
+        .main-logo::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            border-radius: 2px;
+            animation: lineGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes lineGlow {
+            0%, 100% { opacity: 0.5; width: 60%; }
+            50% { opacity: 1; width: 80%; }
+        }
+
+        .logo-sub {
+            font-size: 1.5rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 300;
+            letter-spacing: 8px;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        .logo-country {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            animation: fadeInUp 1s ease-out 0.7s both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Menu Cards */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            width: 100%;
+            margin-top: 2rem;
+        }
+
+        .menu-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            padding: 2.5rem;
+            text-align: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: cardEntry 1s ease-out backwards;
+        }
+
+        .menu-card:nth-child(1) { animation-delay: 0.8s; }
+        .menu-card:nth-child(2) { animation-delay: 1s; }
+        .menu-card:nth-child(3) { animation-delay: 1.2s; }
+
+        @keyframes cardEntry {
+            from { 
+                opacity: 0; 
+                transform: translateY(50px) scale(0.9); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.7s;
+        }
+
+        .menu-card:hover::before {
+            left: 100%;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.4);
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.3),
+                0 0 40px rgba(0,200,255,0.2);
+        }
+
+        .menu-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+
+        .menu-card:hover .menu-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .menu-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-desc {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        .menu-arrow {
+            margin-top: 1.5rem;
+            font-size: 1.5rem;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.3s;
+        }
+
+        .menu-card:hover .menu-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Contact Bar */
+        .contact-bar {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            z-index: 20;
+            animation: fadeInUp 1s ease-out 1.5s both;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .contact-item:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Skip Animation */
+        .skip-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            z-index: 50;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 3s forwards;
+            transition: all 0.3s;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .skip-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-logo { font-size: 3.5rem; }
+            .logo-sub { font-size: 1rem; letter-spacing: 4px; }
+            .menu-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .menu-card { padding: 2rem; }
+            .contact-bar { 
+                flex-direction: column; 
+                gap: 0.5rem;
+                bottom: 1rem;
+            }
+        }
+
+        /* Transition to main site */
+        .page-transition {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 9998;
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .page-transition.active {
+            transform: scaleY(1);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body>
 
-    <nav class="bg-[#0066b2] p-4 text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="text-2xl font-bold tracking-tighter">
-                BAJO <span class="text-blue-200">ZERO</span>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-logo">BAJO ZERO</div>
+        <div class="preloader-bar">
+            <div class="preloader-progress"></div>
+        </div>
+        <div style="margin-top: 1rem; color: rgba(255,255,255,0.7); font-size: 0.9rem;">Cargando experiencia...</div>
+    </div>
+
+    <!-- Page Transition Effect -->
+    <div class="page-transition" id="pageTransition"></div>
+
+    <!-- Main Content -->
+    <div id="main-container">
+        <canvas id="particles-canvas"></canvas>
+        <div class="frost-overlay"></div>
+        
+        <!-- Animated Ice Crystals -->
+        <div id="crystals-container"></div>
+
+        <button class="skip-btn" onclick="skipAnimation()">Saltar animación →</button>
+
+        <div class="content-wrapper">
+            <!-- Logo Section -->
+            <div class="logo-container">
+                <div class="main-logo">
+                    BAJO<br>ZERO
+                </div>
+                <div class="logo-sub">Refrigeración Profesional</div>
+                <div class="logo-country">
+                    <i class="fas fa-map-marker-alt mr-2"></i>Panamá
+                </div>
             </div>
-            <div class="space-x-6 hidden md:block">
-                <a href="#" class="hover:text-blue-200">Inicio</a>
-                <a href="#servicios" class="hover:text-blue-200">Servicios</a>
-                <a href="#marcas" class="hover:text-blue-200">Marcas</a>
-                <a href="login.html" class="bg-white text-[#0066b2] px-4 py-2 rounded font-bold hover:bg-blue-100 transition">Admin Login</a>
+
+            <!-- Menu Grid -->
+            <div class="menu-grid">
+                <div class="menu-card" onclick="navigateTo('inicio.html')">
+                    <div class="menu-icon">
+                        <i class="fas fa-snowflake"></i>
+                    </div>
+                    <div class="menu-title">Conocer Servicios</div>
+                    <div class="menu-desc">Descubre nuestras soluciones de climatización para hogares y empresas en Panamá</div>
+                    <div class="menu-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="openWhatsApp()">
+                    <div class="menu-icon" style="color: #25D366;">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div class="menu-title">Cotización Rápida</div>
+                    <div class="menu-desc">Contacta directo por WhatsApp y recibe atención inmediata</div>
+                    <div class="menu-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="navigateTo('admin.html')">
+                    <div class="menu-icon" style="color: #ffd700;">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="menu-title">Acceso Admin</div>
+                    <div class="menu-desc">Panel de administración para gestión interna</div>
+                    <div class="menu-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Bar -->
+            <div class="contact-bar">
+                <a href="tel:+50761519272" class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>6151-9272</span>
+                </a>
+                <a href="mailto:info@bajozero.net" class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>info@bajozero.net</span>
+                </a>
+                <span class="contact-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Lun-Sáb 8am-6pm</span>
+                </span>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <header class="bg-[#0066b2] text-white py-20 px-6 text-center border-t-4 border-blue-300">
-        <h1 class="text-5xl font-extrabold mb-4">Mantenemos tu mundo fresco</h1>
-        <p class="text-xl mb-8">Instalación, mantenimiento y reparación de aire acondicionado empresarial y doméstico.</p>
-        <button class="bg-white text-[#0066b2] px-8 py-3 rounded-full font-bold text-lg hover:scale-105 transition-transform">Solicitar Cotización</button>
-    </header>
+    <script>
+        // Preloader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('preloader').classList.add('hidden');
+                initParticles();
+                createIceCrystals();
+            }, 2500);
+        });
 
-    <section id="servicios" class="container mx-auto py-16 px-6">
-        <h2 class="text-3xl font-bold text-center mb-12 text-[#0066b2]">Nuestros Servicios</h2>
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="bg-white p-8 rounded-xl shadow-md border-b-4 border-blue-500 hover:shadow-xl transition">
-                <i class="fas fa-tools text-4xl text-blue-500 mb-4"></i>
-                <h3 class="text-xl font-bold mb-2">Reparación Técnica</h3>
-                <p>Diagnóstico preciso y solución inmediata para fallas en cualquier sistema de enfriamiento.</p>
-            </div>
-            <div class="bg-white p-8 rounded-xl shadow-md border-b-4 border-blue-500 hover:shadow-xl transition">
-                <i class="fas fa-snowflake text-4xl text-blue-500 mb-4"></i>
-                <h3 class="text-xl font-bold mb-2">Mantenimiento Preventivo</h3>
-                <p>Limpieza profunda y recarga de gas para optimizar el consumo de energía y vida útil.</p>
-            </div>
-            <div class="bg-white p-8 rounded-xl shadow-md border-b-4 border-blue-500 hover:shadow-xl transition">
-                <i class="fas fa-building text-4xl text-blue-500 mb-4"></i>
-                <h3 class="text-xl font-bold mb-2">Instalación Empresarial</h3>
-                <p>Proyectos a gran escala para oficinas, naves industriales y residencias.</p>
-            </div>
-        </div>
-    </section>
+        function skipAnimation() {
+            document.getElementById('preloader').classList.add('hidden');
+            initParticles();
+            createIceCrystals();
+        }
 
-    <section id="marcas" class="bg-gray-100 py-12">
-        <div class="container mx-auto text-center">
-            <p class="text-gray-500 font-bold uppercase tracking-widest mb-6">Expertos en marcas líderes</p>
-            <div class="flex flex-wrap justify-center gap-10 opacity-70 grayscale hover:grayscale-0 transition-all">
-                <span class="text-2xl font-bold">SAMSUNG</span>
-                <span class="text-2xl font-bold">LG</span>
-                <span class="text-2xl font-bold">HISENSE</span>
-                <span class="text-2xl font-bold">CARRIER</span>
-            </div>
-        </div>
-    </section>
+        // Particle System
+        function initParticles() {
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
 
-    <footer class="bg-gray-800 text-white py-6 text-center">
-        <p>&copy; 2026 BAJO ZERO Refrigeración Profesional.</p>
-    </footer>
+            const particles = [];
+            const particleCount = 100;
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 3 + 1;
+                    this.speedX = Math.random() * 1 - 0.5;
+                    this.speedY = Math.random() * 1 - 0.5;
+                    this.opacity = Math.random() * 0.5 + 0.1;
+                }
+
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+
+                    if (this.x > canvas.width) this.x = 0;
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.y > canvas.height) this.y = 0;
+                    if (this.y < 0) this.y = canvas.height;
+                }
+
+                draw() {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+
+                // Connect particles
+                particles.forEach((a, index) => {
+                    particles.slice(index + 1).forEach(b => {
+                        const dx = a.x - b.x;
+                        const dy = a.y - b.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 100) {
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${0.1 * (1 - distance/100)})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(a.x, a.y);
+                            ctx.lineTo(b.x, b.y);
+                            ctx.stroke();
+                        }
+                    });
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        // Ice Crystals
+        function createIceCrystals() {
+            const container = document.getElementById('crystals-container');
+            const symbols = ['❄', '❅', '❆', '✦', '✧'];
+            
+            setInterval(() => {
+                const crystal = document.createElement('div');
+                crystal.className = 'ice-crystal';
+                crystal.innerHTML = symbols[Math.floor(Math.random() * symbols.length)];
+                crystal.style.left = Math.random() * 100 + '%';
+                crystal.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                crystal.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                crystal.style.opacity = Math.random() * 0.5 + 0.1;
+                
+                container.appendChild(crystal);
+                
+                setTimeout(() => {
+                    crystal.remove();
+                }, 20000);
+            }, 2000);
+        }
+
+        // Navigation
+        function navigateTo(url) {
+            const transition = document.getElementById('pageTransition');
+            transition.classList.add('active');
+            
+            setTimeout(() => {
+                window.location.href = url;
+            }, 600);
+        }
+
+        function openWhatsApp() {
+            window.open('https://wa.me/50761519272?text=Hola%20Bajo%20Zero,%20necesito%20información', '_blank');
+        }
+
+        // Mouse parallax effect
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            
+            document.querySelector('.logo-container').style.transform = 
+                `translate(${x}px, ${y}px)`;
+        });
+    </script>
 </body>
 </html>

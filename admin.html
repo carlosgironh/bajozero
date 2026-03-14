@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin | Bajo Zero Panamá</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+        }
+        .animate-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Login Container -->
+    <div id="loginContainer" class="w-full max-w-md">
+        <div class="glass-panel rounded-3xl shadow-2xl p-8 md:p-12">
+            <div class="text-center mb-10">
+                <div class="inline-block bg-brand-primary text-white px-6 py-3 rounded-xl font-black text-3xl italic tracking-tighter mb-2 shadow-lg" style="background: #0066b2;">
+                    BAJO <span class="text-blue-200">ZERO</span>
+                </div>
+                <div class="text-sm text-gray-500 font-bold tracking-widest mt-2">PANAMÁ</div>
+                <h1 class="text-2xl font-bold text-gray-800 mt-4">Panel de Administración</h1>
+            </div>
+
+            <form id="loginForm" class="space-y-6" onsubmit="handleLogin(event)">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Usuario</label>
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-4 top-3.5 text-gray-400"></i>
+                        <input type="text" id="username" required 
+                            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition bg-gray-50 focus:bg-white"
+                            placeholder="admin">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Contraseña</label>
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-4 top-3.5 text-gray-400"></i>
+                        <input type="password" id="password" required 
+                            class="w-full pl-12 pr-12 py-3 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition bg-gray-50 focus:bg-white"
+                            placeholder="••••••••">
+                        <button type="button" onclick="togglePassword()" class="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" id="loginBtn" 
+                    class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-4 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-[1.02] shadow-lg">
+                    Acceder al Sistema
+                </button>
+
+                <div id="errorMsg" class="hidden bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+                        <span class="text-red-700 text-sm font-medium">Credenciales incorrectas.</span>
+                    </div>
+                </div>
+            </form>
+
+            <div class="mt-8 text-center">
+                <a href="index.html" class="text-gray-500 hover:text-gray-700 text-sm flex items-center justify-center gap-2 transition">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver a bajozero.net
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardContainer" class="hidden w-full max-w-6xl">
+        <div class="glass-panel rounded-3xl shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="bg-white/20 p-3 rounded-xl">
+                        <i class="fas fa-snowflake text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold">Dashboard Panamá</h2>
+                        <p class="text-blue-100 text-sm">Sistema de Gestión Bajo Zero</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Cerrar sesión
+                </button>
+            </div>
+
+            <div class="p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <div class="text-blue-600 text-sm font-semibold mb-1">Solicitudes hoy</div>
+                    <div class="text-3xl font-black text-gray-800">8</div>
+                    <div class="text-green-600 text-xs mt-1"><i class="fas fa-arrow-up"></i> +2 vs ayer</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                    <div class="text-green-600 text-sm font-semibold mb-1">Cotizaciones enviadas</div>
+                    <div class="text-3xl font-black text-gray-800">24</div>
+                    <div class="text-gray-500 text-xs mt-1">Este mes</div>
+                </div>
+                <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-100">
+                    <div class="text-yellow-600 text-sm font-semibold mb-1">Pendientes</div>
+                    <div class="text-3xl font-black text-gray-800">3</div>
+                    <div class="text-red-600 text-xs mt-1">1 urgente</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                    <div class="text-purple-600 text-sm font-semibold mb-1">Clientes PA</div>
+                    <div class="text-3xl font-black text-gray-800">892</div>
+                    <div class="text-gray-500 text-xs mt-1">Total activos</div>
+                </div>
+            </div>
+
+            <div class="px-6 pb-6">
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800">Solicitudes recientes - Panamá</h3>
+                        <span class="text-sm text-gray-500">Actualizado: hace 5 min</span>
+                    </div>
+                    <div class="divide-y divide-gray-100">
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                                    <i class="fas fa-home"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Instalación residencial - Costa del Este</div>
+                                    <div class="text-sm text-gray-500">María González • WhatsApp • hace 30 min</div>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">PENDIENTE</span>
+                        </div>
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-600">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Reparación urgente - Obarrio</div>
+                                    <div class="text-sm text-gray-500">Empresa XYZ • Tel: 6151-9272 • hace 1 hora</div>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">URGENTE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (localStorage.getItem('adminLoggedIn') === 'true') {
+            showDashboard();
+        }
+
+        function togglePassword() {
+            const password = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (password.type === 'password') {
+                password.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Verificando...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                if (username === 'admin' && password === 'admin123') {
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    showDashboard();
+                } else {
+                    btn.innerHTML = 'Acceder al Sistema';
+                    btn.disabled = false;
+                    errorMsg.classList.remove('hidden');
+                    document.getElementById('loginForm').classList.add('animate-shake');
+                    setTimeout(() => document.getElementById('loginForm').classList.remove('animate-shake'), 500);
+                }
+            }, 1000);
+        }
+
+        function showDashboard() {
+            document.getElementById('loginContainer').classList.add('hidden');
+            document.getElementById('dashboardContainer').classList.remove('hidden');
+        }
+
+        function logout() {
+            localStorage.removeItem('adminLoggedIn');
+            location.reload();
+        }
+    </script>
+</body>
+</html>

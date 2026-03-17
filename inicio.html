@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Bajo Zero Panamá - Expertos en instalación, mantenimiento y reparación de aire acondicionado en Panamá. Servicios empresariales y domésticos. Llámanos al 6151-9272.">
+    <meta name="description" content="Bajo Zero Panamá - Expertos en instalación, mantenimiento y reparación de aire acondicionado en Panamá. Servicios empresariales y domésticos. Llámanos al 6672-1466.">
     <meta name="keywords" content="aire acondicionado Panamá, refrigeración Panamá, mantenimiento aire acondicionado, reparación aire acondicionado, instalación aire acondicionado, LG, Samsung, Hisense, Carrier">
     <meta name="author" content="Bajo Zero Panamá">
     <meta name="robots" content="index, follow">
     
-    <title>Bajo Zero Panamá | Aire Acondicionado y Refrigeración | 6151-9272</title>
+    <title>Bajo Zero Panamá | Aire Acondicionado y Refrigeración | 6672-1466</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -58,6 +58,73 @@
         .login-discrete:hover {
             opacity: 1;
         }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s ease-out;
+        }
+        @keyframes modalSlide {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #0066b2 0%, #005a9e 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 1rem 1rem 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .close {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .close:hover {
+            color: #e6f2fa;
+        }
+        .plan-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+        .plan-card:hover {
+            border-color: #0066b2;
+            box-shadow: 0 10px 25px rgba(0,102,178,0.1);
+        }
+        .plan-preventivo {
+            border-left: 5px solid #00a8e8;
+        }
+        .plan-correctivo {
+            border-left: 5px solid #f59e0b;
+        }
+        .check-icon {
+            color: #10b981;
+            margin-right: 0.5rem;
+        }
     </style>
 </head>
 <body class="antialiased text-gray-800">
@@ -68,7 +135,7 @@
     </a>
 
     <!-- WhatsApp Float -->
-    <a href="https://wa.me/50761519272?text=Hola%20Bajo%20Zero,%20necesito%20información%20sobre%20aire%20acondicionado" 
+    <a href="https://wa.me/50766721466?text=Hola%20Bajo%20Zero,%20necesito%20información%20sobre%20aire%20acondicionado" 
        target="_blank"
        class="fixed bottom-6 right-6 z-40 whatsapp-float text-white p-4 rounded-full flex items-center gap-2 group transition-transform hover:scale-110">
         <i class="fab fa-whatsapp text-2xl"></i>
@@ -131,15 +198,15 @@
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <a href="https://wa.me/50761519272?text=Hola,%20necesito%20una%20cotización" 
+                    <a href="https://wa.me/50766721466?text=Hola,%20necesito%20una%20cotización" 
                        target="_blank"
                        class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-full font-bold text-lg transition transform hover:scale-105 shadow-2xl flex items-center gap-2">
                         <i class="fab fa-whatsapp text-xl"></i>
                         Cotización por WhatsApp
                     </a>
-                    <a href="tel:+50761519272" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition flex items-center gap-2">
+                    <a href="tel:+5073916412" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition flex items-center gap-2">
                         <i class="fas fa-phone-alt"></i>
-                        6151-9272
+                        391-6412 
                     </a>
                 </div>
                 
@@ -176,7 +243,7 @@
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- Service 1 -->
+                <!-- Service 1: Reparación -->
                 <div class="service-card bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
                     <div class="w-16 h-16 bg-brand-light rounded-2xl flex items-center justify-center mb-6 text-brand-primary text-3xl">
                         <i class="fas fa-tools"></i>
@@ -186,55 +253,152 @@
                         Diagnóstico preciso y reparación de fallas en equipos de todas las marcas.
                     </p>
                     <ul class="space-y-2 mb-6 text-sm text-gray-600">
-                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Diagnóstico gratuito</li>
-                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Reparación en 24-48h</li>
-                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Garantía extendida</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Diagnóstico</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Reparación de aires acondicionados y línea blanca</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Garantía</li>
                     </ul>
-                    <a href="https://wa.me/50761519272?text=Necesito%20reparación" target="_blank" class="inline-flex items-center text-brand-primary font-bold hover:gap-2 transition-all">
+                    <a href="https://wa.me/50766721466?text=Necesito%20reparación" target="_blank" class="inline-flex items-center text-brand-primary font-bold hover:gap-2 transition-all">
                         Solicitar <i class="fas fa-arrow-right ml-2"></i>
                     </a>
                 </div>
 
-                <!-- Service 2 -->
+                <!-- Service 2: Mantenimiento -->
                 <div class="service-card bg-white rounded-2xl p-8 shadow-lg border-2 border-brand-primary/20">
                     <div class="w-16 h-16 bg-brand-primary rounded-2xl flex items-center justify-center mb-6 text-white text-3xl">
                         <i class="fas fa-snowflake"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-gray-900 mb-3">Mantenimiento</h3>
                     <p class="text-gray-600 mb-4 leading-relaxed">
-                        Planes adaptados al clima panameño. Limpieza profunda y recarga de gas ecológico.
+                        Planes adaptados al clima panameño. Limpieza profunda y revisión especializada.
                     </p>
                     <ul class="space-y-2 mb-6 text-sm text-gray-600">
-                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Limpieza de moldes</li>
-                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Recarga certificada</li>
-                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Revisión trimestral</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Mantenimiento correctivo y preventivo</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Mantenimiento de línea blanca</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Revisión</li>
                     </ul>
-                    <a href="https://wa.me/50761519272?text=Quiero%20mantenimiento" target="_blank" class="inline-flex items-center text-brand-primary font-bold hover:gap-2 transition-all">
+                    <button onclick="openModal()" class="inline-flex items-center text-brand-primary font-bold hover:gap-2 transition-all cursor-pointer bg-transparent border-none">
                         Ver planes <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
+                    </button>
                 </div>
 
-                <!-- Service 3 -->
+                <!-- Service 3: Instalación -->
                 <div class="service-card bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
                     <div class="w-16 h-16 bg-brand-light rounded-2xl flex items-center justify-center mb-6 text-brand-primary text-3xl">
                         <i class="fas fa-building"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-gray-900 mb-3">Instalación</h3>
                     <p class="text-gray-600 mb-4 leading-relaxed">
-                        Proyectos a medida para residencias y comercios. Estudio técnico sin costo.
+                        Proyectos a medida para residencias y comercios con estudio técnico profesional.
                     </p>
                     <ul class="space-y-2 mb-6 text-sm text-gray-600">
-                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Estudio gratuito</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Estudio técnico</li>
                         <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Instalación express</li>
                         <li class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Certificación incluida</li>
                     </ul>
-                    <a href="https://wa.me/50761519272?text=Necesito%20instalación" target="_blank" class="inline-flex items-center text-brand-primary font-bold hover:gap-2 transition-all">
+                    <a href="https://wa.me/50766721466?text=Necesito%20instalación" target="_blank" class="inline-flex items-center text-brand-primary font-bold hover:gap-2 transition-all">
                         Cotizar <i class="fas fa-arrow-right ml-2"></i>
                     </a>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Modal para Planes de Mantenimiento -->
+    <div id="planesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold"><i class="fas fa-clipboard-list mr-2"></i>Planes de Mantenimiento</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="p-6">
+                <!-- Plan Preventivo -->
+                <div class="plan-card plan-preventivo mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xl">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Plan Preventivo</h3>
+                            <p class="text-sm text-gray-500">Mantenimiento Preventivo de Aire Acondicionado</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4 text-sm text-gray-700">
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Limpieza profunda de la unidad evaporadora (unidad interna)</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Limpieza del serpentín y del blower</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Limpieza y revisión del drenaje</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Limpieza general de filtros</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Verificación de presiones de gas refrigerante</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Inspección eléctrica y funcionamiento general del equipo</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Revisión del protector de voltaje (si aplica)</p>
+                    </div>
+                    
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700 font-semibold">Precio por unidad:</span>
+                            <span class="text-2xl font-black text-brand-primary">$35.00 <span class="text-sm font-normal text-gray-600">+ ITBMS</span></span>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-2 italic">
+                            💡 Este mantenimiento ayuda a que tu aire funcione de forma eficiente, alargue su vida útil y consuma menos energía.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Plan Correctivo -->
+                <div class="plan-card plan-correctivo">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 text-xl">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Plan Correctivo</h3>
+                            <p class="text-sm text-gray-500">Mantenimiento Correctivo o Revisión</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-sm text-gray-600 mb-4 italic">
+                        ¿Tu aire acondicionado no enfría, no enciende o presenta ruidos extraños? ¡No te preocupes! Nuestro servicio correctivo está diseñado para resolver cualquier falla.
+                    </p>
+                    
+                    <div class="space-y-2 mb-4 text-sm text-gray-700">
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Inspección técnica completa del sistema</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Revisión de la tarjeta electrónica, termostato y cableado eléctrico</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Verificación del capacitor, motor ventilador y compresor</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Revisión de sensores de temperatura y presiones del gas refrigerante</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Detección de posibles fugas o bloqueos en el sistema</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Limpieza básica de componentes necesarios para el diagnóstico</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Informe técnico con diagnóstico detallado</p>
+                        <p class="flex items-start"><i class="fas fa-check-circle check-icon mt-0.5"></i> Cotización previa en caso de requerir reparación o repuestos</p>
+                    </div>
+                    
+                    <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700 font-semibold">Costo del diagnóstico:</span>
+                            <span class="text-2xl font-black text-yellow-600">$65.00 <span class="text-sm font-normal text-gray-600">+ ITBMS</span></span>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-2">
+                            <i class="fas fa-info-circle text-yellow-600 mr-1"></i>
+                            Si se aprueba una reparación adicional, se descuenta del total del trabajo final.
+                        </p>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600 text-center">
+                        <i class="fas fa-user-check text-brand-primary mr-1"></i>
+                        Contamos con técnicos especializados, repuestos originales y atención rápida.
+                    </div>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <a href="https://wa.me/50766721466?text=Hola,%20quiero%20agendar%20un%20mantenimiento" 
+                       target="_blank"
+                       class="inline-flex items-center bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-bold transition">
+                        <i class="fab fa-whatsapp mr-2"></i>
+                        Agendar por WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Brands Section -->
     <section id="marcas" class="py-16 bg-white">
@@ -276,15 +440,35 @@
                     </p>
 
                     <div class="space-y-6">
-                        <a href="https://wa.me/50761519272" target="_blank" class="flex items-center gap-4 group">
+                        <a href="https://wa.me/50766721466" target="_blank" class="flex items-center gap-4 group">
                             <div class="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center group-hover:bg-green-500 transition">
                                 <i class="fab fa-whatsapp text-2xl"></i>
                             </div>
                             <div>
-                                <div class="text-sm text-gray-400">WhatsApp</div>
-                                <div class="text-2xl font-bold">6151-9272 / 6672-1466</div>
+                                <div class="text-sm text-gray-400">WhatsApp Principal</div>
+                                <div class="text-2xl font-bold">6672-1466</div>
                             </div>
                         </a>
+
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 bg-brand-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-mobile-alt text-2xl"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-400">Teléfono Secundario</div>
+                                <div class="text-xl font-bold">6151-9272</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 bg-brand-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-phone text-2xl"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-400">Teléfono Fijo</div>
+                                <div class="text-xl font-bold">391-6412</div>
+                            </div>
+                        </div>
 
                         <div class="flex items-center gap-4">
                             <div class="w-14 h-14 bg-brand-primary rounded-full flex items-center justify-center">
@@ -365,7 +549,9 @@
                 <div>
                     <h4 class="text-white font-bold mb-4">Contacto</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><i class="fab fa-whatsapp text-green-500 mr-2"></i>6151-9272</li>
+                        <li><i class="fab fa-whatsapp text-green-500 mr-2"></i>6672-1466</li>
+                        <li><i class="fas fa-mobile-alt text-brand-primary mr-2"></i>6151-9272</li>
+                        <li><i class="fas fa-phone text-brand-primary mr-2"></i>391-6412</li>
                         <li><i class="fas fa-envelope text-brand-primary mr-2"></i>info@bajozero.net</li>
                     </ul>
                 </div>
@@ -384,6 +570,33 @@
         </div>
     </footer>
 
+    <script>
+        // Modal functions
+        function openModal() {
+            document.getElementById('planesModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('planesModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('planesModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+
 </body>
 </html>
-

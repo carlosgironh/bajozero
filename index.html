@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bajo Zero Panamá | Cargando...</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden;
+            background: #000;
+        }
+        
+        .intro-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #001a2e 0%, #003d6b 30%, #0066b2 70%, #00a8e8 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Frost overlay effect */
+        .frost-overlay {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 50%);
+            animation: frostPulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes frostPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+        
+        /* Snow particles */
+        .snow-container {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .snowflake {
+            position: absolute;
+            color: rgba(255,255,255,0.6);
+            animation: snowfall linear infinite;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        
+        @keyframes snowfall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        /* Ice crystals */
+        .crystal {
+            position: absolute;
+            color: rgba(255,255,255,0.3);
+            animation: crystalFloat 8s ease-in-out infinite;
+        }
+        
+        @keyframes crystalFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+        
+        /* AC Unit SVG Animation */
+        .ac-unit {
+            width: 200px;
+            height: auto;
+            margin-bottom: 2rem;
+            animation: acFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));
+        }
+        
+        @keyframes acFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .ac-vent {
+            animation: ventPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes ventPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* Temperature display */
+        .temp-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        
+        .temp-display {
+            font-size: 6rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 0 40px rgba(0,200,255,0.5);
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .temp-unit {
+            font-size: 2rem;
+            color: #00a8e8;
+            vertical-align: super;
+        }
+        
+        .temp-label {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+        
+        /* Logo */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .logo-text {
+            font-size: 3rem;
+            font-weight: 900;
+            font-style: italic;
+            color: white;
+            letter-spacing: -0.05em;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #ffffff 0%, #b3e5fc 50%, #ffffff 100%);
+            background-size: 200% 200%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: iceShine 3s ease-in-out infinite;
+        }
+        
+        @keyframes iceShine {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .logo-sub {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+            letter-spacing: 0.3em;
+            margin-top: 0.5rem;
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            width: 300px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00a8e8, #ffffff, #00a8e8);
+            background-size: 200% 100%;
+            width: 0%;
+            animation: progressFill 4s ease-out forwards, shimmer 2s linear infinite;
+        }
+        
+        @keyframes progressFill {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        /* Skip button */
+        .skip-btn {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.7);
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .skip-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        /* Cold breath effect */
+        .cold-breath {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center bottom, transparent 0%, rgba(0,200,255,0.1) 100%);
+            animation: breathe 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { opacity: 0.3; transform: scaleY(1); }
+            50% { opacity: 0.6; transform: scaleY(1.1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="intro-container">
+        <div class="frost-overlay"></div>
+        <div class="cold-breath"></div>
+        <div class="snow-container" id="snowContainer"></div>
+        
+        <!-- Ice crystals decoration -->
+        <div class="crystal" style="top: 10%; left: 10%; font-size: 2rem; animation-delay: 0s;">❄</div>
+        <div class="crystal" style="top: 20%; right: 15%; font-size: 1.5rem; animation-delay: 1s;">❅</div>
+        <div class="crystal" style="bottom: 30%; left: 8%; font-size: 1.8rem; animation-delay: 2s;">❆</div>
+        <div class="crystal" style="bottom: 20%; right: 10%; font-size: 2.2rem; animation-delay: 0.5s;">✦</div>
+        
+        <!-- AC Unit SVG -->
+        <svg class="ac-unit" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Main body -->
+            <rect x="0" y="0" width="200" height="60" rx="8" fill="url(#acGradient)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+            <!-- Vent -->
+            <rect x="20" y="45" width="160" height="8" rx="4" fill="rgba(0,0,0,0.3)"/>
+            <rect x="20" y="45" width="160" height="8" rx="4" fill="url(#ventGradient)" class="ac-vent"/>
+            <!-- Display -->
+            <rect x="160" y="15" width="25" height="15" rx="2" fill="rgba(0,0,0,0.5)"/>
+            <text x="172" y="26" text-anchor="middle" fill="#00ff88" font-size="10" font-family="monospace" font-weight="bold">16°</text>
+            <!-- Brand -->
+            <text x="100" y="35" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="14" font-weight="bold" font-style="italic">BAJO ZERO</text>
+            
+            <defs>
+                <linearGradient id="acGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95" />
+                    <stop offset="50%" style="stop-color:#e6f2fa;stop-opacity:0.9" />
+                    <stop offset="100%" style="stop-color:#b3e5fc;stop-opacity:0.8" />
+                </linearGradient>
+                <linearGradient id="ventGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#00a8e8;stop-opacity:0.8" />
+                    <stop offset="100%" style="stop-color:#0066b2;stop-opacity:0.4" />
+                </linearGradient>
+            </defs>
+        </svg>
+        
+        <!-- Temperature Animation -->
+        <div class="temp-container">
+            <div class="temp-display">
+                <span id="tempValue">24</span><span class="temp-unit">°C</span>
+            </div>
+            <div class="temp-label">Enfriando tu espacio</div>
+        </div>
+        
+        <!-- Logo -->
+        <div class="logo-container">
+            <div class="logo-text">BAJO ZERO</div>
+            <div class="logo-sub">PANAMÁ • REFRIGERACIÓN PROFESIONAL</div>
+        </div>
+        
+        <!-- Progress -->
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+        
+        <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Cargando experiencia...</div>
+        
+        <!-- Skip Button -->
+        <button class="skip-btn" onclick="skipIntro()">
+            Saltar intro →
+        </button>
+    </div>
+
+    <script>
+        // Generate snowflakes
+        function createSnow() {
+            const container = document.getElementById('snowContainer');
+            const count = 50;
+            
+            for (let i = 0; i < count; i++) {
+                const flake = document.createElement('div');
+                flake.className = 'snowflake';
+                flake.innerHTML = ['❄','❅','❆','✦'][Math.floor(Math.random() * 4)];
+                flake.style.left = Math.random() * 100 + '%';
+                flake.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                flake.style.animationDelay = Math.random() * 5 + 's';
+                flake.style.fontSize = (Math.random() * 15 + 10) + 'px';
+                flake.style.opacity = Math.random() * 0.6 + 0.2;
+                container.appendChild(flake);
+            }
+        }
+        
+        // Temperature countdown animation
+        function animateTemp() {
+            const tempEl = document.getElementById('tempValue');
+            let current = 24;
+            const target = 16;
+            const duration = 3000;
+            const step = (current - target) / (duration / 50);
+            
+            const interval = setInterval(() => {
+                current -= step;
+                if (current <= target) {
+                    current = target;
+                    clearInterval(interval);
+                }
+                tempEl.textContent = Math.floor(current);
+            }, 50);
+        }
+        
+        // Redirect function
+        function redirectToMain() {
+            window.location.href = 'inicio.html';
+        }
+        
+        function skipIntro() {
+            redirectToMain();
+        }
+        
+        // Initialize
+        createSnow();
+        animateTemp();
+        
+        // Auto redirect after 4 seconds
+        setTimeout(redirectToMain, 4000);
+    </script>
+</body>
+</html>
+

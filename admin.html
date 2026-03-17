@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Técnico | Bajo Zero Panamá</title>
+    <meta name="robots" content="noindex, nofollow">
+    <title>Panel Administrativo | Bajo Zero Panamá</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -79,6 +79,7 @@
             font-size: 0.75rem;
             font-weight: 600;
         }
+        .status-pendiente { background: #fef3c7; color: #92400e; }
         .status-asignada { background: #dbeafe; color: #1e40af; }
         .status-completada { background: #d1fae5; color: #065f46; }
         .mobile-menu {
@@ -87,47 +88,6 @@
         }
         .mobile-menu.open {
             transform: translateX(0);
-        }
-        .inspection-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .inspection-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        .signature-pad {
-            border: 2px dashed #cbd5e1;
-            border-radius: 8px;
-            background: #f8fafc;
-            cursor: crosshair;
-            touch-action: none;
-        }
-        .photo-upload-box {
-            border: 2px dashed #0066b2;
-            border-radius: 6px;
-            height: 120px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            background-color: #f9f9f9;
-            color: #0066b2;
-            transition: all 0.3s ease;
-        }
-        .photo-upload-box:hover {
-            background-color: #e9f2ff;
-        }
-        .photo-input {
-            display: none;
-        }
-        .photo-preview {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 2px solid #e5e7eb;
         }
     </style>
 </head>
@@ -141,8 +101,8 @@
                     BAJO <span class="text-blue-200">ZERO</span>
                 </div>
                 <div class="text-sm text-gray-500 font-bold tracking-widest mt-2">PANAMÁ</div>
-                <h1 class="text-2xl font-bold text-gray-800 mt-4">Panel de Técnico</h1>
-                <p class="text-gray-600 mt-2">Accede a tus inspecciones asignadas</p>
+                <h1 class="text-2xl font-bold text-gray-800 mt-4">Panel Administrativo</h1>
+                <p class="text-gray-600 mt-2">Gestión de Inspecciones y Técnicos</p>
             </div>
 
             <form id="loginForm" class="space-y-6" onsubmit="handleLogin(event)">
@@ -152,7 +112,7 @@
                         <i class="fas fa-envelope absolute left-4 top-3.5 text-gray-400"></i>
                         <input type="email" id="loginEmail" required 
                             class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition bg-gray-50 focus:bg-white"
-                            placeholder="tecnico@bajozero.net">
+                            placeholder="admin@bajozero.net">
                     </div>
                 </div>
 
@@ -172,13 +132,13 @@
                 <div id="loginError" class="hidden bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
                     <div class="flex items-center">
                         <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
-                        <span class="text-red-700 text-sm font-medium">Credenciales incorrectas.</span>
+                        <span class="text-red-700 text-sm font-medium">Credenciales incorrectas o sin permisos de administrador.</span>
                     </div>
                 </div>
 
                 <button type="submit" id="loginBtn" 
                     class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-4 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-[1.02] shadow-lg flex items-center justify-center gap-2">
-                    <span>Acceder al Panel</span>
+                    <span>Acceder al Panel Admin</span>
                 </button>
             </form>
 
@@ -203,7 +163,7 @@
                     </div>
                     <div>
                         <div class="font-bold">Bajo Zero</div>
-                        <div class="text-xs text-gray-400">Panel Técnico</div>
+                        <div class="text-xs text-gray-400">Panel Admin</div>
                     </div>
                 </div>
             </div>
@@ -211,22 +171,34 @@
             <nav class="mt-6">
                 <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-6 py-4 text-gray-300 hover:text-white">
                     <i class="fas fa-home w-5"></i>
-                    <span>Mis Inspecciones</span>
+                    <span>Dashboard</span>
                 </a>
-                <a href="#" onclick="showSection('completed')" class="nav-item flex items-center gap-3 px-6 py-4 text-gray-300 hover:text-white">
-                    <i class="fas fa-check-circle w-5"></i>
-                    <span>Completadas</span>
+                <a href="#" onclick="showSection('newInspection')" class="nav-item flex items-center gap-3 px-6 py-4 text-gray-300 hover:text-white">
+                    <i class="fas fa-plus-circle w-5"></i>
+                    <span>Nueva Inspección</span>
+                </a>
+                <a href="#" onclick="showSection('inspections')" class="nav-item flex items-center gap-3 px-6 py-4 text-gray-300 hover:text-white">
+                    <i class="fas fa-clipboard-list w-5"></i>
+                    <span>Inspecciones</span>
+                </a>
+                <a href="#" onclick="showSection('technicians')" class="nav-item flex items-center gap-3 px-6 py-4 text-gray-300 hover:text-white">
+                    <i class="fas fa-users-cog w-5"></i>
+                    <span>Técnicos</span>
+                </a>
+                <a href="#" onclick="showSection('clients')" class="nav-item flex items-center gap-3 px-6 py-4 text-gray-300 hover:text-white">
+                    <i class="fas fa-users w-5"></i>
+                    <span>Clientes</span>
                 </a>
             </nav>
 
             <div class="absolute bottom-0 w-full p-6 border-t border-gray-700">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center">
-                        <i class="fas fa-user-hard-hat"></i>
+                        <i class="fas fa-user-shield"></i>
                     </div>
                     <div>
-                        <div id="userName" class="font-semibold text-sm">Técnico</div>
-                        <div id="userEmail" class="text-xs text-gray-400">tecnico@bajozero.net</div>
+                        <div id="userName" class="font-semibold text-sm">Administrador</div>
+                        <div id="userEmail" class="text-xs text-gray-400">admin@bajozero.net</div>
                     </div>
                 </div>
                 <button onclick="logout()" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-sm font-semibold transition">
@@ -237,7 +209,7 @@
 
         <!-- Mobile Header -->
         <div class="md:hidden fixed top-0 w-full bg-gray-900 text-white z-40 p-4 flex justify-between items-center">
-            <div class="font-black italic text-xl">BAJO ZERO - TÉCNICO</div>
+            <div class="font-black italic text-xl">BAJO ZERO - ADMIN</div>
             <button onclick="toggleMobileMenu()" class="text-2xl">
                 <i class="fas fa-bars"></i>
             </button>
@@ -246,14 +218,17 @@
         <!-- Mobile Menu -->
         <div id="mobileMenu" class="mobile-menu fixed inset-0 z-50 bg-gray-900 text-white md:hidden">
             <div class="p-4 flex justify-between items-center border-b border-gray-700">
-                <div class="font-black italic text-xl">BAJO ZERO - TÉCNICO</div>
+                <div class="font-black italic text-xl">BAJO ZERO - ADMIN</div>
                 <button onclick="toggleMobileMenu()" class="text-2xl">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <nav class="p-4">
-                <a href="#" onclick="showSection('dashboard'); toggleMobileMenu()" class="block py-4 text-gray-300 hover:text-white border-b border-gray-700">Mis Inspecciones</a>
-                <a href="#" onclick="showSection('completed'); toggleMobileMenu()" class="block py-4 text-gray-300 hover:text-white border-b border-gray-700">Completadas</a>
+                <a href="#" onclick="showSection('dashboard'); toggleMobileMenu()" class="block py-4 text-gray-300 hover:text-white border-b border-gray-700">Dashboard</a>
+                <a href="#" onclick="showSection('newInspection'); toggleMobileMenu()" class="block py-4 text-gray-300 hover:text-white border-b border-gray-700">Nueva Inspección</a>
+                <a href="#" onclick="showSection('inspections'); toggleMobileMenu()" class="block py-4 text-gray-300 hover:text-white border-b border-gray-700">Inspecciones</a>
+                <a href="#" onclick="showSection('technicians'); toggleMobileMenu()" class="block py-4 text-gray-300 hover:text-white border-b border-gray-700">Técnicos</a>
+                <a href="#" onclick="showSection('clients'); toggleMobileMenu()" class="block py-4 text-gray-300 hover:text-white border-b border-gray-700">Clientes</a>
                 <button onclick="logout()" class="w-full mt-4 bg-red-600 text-white py-3 rounded-lg font-semibold">Cerrar Sesión</button>
             </nav>
         </div>
@@ -261,362 +236,310 @@
         <!-- Main Content -->
         <main class="flex-1 md:ml-64 p-8 pt-20 md:pt-8">
             
-            <!-- Dashboard Section - Lista de Inspecciones Asignadas -->
+            <!-- Dashboard Section -->
             <div id="dashboardSection" class="section animate-fade-in">
                 <div class="flex justify-between items-center mb-8">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-800">Mis Inspecciones Asignadas</h1>
-                        <p class="text-gray-600 mt-1">Selecciona una inspección para completar el formulario</p>
+                        <h1 class="text-3xl font-bold text-gray-800">Dashboard Administrativo</h1>
+                        <p class="text-gray-600 mt-1">Gestión de inspecciones y asignaciones</p>
                     </div>
-                </div>
-
-                <div id="assignedInspectionsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="col-span-full text-center py-12">
-                        <div class="loading-spinner mx-auto mb-4"></div>
-                        <p class="text-gray-500">Cargando inspecciones...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Completed Section -->
-            <div id="completedSection" class="section hidden animate-fade-in">
-                <div class="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-800">Inspecciones Completadas</h1>
-                        <p class="text-gray-600 mt-1">Historial de trabajos realizados</p>
-                    </div>
-                </div>
-
-                <div id="completedInspectionsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="col-span-full text-center py-12 text-gray-500">
-                        <i class="fas fa-clipboard-check text-6xl mb-4 text-gray-300"></i>
-                        <p>No hay inspecciones completadas aún</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Inspection Form Section (Hidden initially) -->
-            <div id="inspectionFormSection" class="section hidden animate-fade-in">
-                <div class="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-800">Completar Inspección</h1>
-                        <p class="text-gray-600 mt-1" id="formSubtitle">Formulario técnico de inspección</p>
-                    </div>
-                    <button onclick="backToList()" class="text-gray-600 hover:text-gray-800 font-semibold">
-                        <i class="fas fa-arrow-left mr-2"></i>Volver a la lista
+                    <button onclick="showSection('newInspection')" class="bg-brand-primary hover:bg-brand-secondary text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition flex items-center gap-2">
+                        <i class="fas fa-plus"></i>
+                        Nueva Inspección
                     </button>
                 </div>
 
-                <form id="technicalForm" onsubmit="submitInspection(event)" class="space-y-6">
-                    <!-- Hidden Inspection ID -->
-                    <input type="hidden" id="currentInspectionId">
-                    
-                    <!-- Pre-loaded Client Info (Read Only) -->
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-brand-primary text-xl">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-black text-gray-800" id="totalInspections">0</div>
+                        <div class="text-gray-500 text-sm">Total Inspecciones</div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center text-yellow-600 text-xl">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-black text-gray-800" id="pendingInspections">0</div>
+                        <div class="text-gray-500 text-sm">Pendientes de Asignar</div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 text-xl">
+                                <i class="fas fa-user-hard-hat"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-black text-gray-800" id="assignedInspections">0</div>
+                        <div class="text-gray-500 text-sm">Asignadas a Técnicos</div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 text-xl">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-black text-gray-800" id="completedInspections">0</div>
+                        <div class="text-gray-500 text-sm">Completadas</div>
+                    </div>
+                </div>
+
+                <!-- Recent Inspections -->
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-gray-800">Inspecciones Recientes</h2>
+                        <a href="#" onclick="showSection('inspections')" class="text-brand-primary font-semibold hover:underline">Ver todas</a>
+                    </div>
+                    <div id="recentInspectionsList" class="divide-y divide-gray-100">
+                        <div class="p-8 text-center text-gray-500">
+                            <div class="loading-spinner mx-auto mb-4"></div>
+                            Cargando inspecciones...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Inspection Section -->
+            <div id="newInspectionSection" class="section hidden animate-fade-in">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">Crear Nueva Inspección</h1>
+                        <p class="text-gray-600 mt-1">Asigna una nueva inspección a un técnico</p>
+                    </div>
+                    <button onclick="showSection('dashboard')" class="text-gray-600 hover:text-gray-800 font-semibold">
+                        <i class="fas fa-arrow-left mr-2"></i>Volver
+                    </button>
+                </div>
+
+                <form id="inspectionForm" onsubmit="saveInspection(event)" class="space-y-6">
+                    <!-- Client Info -->
                     <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
                         <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                             <i class="fas fa-user text-brand-primary"></i>
-                            Información del Cliente (Pre-cargada)
+                            Información del Cliente
                         </h3>
                         <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre del Cliente</label>
-                                <input type="text" id="formClientName" readonly class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono</label>
-                                <input type="text" id="formClientPhone" readonly class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 outline-none">
-                            </div>
                             <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Dirección</label>
-                                <input type="text" id="formClientAddress" readonly class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 outline-none">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Cliente Existente</label>
+                                <select id="existingClient" onchange="fillClientData()" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
+                                    <option value="">Nuevo cliente...</option>
+                                </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha Programada</label>
-                                <input type="text" id="formScheduledDate" readonly class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 outline-none">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre del Cliente *</label>
+                                <input type="text" id="clientName" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Nombre completo">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">N° de Inspección</label>
-                                <input type="text" id="formInspectionNumber" readonly class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 outline-none font-mono font-bold text-brand-primary">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono *</label>
+                                <input type="tel" id="clientPhone" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="6000-0000">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico</label>
+                                <input type="email" id="clientEmail" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="cliente@email.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Dirección *</label>
+                                <input type="text" id="clientAddress" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Dirección completa de la instalación">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Technical Details Table (Similar to WhatsApp image) -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <i class="fas fa-tools text-brand-primary"></i>
-                            Detalles Técnicos de Instalación
-                        </h3>
-                        
-                        <div class="overflow-x-auto">
-                            <table class="w-full border-collapse border-2 border-blue-800">
-                                <thead>
-                                    <tr class="bg-blue-50">
-                                        <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">MODELO</th>
-                                        <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">INSTALACIÓN<br>BÁSICA</th>
-                                        <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">INSTALACIÓN<br>POR MANGA</th>
-                                        <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">INSTALACIÓN POR<br>RECORRIDO</th>
-                                        <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">PIES DE<br>TUBERÍA</th>
-                                        <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">CABLE DE<br>SEÑAL 4x14</th>
-                                        <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">CABLE DE<br>SEÑAL 5x14</th>
-                                        <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">CABLE DE<br>CORRIENTE 3x12</th>
-                                        <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">SOPORTE<br>CONDENSADORA</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="modelo" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_basica" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_manga" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_recorrido" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="pies_tuberia" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_4x14" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_5x14" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_3x12" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="soporte" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="modelo2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_basica2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_manga2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_recorrido2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="pies_tuberia2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_4x14_2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_5x14_2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_3x12_2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="soporte2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Additional Details (Yes/No checklist) -->
+                    <!-- Inspection Details -->
                     <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
                         <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                             <i class="fas fa-clipboard-check text-brand-primary"></i>
-                            Verificaciones Adicionales
-                        </h3>
-                        
-                        <div class="space-y-3">
-                            <div class="grid grid-cols-4 gap-4 items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="font-medium text-gray-700">Manga Obstruida</span>
-                                <label class="flex items-center gap-2"><input type="radio" name="manga_obstruida" value="SI" class="text-brand-primary"> SI</label>
-                                <label class="flex items-center gap-2"><input type="radio" name="manga_obstruida" value="NO" class="text-brand-primary"> NO</label>
-                                <label class="flex items-center gap-2"><input type="radio" name="manga_obstruida" value="N/A" class="text-brand-primary"> N/A</label>
-                            </div>
-                            
-                            <div class="grid grid-cols-4 gap-4 items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="font-medium text-gray-700">Pie de Tubería de Desagüe</span>
-                                <label class="flex items-center gap-2"><input type="radio" name="pie_desague" value="SI" class="text-brand-primary"> SI</label>
-                                <label class="flex items-center gap-2"><input type="radio" name="pie_desague" value="NO" class="text-brand-primary"> NO</label>
-                                <input type="text" name="pie_desague_detalle" placeholder="Detalle" class="px-3 py-1 border border-gray-300 rounded text-sm">
-                            </div>
-                            
-                            <div class="grid grid-cols-4 gap-4 items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="font-medium text-gray-700">Hueco en Pared (Está Hecho)</span>
-                                <label class="flex items-center gap-2"><input type="radio" name="hueco_pared" value="SI" class="text-brand-primary"> SI</label>
-                                <label class="flex items-center gap-2"><input type="radio" name="hueco_pared" value="NO" class="text-brand-primary"> NO</label>
-                                <span></span>
-                            </div>
-                            
-                            <div class="grid grid-cols-4 gap-4 items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="font-medium text-gray-700">Instalación Peligrosa</span>
-                                <label class="flex items-center gap-2"><input type="radio" name="inst_peligrosa" value="SI" class="text-brand-primary"> SI</label>
-                                <label class="flex items-center gap-2"><input type="radio" name="inst_peligrosa" value="NO" class="text-brand-primary"> NO</label>
-                                <span></span>
-                            </div>
-                            
-                            <div class="grid grid-cols-4 gap-4 items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="font-medium text-gray-700">Demontar A/A</span>
-                                <label class="flex items-center gap-2"><input type="radio" name="demontar" value="SI" class="text-brand-primary"> SI</label>
-                                <label class="flex items-center gap-2"><input type="radio" name="demontar" value="NO" class="text-brand-primary"> NO</label>
-                                <span></span>
-                            </div>
-                            
-                            <div class="grid grid-cols-4 gap-4 items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="font-medium text-gray-700">Repellar</span>
-                                <label class="flex items-center gap-2"><input type="radio" name="repellar" value="SI" class="text-brand-primary"> SI</label>
-                                <label class="flex items-center gap-2"><input type="radio" name="repellar" value="NO" class="text-brand-primary"> NO</label>
-                                <span></span>
-                            </div>
-                            
-                            <div class="grid grid-cols-4 gap-4 items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="font-medium text-gray-700">Tiene Corriente Adecuada</span>
-                                <label class="flex items-center gap-2"><input type="radio" name="corriente" value="SI" class="text-brand-primary"> SI</label>
-                                <label class="flex items-center gap-2"><input type="radio" name="corriente" value="NO" class="text-brand-primary"> NO</label>
-                                <span></span>
-                            </div>
-                            
-                            <div class="grid grid-cols-4 gap-4 items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="font-medium text-gray-700">Altura</span>
-                                <label class="flex items-center gap-2"><input type="radio" name="altura" value="SI" class="text-brand-primary"> SI</label>
-                                <label class="flex items-center gap-2"><input type="radio" name="altura" value="NO" class="text-brand-primary"> NO</label>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-sm text-gray-600">Distancia:</span>
-                                    <input type="text" name="distancia" class="w-20 px-2 py-1 border border-gray-300 rounded text-sm">
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-4 gap-4 items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="font-medium text-gray-700">Salida de Desagüe</span>
-                                <label class="flex items-center gap-2"><input type="radio" name="salida_desague" value="A NIVEL" class="text-brand-primary"> A NIVEL</label>
-                                <label class="flex items-center gap-2"><input type="radio" name="salida_desague" value="ARRIBA DEL AIRE" class="text-brand-primary"> ARRIBA DEL AIRE</label>
-                                <span></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Photos -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <i class="fas fa-camera text-brand-primary"></i>
-                            Evidencias Fotográficas
-                        </h3>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div>
-                                <input type="file" id="foto1" accept="image/*" capture="camera" class="photo-input" onchange="previewPhoto(this, 'preview1')">
-                                <label for="foto1" class="photo-upload-box">
-                                    <i class="fas fa-camera text-2xl mb-2"></i>
-                                    <span class="text-xs text-center">Área de Evaporadora</span>
-                                </label>
-                                <div id="preview1" class="mt-2 hidden">
-                                    <img class="photo-preview">
-                                </div>
-                            </div>
-                            <div>
-                                <input type="file" id="foto2" accept="image/*" capture="camera" class="photo-input" onchange="previewPhoto(this, 'preview2')">
-                                <label for="foto2" class="photo-upload-box">
-                                    <i class="fas fa-camera text-2xl mb-2"></i>
-                                    <span class="text-xs text-center">Área de Condensadora</span>
-                                </label>
-                                <div id="preview2" class="mt-2 hidden">
-                                    <img class="photo-preview">
-                                </div>
-                            </div>
-                            <div>
-                                <input type="file" id="foto3" accept="image/*" capture="camera" class="photo-input" onchange="previewPhoto(this, 'preview3')">
-                                <label for="foto3" class="photo-upload-box">
-                                    <i class="fas fa-camera text-2xl mb-2"></i>
-                                    <span class="text-xs text-center">Punto de Drenaje</span>
-                                </label>
-                                <div id="preview3" class="mt-2 hidden">
-                                    <img class="photo-preview">
-                                </div>
-                            </div>
-                            <div>
-                                <input type="file" id="foto4" accept="image/*" capture="camera" class="photo-input" onchange="previewPhoto(this, 'preview4')">
-                                <label for="foto4" class="photo-upload-box">
-                                    <i class="fas fa-camera text-2xl mb-2"></i>
-                                    <span class="text-xs text-center">Otras Observaciones</span>
-                                </label>
-                                <div id="preview4" class="mt-2 hidden">
-                                    <img class="photo-preview">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Additional Observations -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <i class="fas fa-comment-alt text-brand-primary"></i>
-                            Otras Observaciones
-                        </h3>
-                        <textarea id="otrasObservaciones" rows="4" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Escribe aquí detalles adicionales relevantes..."></textarea>
-                    </div>
-
-                    <!-- Signature -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <i class="fas fa-signature text-brand-primary"></i>
-                            Firma del Cliente
-                        </h3>
-                        <canvas id="signaturePad" class="signature-pad w-full h-48 rounded-xl"></canvas>
-                        <div class="flex gap-2 mt-4">
-                            <button type="button" onclick="clearSignature()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 font-semibold transition">
-                                <i class="fas fa-eraser mr-2"></i>Limpiar
-                            </button>
-                            <span class="text-gray-500 text-sm self-center">Solicite al cliente que firme en el área de arriba</span>
-                        </div>
-                    </div>
-
-                    <!-- Final Info -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <i class="fas fa-user-check text-brand-primary"></i>
-                            Finalización
+                            Detalles de la Inspección
                         </h3>
                         <div class="grid md:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Técnico</label>
-                                <input type="text" id="technicianName" readonly class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 outline-none">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">N° de Inspección</label>
+                                <input type="text" id="inspectionNumber" readonly class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 outline-none" placeholder="Se genera automáticamente">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha de Realización *</label>
-                                <input type="date" id="completionDate" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha Programada *</label>
+                                <input type="date" id="scheduledDate" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Hora de Finalización *</label>
-                                <input type="time" id="completionTime" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Hora Programada</label>
+                                <input type="time" id="scheduledTime" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipment Info -->
+                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-tools text-brand-primary"></i>
+                            Información del Equipo
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Equipo *</label>
+                                <select id="equipmentType" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="split">Aire Acondicionado Split</option>
+                                    <option value="ventana">Aire Acondicionado Ventana</option>
+                                    <option value="central">Aire Acondicionado Central</option>
+                                    <option value="multi_split">Multi Split</option>
+                                    <option value="cassette">Cassette</option>
+                                    <option value="linea_blanca">Línea Blanca</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Marca (si se conoce)</label>
+                                <input type="text" id="equipmentBrand" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="LG, Samsung, Carrier...">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Modelo (si se conoce)</label>
+                                <input type="text" id="equipmentModel" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Modelo del equipo">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">BTU/Capacidad</label>
+                                <input type="text" id="equipmentCapacity" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Ej: 12000 BTU">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assignment -->
+                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-user-hard-hat text-brand-primary"></i>
+                            Asignación
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Asignar a Técnico *</label>
+                                <select id="assignedTechnician" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
+                                    <option value="">Seleccionar técnico...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Prioridad</label>
+                                <select id="priority" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
+                                    <option value="normal">Normal</option>
+                                    <option value="alta">Alta</option>
+                                    <option value="urgente">Urgente</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Notas para el Técnico</label>
+                            <textarea id="technicianNotes" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Instrucciones especiales, ubicación específica, etc."></textarea>
                         </div>
                     </div>
 
                     <!-- Actions -->
                     <div class="flex flex-col md:flex-row gap-4">
-                        <button type="submit" id="submitBtn" class="flex-1 bg-brand-primary hover:bg-brand-secondary text-white py-4 rounded-xl font-bold text-lg shadow-lg transition flex items-center justify-center gap-2">
-                            <i class="fas fa-check-circle"></i>
-                            Completar Inspección y Enviar
-                        </button>
-                        <button type="button" onclick="backToList()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-4 rounded-xl font-bold text-lg transition">
-                            <i class="fas fa-times mr-2"></i>Cancelar
+                        <button type="submit" id="saveInspectionBtn" class="flex-1 bg-brand-primary hover:bg-brand-secondary text-white py-4 rounded-xl font-bold text-lg shadow-lg transition flex items-center justify-center gap-2">
+                            <i class="fas fa-save"></i>
+                            Crear y Asignar Inspección
                         </button>
                     </div>
                 </form>
             </div>
 
+            <!-- Inspections List Section -->
+            <div id="inspectionsSection" class="section hidden animate-fade-in">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">Gestión de Inspecciones</h1>
+                        <p class="text-gray-600 mt-1">Todas las inspecciones del sistema</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="filterStatus" onchange="filterInspections()" class="px-4 py-2 rounded-xl border border-gray-300 focus:border-brand-primary outline-none">
+                            <option value="">Todos los estados</option>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="asignada">Asignada</option>
+                            <option value="completada">Completada</option>
+                        </select>
+                        <button onclick="showSection('newInspection')" class="bg-brand-primary hover:bg-brand-secondary text-white px-6 py-2 rounded-xl font-semibold shadow-lg transition">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">N° Inspección</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Fecha</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Cliente</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Técnico</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Estado</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inspectionsTableBody" class="divide-y divide-gray-100">
+                                <tr><td colspan="6" class="p-8 text-center text-gray-500">Cargando inspecciones...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technicians Section -->
+            <div id="techniciansSection" class="section hidden animate-fade-in">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">Gestión de Técnicos</h1>
+                        <p class="text-gray-600 mt-1">Administrar técnicos del sistema</p>
+                    </div>
+                    <button onclick="showSection('dashboard')" class="text-gray-600 hover:text-gray-800 font-semibold">
+                        <i class="fas fa-arrow-left mr-2"></i>Volver
+                    </button>
+                </div>
+                <div id="techniciansList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Technicians loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Clients Section -->
+            <div id="clientsSection" class="section hidden animate-fade-in">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">Clientes</h1>
+                        <p class="text-gray-600 mt-1">Gestión de clientes registrados</p>
+                    </div>
+                    <button onclick="showSection('dashboard')" class="text-gray-600 hover:text-gray-800 font-semibold">
+                        <i class="fas fa-arrow-left mr-2"></i>Volver
+                    </button>
+                </div>
+                <div id="clientsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Clients loaded dynamically -->
+                </div>
+            </div>
+
         </main>
     </div>
 
-    <!-- Report Preview Modal -->
-    <div id="previewModal" class="fixed inset-0 z-50 bg-black/50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <!-- Inspection Detail Modal -->
+    <div id="inspectionModal" class="fixed inset-0 z-50 bg-black/50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-gray-800">Inspección Completada</h2>
-                <button onclick="closePreview()" class="text-gray-500 hover:text-gray-700 text-2xl">
+                <h2 class="text-2xl font-bold text-gray-800">Detalle de Inspección</h2>
+                <button onclick="closeInspectionModal()" class="text-gray-500 hover:text-gray-700 text-2xl">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="p-6">
-                <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-check-circle text-green-600 text-2xl"></i>
-                        <div>
-                            <h3 class="font-bold text-green-800">¡Inspección completada exitosamente!</h3>
-                            <p class="text-green-700 text-sm">El reporte ha sido enviado a administracion@bajozero.net</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="reportPreviewContent" class="bg-gray-50 p-6 rounded-xl border border-gray-200">
-                    <!-- Preview content -->
-                </div>
-            </div>
-            <div class="sticky bottom-0 bg-white border-t border-gray-200 p-6 flex gap-4">
-                <button onclick="downloadPDF()" class="flex-1 bg-brand-primary hover:bg-brand-secondary text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
-                    <i class="fas fa-download"></i>
-                    Descargar PDF
-                </button>
-                <button onclick="closePreview(); backToList();" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-xl font-bold transition">
-                    Cerrar
-                </button>
+            <div id="inspectionDetailContent" class="p-6">
+                <!-- Content loaded dynamically -->
             </div>
         </div>
     </div>
 
     <script>
         // ==================== CONFIGURACIÓN SUPABASE ====================
+        // REEMPLAZA CON TUS CREDENCIALES REALES
         const SUPABASE_URL = 'https://nuuehnixxoudctlzlwmi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51dWVobml4eG91ZGN0bHpsd21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDM3NzYsImV4cCI6MjA4OTA3OTc3Nn0.DNc5wONm5QveZVTuz8zYtQMV6EzO2OsYU_ukDVsOB88';
         
@@ -624,9 +547,7 @@
         
         // Variables globales
         let currentUser = null;
-        let currentTechnician = null;
         let currentInspection = null;
-        let uploadedPhotos = [];
         
         // ==================== AUTENTICACIÓN ====================
         
@@ -649,30 +570,28 @@
                 
                 if (error) throw error;
                 
-                // Verificar si es técnico
-                const { data: techData, error: techError } = await supabaseClient
-                    .from('technicians')
+                // Verificar si es admin
+                const { data: adminData, error: adminError } = await supabaseClient
+                    .from('admins')
                     .select('*')
                     .eq('auth_user_id', data.user.id)
-                    .eq('is_active', true)
                     .maybeSingle();
                 
-                if (techError && techError.code !== 'PGRST116') {
-                    console.error("Error verificando técnico:", techError);
+                if (adminError && adminError.code !== 'PGRST116') {
+                    console.error("Error verificando admin:", adminError);
                 }
                 
-                if (!techData) {
-                    throw new Error('Usuario no es técnico activo');
+                if (!adminData) {
+                    throw new Error('Usuario no tiene permisos de administrador');
                 }
                 
                 currentUser = data.user;
-                currentTechnician = techData;
                 showDashboard();
                 
             } catch (error) {
                 console.error('Error de login:', error);
                 errorDiv.classList.remove('hidden');
-                btn.innerHTML = '<span>Acceder al Panel</span>';
+                btn.innerHTML = '<span>Acceder al Panel Admin</span>';
                 btn.disabled = false;
             }
         }
@@ -694,18 +613,12 @@
         function showDashboard() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('dashboardScreen').classList.remove('hidden');
-            document.getElementById('userName').textContent = currentTechnician.full_name;
             document.getElementById('userEmail').textContent = currentUser.email;
-            document.getElementById('technicianName').value = currentTechnician.full_name;
             
-            loadAssignedInspections();
-            loadCompletedInspections();
-            initializeSignaturePad();
-            
-            // Set current date/time defaults
-            document.getElementById('completionDate').valueAsDate = new Date();
-            const now = new Date();
-            document.getElementById('completionTime').value = now.toTimeString().slice(0,5);
+            loadDashboardData();
+            loadClients();
+            loadTechnicians();
+            generateInspectionNumber();
         }
         
         async function logout() {
@@ -722,68 +635,331 @@
             
             document.getElementById(sectionName + 'Section').classList.remove('hidden');
             
-            if (sectionName === 'dashboard') loadAssignedInspections();
-            if (sectionName === 'completed') loadCompletedInspections();
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (sectionName === 'dashboard') loadDashboardData();
+            if (sectionName === 'inspections') loadAllInspections();
+            if (sectionName === 'technicians') loadTechniciansList();
+            if (sectionName === 'clients') loadClientsList();
         }
         
         function toggleMobileMenu() {
             document.getElementById('mobileMenu').classList.toggle('open');
         }
         
-        function backToList() {
-            showSection('dashboard');
-        }
+        // ==================== DASHBOARD ====================
         
-        // ==================== CARGAR INSPECCIONES ====================
-        
-        async function loadAssignedInspections() {
+        async function loadDashboardData() {
             try {
                 const { data: inspections, error } = await supabaseClient
                     .from('inspections')
-                    .select('*, clients(contact_name, phone, address)')
-                    .eq('assigned_technician_id', currentTechnician.id)
-                    .eq('status', 'asignada')
-                    .order('scheduled_date', { ascending: true });
+                    .select('*, clients(contact_name), inspectors(full_name)')
+                    .order('created_at', { ascending: false });
                     
                 if (error) throw error;
                 
-                const container = document.getElementById('assignedInspectionsList');
+                const pendiente = inspections.filter(i => i.status === 'pendiente').length;
+                const asignada = inspections.filter(i => i.status === 'asignada').length;
+                const completada = inspections.filter(i => i.status === 'completada').length;
                 
-                if (!inspections || inspections.length === 0) {
-                    container.innerHTML = `
-                        <div class="col-span-full text-center py-12 text-gray-500">
-                            <i class="fas fa-clipboard-list text-6xl mb-4 text-gray-300"></i>
-                            <p>No tienes inspecciones asignadas pendientes</p>
-                        </div>
-                    `;
-                    return;
+                document.getElementById('totalInspections').textContent = inspections.length;
+                document.getElementById('pendingInspections').textContent = pendiente;
+                document.getElementById('assignedInspections').textContent = asignada;
+                document.getElementById('completedInspections').textContent = completada;
+                
+                // Load recent inspections
+                const recentList = document.getElementById('recentInspectionsList');
+                recentList.innerHTML = '';
+                
+                if (inspections && inspections.length > 0) {
+                    inspections.slice(0, 5).forEach(inspection => {
+                        const statusClass = inspection.status === 'pendiente' ? 'status-pendiente' : 
+                                          inspection.status === 'asignada' ? 'status-asignada' : 'status-completada';
+                        
+                        recentList.innerHTML += `
+                            <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer" onclick="viewInspectionDetail('${inspection.id}')">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-brand-primary">
+                                        <i class="fas fa-clipboard-check"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-gray-800">${inspection.inspection_number}</div>
+                                        <div class="text-sm text-gray-500">${inspection.clients?.contact_name || 'Cliente'} • ${formatDate(inspection.scheduled_date)}</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <span class="status-badge ${statusClass}">${inspection.status}</span>
+                                    <span class="text-sm text-gray-600">${inspection.inspectors?.full_name || 'Sin asignar'}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    recentList.innerHTML = '<div class="p-8 text-center text-gray-500">No hay inspecciones recientes</div>';
                 }
                 
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+        
+        // ==================== CLIENTES ====================
+        
+        async function loadClients() {
+            try {
+                const { data: clients, error } = await supabaseClient
+                    .from('clients')
+                    .select('*')
+                    .order('contact_name');
+                    
+                if (error) throw error;
+                
+                const select = document.getElementById('existingClient');
+                select.innerHTML = '<option value="">Nuevo cliente...</option>';
+                
+                clients.forEach(client => {
+                    select.innerHTML += `<option value="${client.id}" data-name="${client.contact_name}" data-phone="${client.phone}" data-email="${client.email || ''}" data-address="${client.address || ''}">${client.contact_name} - ${client.phone}</option>`;
+                });
+                
+            } catch (error) {
+                console.error('Error loading clients:', error);
+            }
+        }
+        
+        function fillClientData() {
+            const select = document.getElementById('existingClient');
+            const option = select.options[select.selectedIndex];
+            
+            if (option.value) {
+                document.getElementById('clientName').value = option.dataset.name;
+                document.getElementById('clientPhone').value = option.dataset.phone;
+                document.getElementById('clientEmail').value = option.dataset.email;
+                document.getElementById('clientAddress').value = option.dataset.address;
+            } else {
+                document.getElementById('clientName').value = '';
+                document.getElementById('clientPhone').value = '';
+                document.getElementById('clientEmail').value = '';
+                document.getElementById('clientAddress').value = '';
+            }
+        }
+        
+        async function loadClientsList() {
+            try {
+                const { data: clients, error } = await supabaseClient
+                    .from('clients')
+                    .select('*')
+                    .order('contact_name');
+                    
+                if (error) throw error;
+                
+                const container = document.getElementById('clientsList');
                 container.innerHTML = '';
-                inspections.forEach(inspection => {
+                
+                clients.forEach(client => {
                     container.innerHTML += `
-                        <div class="inspection-card bg-white rounded-2xl p-6 shadow-lg border border-gray-100" onclick="openInspectionForm('${inspection.id}')">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <span class="text-xs font-bold text-brand-primary bg-blue-50 px-3 py-1 rounded-full">${inspection.inspection_number}</span>
-                                    <h3 class="font-bold text-gray-800 mt-2 text-lg">${inspection.clients?.contact_name}</h3>
+                        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center text-white text-xl">
+                                    <i class="fas fa-user"></i>
                                 </div>
-                                <span class="status-badge status-asignada">ASIGNADA</span>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">${client.contact_name}</h3>
+                                    <p class="text-sm text-gray-500">${client.phone}</p>
+                                </div>
                             </div>
-                            
-                            <div class="space-y-2 text-sm text-gray-600">
-                                <p><i class="fas fa-phone mr-2 text-brand-primary"></i>${inspection.clients?.phone}</p>
-                                <p><i class="fas fa-map-marker-alt mr-2 text-brand-primary"></i>${inspection.clients?.address}</p>
-                                <p><i class="fas fa-calendar mr-2 text-brand-primary"></i>${formatDate(inspection.scheduled_date)}</p>
-                                <p><i class="fas fa-tools mr-2 text-brand-primary"></i>${inspection.equipment_type}</p>
+                            ${client.email ? `<p class="text-sm text-gray-600 mb-2"><i class="fas fa-envelope mr-2 text-brand-primary"></i>${client.email}</p>` : ''}
+                            ${client.address ? `<p class="text-sm text-gray-600"><i class="fas fa-map-marker-alt mr-2 text-brand-primary"></i>${client.address}</p>` : ''}
+                        </div>
+                    `;
+                });
+                
+            } catch (error) {
+                console.error('Error loading clients list:', error);
+            }
+        }
+        
+        // ==================== TÉCNICOS ====================
+        
+        async function loadTechnicians() {
+            try {
+                const { data: technicians, error } = await supabaseClient
+                    .from('inspectors')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('full_name');
+                    
+                if (error) throw error;
+                
+                const select = document.getElementById('assignedTechnician');
+                select.innerHTML = '<option value="">Seleccionar técnico...</option>';
+                
+                technicians.forEach(tech => {
+                    select.innerHTML += `<option value="${tech.id}">${tech.full_name} - ${tech.specialty || 'Técnico'}</option>`;
+                });
+                
+            } catch (error) {
+                console.error('Error loading technicians:', error);
+            }
+        }
+        
+        async function loadTechniciansList() {
+            try {
+                const { data: technicians, error } = await supabaseClient
+                    .from('inspectors')
+                    .select('*')
+                    .order('full_name');
+                    
+                if (error) throw error;
+                
+                const container = document.getElementById('techniciansList');
+                container.innerHTML = '';
+                
+                technicians.forEach(tech => {
+                    container.innerHTML += `
+                        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center text-white text-xl">
+                                    <i class="fas fa-user-hard-hat"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">${tech.full_name}</h3>
+                                    <p class="text-sm text-gray-500">${tech.specialty || 'Técnico General'}</p>
+                                </div>
                             </div>
-                            
+                            <div class="flex gap-2 text-sm text-gray-600">
+                                <span class="px-3 py-1 bg-gray-100 rounded-full">${tech.is_active ? 'Activo' : 'Inactivo'}</span>
+                            </div>
                             <div class="mt-4 pt-4 border-t border-gray-100">
-                                <button class="w-full bg-brand-primary hover:bg-brand-secondary text-white py-2 rounded-lg font-semibold transition">
-                                    <i class="fas fa-play mr-2"></i>Iniciar Inspección
-                                </button>
+                                <p class="text-sm text-gray-600"><i class="fas fa-phone mr-2 text-brand-primary"></i>${tech.phone || 'N/A'}</p>
+                                <p class="text-sm text-gray-600 mt-1"><i class="fas fa-envelope mr-2 text-brand-primary"></i>${tech.email || 'N/A'}</p>
                             </div>
                         </div>
+                    `;
+                });
+                
+            } catch (error) {
+                console.error('Error loading technicians list:', error);
+            }
+        }
+        
+        // ==================== INSPECCIONES ====================
+        
+        async function generateInspectionNumber() {
+            try {
+                const year = new Date().getFullYear();
+                const { data, error } = await supabaseClient
+                    .rpc('generate_inspection_number', { year: year });
+                
+                if (error) throw error;
+                document.getElementById('inspectionNumber').value = data;
+            } catch (error) {
+                console.error('Error generating inspection number:', error);
+                // Fallback manual
+                const timestamp = Date.now().toString(36).toUpperCase();
+                document.getElementById('inspectionNumber').value = `BZ-${new Date().getFullYear()}-${timestamp}`;
+            }
+        }
+        
+        async function saveInspection(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveInspectionBtn');
+            btn.innerHTML = '<div class="loading-spinner"></div> Guardando...';
+            btn.disabled = true;
+            
+            try {
+                // 1. Save or get client
+                let clientId = document.getElementById('existingClient').value;
+                
+                if (!clientId) {
+                    const { data: newClient, error: clientError } = await supabaseClient
+                        .from('clients')
+                        .insert({
+                            contact_name: document.getElementById('clientName').value,
+                            phone: document.getElementById('clientPhone').value,
+                            email: document.getElementById('clientEmail').value,
+                            address: document.getElementById('clientAddress').value
+                        })
+                        .select()
+                        .single();
+                        
+                    if (clientError) throw clientError;
+                    clientId = newClient.id;
+                }
+                
+                // 2. Save inspection
+                const inspectionData = {
+                    inspection_number: document.getElementById('inspectionNumber').value,
+                    client_id: clientId,
+                    scheduled_date: document.getElementById('scheduledDate').value,
+                    scheduled_time: document.getElementById('scheduledTime').value,
+                    equipment_type: document.getElementById('equipmentType').value,
+                    equipment_brand: document.getElementById('equipmentBrand').value,
+                    equipment_model: document.getElementById('equipmentModel').value,
+                    equipment_capacity: document.getElementById('equipmentCapacity').value,
+                    assigned_technician_id: document.getElementById('assignedTechnician').value,
+                    priority: document.getElementById('priority').value,
+                    technician_notes: document.getElementById('technicianNotes').value,
+                    status: 'asignada',
+                    created_by: currentUser.id
+                };
+                
+                const { data: savedInspection, error: inspectionError } = await supabaseClient
+                    .from('inspections')
+                    .insert(inspectionData)
+                    .select()
+                    .single();
+                    
+                if (inspectionError) throw inspectionError;
+                
+                alert('Inspección creada y asignada exitosamente');
+                
+                // Reset form and generate new number
+                document.getElementById('inspectionForm').reset();
+                generateInspectionNumber();
+                showSection('inspections');
+                
+            } catch (error) {
+                console.error('Error saving inspection:', error);
+                alert('Error al guardar: ' + error.message);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-save"></i> Crear y Asignar Inspección';
+                btn.disabled = false;
+            }
+        }
+        
+        async function loadAllInspections() {
+            try {
+                const { data: inspections, error } = await supabaseClient
+                    .from('inspections')
+                    .select('*, clients(contact_name, phone, address), inspectors(full_name)')
+                    .order('scheduled_date', { ascending: false });
+                    
+                if (error) throw error;
+                
+                const tbody = document.getElementById('inspectionsTableBody');
+                tbody.innerHTML = '';
+                
+                inspections.forEach(inspection => {
+                    const statusClass = inspection.status === 'pendiente' ? 'status-pendiente' : 
+                                      inspection.status === 'asignada' ? 'status-asignada' : 'status-completada';
+                    
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 font-semibold text-brand-primary">${inspection.inspection_number}</td>
+                            <td class="px-6 py-4 text-gray-600">${formatDate(inspection.scheduled_date)}</td>
+                            <td class="px-6 py-4 font-medium">${inspection.clients?.contact_name || 'N/A'}</td>
+                            <td class="px-6 py-4">${inspection.inspectors?.full_name || 'Sin asignar'}</td>
+                            <td class="px-6 py-4">
+                                <span class="status-badge ${statusClass}">${inspection.status}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <button onclick="viewInspectionDetail('${inspection.id}')" class="text-brand-primary hover:text-brand-secondary" title="Ver detalle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
                     `;
                 });
                 
@@ -792,57 +968,11 @@
             }
         }
         
-        async function loadCompletedInspections() {
-            try {
-                const { data: inspections, error } = await supabaseClient
-                    .from('inspections')
-                    .select('*, clients(contact_name)')
-                    .eq('assigned_technician_id', currentTechnician.id)
-                    .eq('status', 'completada')
-                    .order('completed_at', { ascending: false });
-                    
-                if (error) throw error;
-                
-                const container = document.getElementById('completedInspectionsList');
-                
-                if (!inspections || inspections.length === 0) {
-                    container.innerHTML = `
-                        <div class="col-span-full text-center py-12 text-gray-500">
-                            <i class="fas fa-clipboard-check text-6xl mb-4 text-gray-300"></i>
-                            <p>No hay inspecciones completadas aún</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                container.innerHTML = '';
-                inspections.forEach(inspection => {
-                    container.innerHTML += `
-                        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <span class="text-xs font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full">${inspection.inspection_number}</span>
-                                    <h3 class="font-bold text-gray-800 mt-2 text-lg">${inspection.clients?.contact_name}</h3>
-                                </div>
-                                <span class="status-badge status-completada">COMPLETADA</span>
-                            </div>
-                            <p class="text-sm text-gray-600"><i class="fas fa-calendar-check mr-2 text-green-600"></i>${formatDate(inspection.completed_at)}</p>
-                        </div>
-                    `;
-                });
-                
-            } catch (error) {
-                console.error('Error loading completed inspections:', error);
-            }
-        }
-        
-        // ==================== FORMULARIO DE INSPECCIÓN ====================
-        
-        async function openInspectionForm(inspectionId) {
+        async function viewInspectionDetail(inspectionId) {
             try {
                 const { data: inspection, error } = await supabaseClient
                     .from('inspections')
-                    .select('*, clients(*)')
+                    .select('*, clients(*), inspectors(*)')
                     .eq('id', inspectionId)
                     .single();
                     
@@ -850,358 +980,66 @@
                 
                 currentInspection = inspection;
                 
-                // Fill pre-loaded data
-                document.getElementById('currentInspectionId').value = inspection.id;
-                document.getElementById('formClientName').value = inspection.clients?.contact_name;
-                document.getElementById('formClientPhone').value = inspection.clients?.phone;
-                document.getElementById('formClientAddress').value = inspection.clients?.address;
-                document.getElementById('formScheduledDate').value = formatDate(inspection.scheduled_date) + (inspection.scheduled_time ? ' a las ' + inspection.scheduled_time : '');
-                document.getElementById('formInspectionNumber').value = inspection.inspection_number;
+                const content = document.getElementById('inspectionDetailContent');
+                content.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm text-gray-500">N° Inspección</label>
+                                <p class="font-semibold text-lg">${inspection.inspection_number}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-500">Estado</label>
+                                <p class="font-semibold"><span class="status-badge ${inspection.status === 'pendiente' ? 'status-pendiente' : inspection.status === 'asignada' ? 'status-asignada' : 'status-completada'}">${inspection.status}</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t pt-4">
+                            <h4 class="font-semibold mb-2">Cliente</h4>
+                            <p><strong>${inspection.clients?.contact_name}</strong></p>
+                            <p class="text-gray-600">${inspection.clients?.phone}</p>
+                            <p class="text-gray-600">${inspection.clients?.address}</p>
+                        </div>
+                        
+                        <div class="border-t pt-4">
+                            <h4 class="font-semibold mb-2">Detalles</h4>
+                            <p><strong>Fecha:</strong> ${formatDate(inspection.scheduled_date)} ${inspection.scheduled_time ? 'a las ' + inspection.scheduled_time : ''}</p>
+                            <p><strong>Equipo:</strong> ${inspection.equipment_type} ${inspection.equipment_brand ? '- ' + inspection.equipment_brand : ''}</p>
+                            <p><strong>Técnico Asignado:</strong> ${inspection.inspectors?.full_name || 'Sin asignar'}</p>
+                        </div>
+                        
+                        ${inspection.technician_notes ? `
+                        <div class="border-t pt-4">
+                            <h4 class="font-semibold mb-2">Notas para el Técnico</h4>
+                            <p class="text-gray-600 bg-gray-50 p-3 rounded-lg">${inspection.technician_notes}</p>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
                 
-                // Show form section
-                document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-                document.getElementById('inspectionFormSection').classList.remove('hidden');
-                
-                // Scroll to top
-                window.scrollTo(0, 0);
+                document.getElementById('inspectionModal').classList.remove('hidden');
+                document.getElementById('inspectionModal').classList.add('flex');
                 
             } catch (error) {
-                console.error('Error loading inspection:', error);
-                alert('Error al cargar la inspección');
+                console.error('Error loading inspection detail:', error);
             }
         }
         
-        // ==================== MANEJO DE FOTOS ====================
-        
-        function previewPhoto(input, previewId) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById(previewId);
-                    preview.querySelector('img').src = e.target.result;
-                    preview.classList.remove('hidden');
-                    uploadedPhotos.push({
-                        name: input.files[0].name,
-                        data: e.target.result
-                    });
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
+        function closeInspectionModal() {
+            document.getElementById('inspectionModal').classList.add('hidden');
+            document.getElementById('inspectionModal').classList.remove('flex');
         }
         
-        // ==================== FIRMA ====================
-        
-        function initializeSignaturePad() {
-            const canvas = document.getElementById('signaturePad');
-            if (!canvas) return;
+        function filterInspections() {
+            const status = document.getElementById('filterStatus').value;
+            const rows = document.querySelectorAll('#inspectionsTableBody tr');
             
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-            
-            let isDrawing = false;
-            let lastX = 0;
-            let lastY = 0;
-            
-            function getPos(e) {
-                const rect = canvas.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                return {
-                    x: clientX - rect.left,
-                    y: clientY - rect.top
-                };
-            }
-            
-            function startDrawing(e) {
-                isDrawing = true;
-                const pos = getPos(e);
-                lastX = pos.x;
-                lastY = pos.y;
-                e.preventDefault();
-            }
-            
-            function draw(e) {
-                if (!isDrawing) return;
-                const pos = getPos(e);
-                ctx.beginPath();
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(pos.x, pos.y);
-                ctx.stroke();
-                lastX = pos.x;
-                lastY = pos.y;
-                e.preventDefault();
-            }
-            
-            function stopDrawing() {
-                isDrawing = false;
-            }
-            
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseout', stopDrawing);
-            
-            canvas.addEventListener('touchstart', startDrawing);
-            canvas.addEventListener('touchmove', draw);
-            canvas.addEventListener('touchend', stopDrawing);
-        }
-        
-        function clearSignature() {
-            const canvas = document.getElementById('signaturePad');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-        
-        function isSignatureEmpty() {
-            const canvas = document.getElementById('signaturePad');
-            const ctx = canvas.getContext('2d');
-            const pixelBuffer = new Uint32Array(
-                ctx.getImageData(0, 0, canvas.width, canvas.height).data.buffer
-            );
-            return !pixelBuffer.some(color => color !== 0);
-        }
-        
-        function getSignatureData() {
-            const canvas = document.getElementById('signaturePad');
-            return canvas.toDataURL('image/png');
-        }
-        
-        // ==================== ENVIAR INSPECCIÓN ====================
-        
-        async function submitInspection(e) {
-            e.preventDefault();
-            
-            if (isSignatureEmpty()) {
-                alert('Por favor, solicite la firma del cliente antes de enviar.');
-                return;
-            }
-            
-            const btn = document.getElementById('submitBtn');
-            btn.innerHTML = '<div class="loading-spinner"></div> Enviando...';
-            btn.disabled = true;
-            
-            try {
-                // 1. Recopilar datos del formulario técnico
-                const formData = {
-                    modelo: document.querySelector('input[name="modelo"]').value,
-                    inst_basica: document.querySelector('input[name="inst_basica"]').value,
-                    inst_manga: document.querySelector('input[name="inst_manga"]').value,
-                    inst_recorrido: document.querySelector('input[name="inst_recorrido"]').value,
-                    pies_tuberia: document.querySelector('input[name="pies_tuberia"]').value,
-                    cable_4x14: document.querySelector('input[name="cable_4x14"]').value,
-                    cable_5x14: document.querySelector('input[name="cable_5x14"]').value,
-                    cable_3x12: document.querySelector('input[name="cable_3x12"]').value,
-                    soporte: document.querySelector('input[name="soporte"]').value,
-                    
-                    // Checklist
-                    manga_obstruida: document.querySelector('input[name="manga_obstruida"]:checked')?.value || '',
-                    pie_desague: document.querySelector('input[name="pie_desague"]:checked')?.value || '',
-                    pie_desague_detalle: document.querySelector('input[name="pie_desague_detalle"]').value,
-                    hueco_pared: document.querySelector('input[name="hueco_pared"]:checked')?.value || '',
-                    inst_peligrosa: document.querySelector('input[name="inst_peligrosa"]:checked')?.value || '',
-                    demontar: document.querySelector('input[name="demontar"]:checked')?.value || '',
-                    repellar: document.querySelector('input[name="repellar"]:checked')?.value || '',
-                    corriente: document.querySelector('input[name="corriente"]:checked')?.value || '',
-                    altura: document.querySelector('input[name="altura"]:checked')?.value || '',
-                    distancia: document.querySelector('input[name="distancia"]').value,
-                    salida_desague: document.querySelector('input[name="salida_desague"]:checked')?.value || '',
-                    
-                    observaciones: document.getElementById('otrasObservaciones').value,
-                    firma_cliente: getSignatureData(),
-                    fotos: uploadedPhotos,
-                    
-                    fecha_completado: document.getElementById('completionDate').value,
-                    hora_completado: document.getElementById('completionTime').value
-                };
-                
-                // 2. Actualizar inspección en Supabase
-                const { error: updateError } = await supabaseClient
-                    .from('inspections')
-                    .update({
-                        status: 'completada',
-                        completed_at: new Date().toISOString(),
-                        technical_data: formData,
-                        completion_date: formData.fecha_completado,
-                        completion_time: formData.hora_completado
-                    })
-                    .eq('id', currentInspection.id);
-                    
-                if (updateError) throw updateError;
-                
-                // 3. Generar PDF
-                const pdfBlob = await generatePDF(formData);
-                
-                // 4. Enviar email usando Supabase Edge Function
-                await sendEmailWithPDF(pdfBlob, formData);
-                
-                // 5. Mostrar preview de éxito
-                showSuccessPreview(formData);
-                
-            } catch (error) {
-                console.error('Error submitting inspection:', error);
-                alert('Error al enviar: ' + error.message);
-                btn.innerHTML = '<i class="fas fa-check-circle"></i> Completar Inspección y Enviar';
-                btn.disabled = false;
-            }
-        }
-        
-        async function generatePDF(formData) {
-            const element = document.createElement('div');
-            element.innerHTML = generateReportHTML(formData);
-            document.body.appendChild(element);
-            
-            const opt = {
-                margin: 10,
-                filename: `Inspeccion_${currentInspection.inspection_number}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            
-            const pdf = await html2pdf().set(opt).from(element).output('blob');
-            document.body.removeChild(element);
-            return pdf;
-        }
-        
-        function generateReportHTML(formData) {
-            return `
-                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-                    <div style="text-align: center; border-bottom: 3px solid #0066b2; padding-bottom: 20px; margin-bottom: 30px;">
-                        <h1 style="color: #0066b2; margin: 0; font-size: 28px; font-weight: bold;">BAJO ZERO</h1>
-                        <p style="color: #666; margin: 5px 0;">INSPECCIÓN PARA INSTALACIÓN DE AIRE ACONDICIONADO</p>
-                        <p style="font-size: 12px; color: #999;">${currentInspection.inspection_number}</p>
-                    </div>
-                    
-                    <div style="margin-bottom: 20px;">
-                        <h3 style="color: #0066b2; border-bottom: 1px solid #ddd; padding-bottom: 5px;">DATOS DEL CLIENTE</h3>
-                        <p><strong>Cliente:</strong> ${currentInspection.clients.contact_name}</p>
-                        <p><strong>Dirección:</strong> ${currentInspection.clients.address}</p>
-                        <p><strong>Teléfono:</strong> ${currentInspection.clients.phone}</p>
-                        <p><strong>Fecha:</strong> ${formData.fecha_completado} ${formData.hora_completado}</p>
-                    </div>
-                    
-                    <div style="margin-bottom: 20px;">
-                        <h3 style="color: #0066b2; border-bottom: 1px solid #ddd; padding-bottom: 5px;">DETALLES TÉCNICOS</h3>
-                        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                            <tr style="background: #f0f0f0;">
-                                <th style="border: 1px solid #999; padding: 8px;">Modelo</th>
-                                <th style="border: 1px solid #999; padding: 8px;">Inst. Básica</th>
-                                <th style="border: 1px solid #999; padding: 8px;">Inst. Manga</th>
-                                <th style="border: 1px solid #999; padding: 8px;">Recorrido</th>
-                                <th style="border: 1px solid #999; padding: 8px;">Pies Tub.</th>
-                                <th style="border: 1px solid #999; padding: 8px;">Cable 4x14</th>
-                                <th style="border: 1px solid #999; padding: 8px;">Cable 5x14</th>
-                                <th style="border: 1px solid #999; padding: 8px;">Cable 3x12</th>
-                                <th style="border: 1px solid #999; padding: 8px;">Soporte</th>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.modelo || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.inst_basica || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.inst_manga || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.inst_recorrido || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.pies_tuberia || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.cable_4x14 || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.cable_5x14 || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.cable_3x12 || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.soporte || '-'}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    
-                    <div style="margin-bottom: 20px;">
-                        <h3 style="color: #0066b2; border-bottom: 1px solid #ddd; padding-bottom: 5px;">VERIFICACIONES ADICIONALES</h3>
-                        <table style="width: 100%; font-size: 12px;">
-                            <tr><td style="padding: 5px;"><strong>Manga Obstruida:</strong> ${formData.manga_obstruida || 'N/A'}</td></tr>
-                            <tr><td style="padding: 5px;"><strong>Pie de Tubería de Desagüe:</strong> ${formData.pie_desague || 'N/A'} ${formData.pie_desague_detalle ? '(' + formData.pie_desague_detalle + ')' : ''}</td></tr>
-                            <tr><td style="padding: 5px;"><strong>Hueco en Pared:</strong> ${formData.hueco_pared || 'N/A'}</td></tr>
-                            <tr><td style="padding: 5px;"><strong>Instalación Peligrosa:</strong> ${formData.inst_peligrosa || 'N/A'}</td></tr>
-                            <tr><td style="padding: 5px;"><strong>Demontar A/A:</strong> ${formData.demontar || 'N/A'}</td></tr>
-                            <tr><td style="padding: 5px;"><strong>Repellar:</strong> ${formData.repellar || 'N/A'}</td></tr>
-                            <tr><td style="padding: 5px;"><strong>Corriente Adecuada:</strong> ${formData.corriente || 'N/A'}</td></tr>
-                            <tr><td style="padding: 5px;"><strong>Altura:</strong> ${formData.altura || 'N/A'} ${formData.distancia ? '- Distancia: ' + formData.distancia : ''}</td></tr>
-                            <tr><td style="padding: 5px;"><strong>Salida de Desagüe:</strong> ${formData.salida_desague || 'N/A'}</td></tr>
-                        </table>
-                    </div>
-                    
-                    ${formData.observaciones ? `
-                    <div style="margin-bottom: 20px;">
-                        <h3 style="color: #0066b2; border-bottom: 1px solid #ddd; padding-bottom: 5px;">OBSERVACIONES</h3>
-                        <p style="background: #f9f9f9; padding: 10px; border-radius: 5px;">${formData.observaciones}</p>
-                    </div>
-                    ` : ''}
-                    
-                    <div style="margin-top: 40px; text-align: center;">
-                        <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Firma del Cliente</p>
-                        <img src="${formData.firma_cliente}" style="max-width: 300px; border: 1px solid #ddd; border-radius: 5px;">
-                    </div>
-                    
-                    <div style="margin-top: 40px; text-align: center; font-size: 10px; color: #999; border-top: 1px solid #ddd; padding-top: 20px;">
-                        <p>Bajo Zero Panamá • Tel: 6672-1466 / 391-6412 • administracion@bajozero.net</p>
-                        <p>Reporte generado el ${new Date().toLocaleDateString('es-PA')}</p>
-                    </div>
-                </div>
-            `;
-        }
-        
-        async function sendEmailWithPDF(pdfBlob, formData) {
-            // Convertir PDF a base64
-            const reader = new FileReader();
-            const base64Promise = new Promise((resolve) => {
-                reader.onloadend = () => resolve(reader.result.split(',')[1]);
-                reader.readAsDataURL(pdfBlob);
-            });
-            const base64PDF = await base64Promise;
-            
-            // Llamar a Supabase Edge Function
-            const { data, error } = await supabaseClient.functions.invoke('send-inspection-email', {
-                body: {
-                    to: 'administracion@bajozero.net',
-                    subject: `Inspección Completada - ${currentInspection.inspection_number}`,
-                    inspectionNumber: currentInspection.inspection_number,
-                    clientName: currentInspection.clients.contact_name,
-                    technicianName: currentTechnician.full_name,
-                    completionDate: formData.fecha_completado,
-                    pdfBase64: base64PDF,
-                    pdfName: `Inspeccion_${currentInspection.inspection_number}.pdf`
+            rows.forEach(row => {
+                if (!status || row.textContent.toLowerCase().includes(status)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
                 }
-            });
-            
-            if (error) throw error;
-            return data;
-        }
-        
-        function showSuccessPreview(formData) {
-            const previewContent = document.getElementById('reportPreviewContent');
-            previewContent.innerHTML = generateReportHTML(formData);
-            document.getElementById('previewModal').classList.remove('hidden');
-            document.getElementById('previewModal').classList.add('flex');
-        }
-        
-        function closePreview() {
-            document.getElementById('previewModal').classList.add('hidden');
-            document.getElementById('previewModal').classList.remove('flex');
-        }
-        
-        function downloadPDF() {
-            const element = document.createElement('div');
-            element.innerHTML = document.getElementById('reportPreviewContent').innerHTML;
-            document.body.appendChild(element);
-            
-            const opt = {
-                margin: 10,
-                filename: `Inspeccion_${currentInspection.inspection_number}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            
-            html2pdf().set(opt).from(element).save().then(() => {
-                document.body.removeChild(element);
             });
         }
         
@@ -1223,26 +1061,23 @@
             // Check if user is already logged in
             supabaseClient.auth.getSession().then(({ data: { session } }) => {
                 if (session) {
+                    // Verificar si es admin
                     supabaseClient
-                        .from('technicians')
+                        .from('admins')
                         .select('*')
                         .eq('auth_user_id', session.user.id)
-                        .eq('is_active', true)
                         .maybeSingle()
-                        .then(({ data: techData }) => {
-                            if (techData) {
+                        .then(({ data: adminData }) => {
+                            if (adminData) {
                                 currentUser = session.user;
-                                currentTechnician = techData;
                                 showDashboard();
                             }
                         });
                 }
             });
-        });
-        
-        // Handle window resize for signature pad
-        window.addEventListener('resize', function() {
-            initializeSignaturePad();
+            
+            // Set today's date as default
+            document.getElementById('scheduledDate').valueAsDate = new Date();
         });
     </script>
 

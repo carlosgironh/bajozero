@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin | Bajo Zero</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        /* Layout */
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            width: 280px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-logo {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.6;
+            margin-bottom: 0.75rem;
+            padding-left: 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 0.25rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            transform: translateX(5px);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-section {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 {
+            font-size: 1.875rem;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-title p {
+            color: #64748b;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.blue { background: #dbeafe; color: #2563eb; }
+        .stat-icon.green { background: #d1fae5; color: #059669; }
+        .stat-icon.orange { background: #ffedd5; color: #ea580c; }
+        .stat-icon.red { background: #fee2e2; color: #dc2626; }
+
+        .stat-info h3 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-info p {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.875rem;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-progress { background: #dbeafe; color: #1e40af; }
+        .badge-completed { background: #d1fae5; color: #065f46; }
+        .badge-urgent { background: #fee2e2; color: #991b1b; }
+
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .btn-edit { background: #dbeafe; color: #2563eb; }
+        .btn-delete { background: #fee2e2; color: #dc2626; }
+        .btn-view { background: #f3e8ff; color: #7c3aed; }
+
+        .btn-icon:hover {
+            transform: scale(1.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s;
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn-cancel {
+            padding: 0.75rem 1.5rem;
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #64748b;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">❄️</div>
+                <div class="sidebar-title">Bajo Zero</div>
+                <div class="sidebar-subtitle">Panel Administrativo</div>
+            </div>
+
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-title">Principal</div>
+                    <a href="#" class="nav-item active" onclick="showSection('dashboard')">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="showSection('services')">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Servicios</span>
+                        <span class="badge badge-urgent" id="pendingCount" style="margin-left: auto; display: none;">0</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title">Gestión</div>
+                    <a href="#" class="nav-item" onclick="showSection('technicians')">
+                        <i class="fas fa-users-cog"></i>
+                        <span>Técnicos</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="showSection('customers')">
+                        <i class="fas fa-users"></i>
+                        <span>Clientes</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="showSection('equipment')">
+                        <i class="fas fa-snowflake"></i>
+                        <span>Equipos</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title">Sistema</div>
+                    <a href="#" class="nav-item" onclick="showSection('analytics')">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="showSection('settings')">
+                        <i class="fas fa-cog"></i>
+                        <span>Configuración</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">Admin</div>
+                        <div class="user-role">Administrador</div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="page-title">
+                    <h1>Dashboard</h1>
+                    <p>Bienvenido de vuelta, <span id="headerUserName">Admin</span></p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-primary" onclick="openModal('technician')">
+                        <i class="fas fa-plus"></i>
+                        Nuevo Técnico
+                    </button>
+                    <button class="btn-primary" onclick="openModal('service')" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-plus"></i>
+                        Nuevo Servicio
+                    </button>
+                </div>
+            </header>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalServices">0</h3>
+                        <p>Total Servicios</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pendingServices">0</h3>
+                        <p>Pendientes</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="completedServices">0</h3>
+                        <p>Completados Hoy</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="activeTechnicians">0</h3>
+                        <p>Técnicos Activos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Recent Services -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Servicios Recientes</h2>
+                        <button class="btn-sm btn-secondary">Ver todos</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Cliente</th>
+                                    <th>Tipo</th>
+                                    <th>Estado</th>
+                                    <th>Técnico</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="servicesTable">
+                                <!-- Se llena dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Acciones Rápidas</h2>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <button class="btn-primary" style="justify-content: flex-start; padding: 1rem;" onclick="openModal('technician')">
+                            <i class="fas fa-user-plus"></i>
+                            <div style="text-align: left;">
+                                <div style="font-weight: 600;">Nuevo Técnico</div>
+                                <div style="font-size: 0.8rem; opacity: 0.9;">Registrar técnico en el sistema</div>
+                            </div>
+                        </button>
+                        
+                        <button class="btn-primary" style="justify-content: flex-start; padding: 1rem; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);" onclick="openModal('customer')">
+                            <i class="fas fa-user-plus"></i>
+                            <div style="text-align: left;">
+                                <div style="font-weight: 600;">Nuevo Cliente</div>
+                                <div style="font-size: 0.8rem; opacity: 0.9;">Registrar cliente nuevo</div>
+                            </div>
+                        </button>
+
+                        <button class="btn-primary" style="justify-content: flex-start; padding: 1rem; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);" onclick="openModal('service')">
+                            <i class="fas fa-plus-circle"></i>
+                            <div style="text-align: left;">
+                                <div style="font-weight: 600;">Crear Servicio</div>
+                                <div style="font-size: 0.8rem; opacity: 0.9;">Nueva orden de trabajo</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Nuevo Técnico -->
+    <div class="modal" id="technicianModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nuevo Técnico</h2>
+                <button class="btn-close" onclick="closeModal('technician')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="technicianForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre Completo</label>
+                            <input type="text" id="techName" required placeholder="Juan Pérez">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="techEmail" required placeholder="juan@bajozero.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="tel" id="techPhone" placeholder="507-6000-0000">
+                        </div>
+                        <div class="form-group">
+                            <label>Código de Empleado</label>
+                            <input type="text" id="techCode" placeholder="BZ-001">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Especialización</label>
+                        <select id="techSpec" multiple style="height: 80px;">
+                            <option value="ac">Aire Acondicionado</option>
+                            <option value="frost">Refrigeración</option>
+                            <option value="electrical">Eléctrico</option>
+                        </select>
+                        <small style="color: #64748b;">Mantén presionado Ctrl para seleccionar varias</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Zonas de Servicio</label>
+                        <input type="text" id="techZones" placeholder="Panamá, San Miguelito, Arraiján...">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('technician')">Cancelar</button>
+                <button class="btn-primary" onclick="saveTechnician()">Guardar Técnico</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo Cliente -->
+    <div class="modal" id="customerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nuevo Cliente</h2>
+                <button class="btn-close" onclick="closeModal('customer')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="customerForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo de Cliente</label>
+                            <select id="custType">
+                                <option value="individual">Persona Natural</option>
+                                <option value="company">Empresa</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre / Empresa</label>
+                            <input type="text" id="custName" required placeholder="Nombre completo o razón social">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="custEmail" required placeholder="cliente@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="tel" id="custPhone" required placeholder="507-6000-0000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Dirección</label>
+                        <textarea id="custAddress" rows="2" placeholder="Dirección completa..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ciudad</label>
+                            <input type="text" id="custCity" value="Panamá">
+                        </div>
+                        <div class="form-group">
+                            <label>Distrito</label>
+                            <input type="text" id="custDistrict" placeholder="Ej: San Francisco">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('customer')">Cancelar</button>
+                <button class="btn-primary" onclick="saveCustomer()">Guardar Cliente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo Servicio -->
+    <div class="modal" id="serviceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nuevo Servicio</h2>
+                <button class="btn-close" onclick="closeModal('service')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="serviceForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cliente</label>
+                            <select id="servCustomer" required>
+                                <option value="">Seleccionar cliente...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Servicio</label>
+                            <select id="servType" required>
+                                <option value="diagnostic">Diagnóstico</option>
+                                <option value="ac_repair">Reparación AC</option>
+                                <option value="ac_installation">Instalación AC</option>
+                                <option value="ac_maintenance">Mantenimiento AC</option>
+                                <option value="frost_repair">Reparación Refrigeración</option>
+                                <option value="emergency">Emergencia</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha Solicitada</label>
+                            <input type="date" id="servDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Franja Horaria</label>
+                            <select id="servTime">
+                                <option value="morning">Mañana (8am - 12pm)</option>
+                                <option value="afternoon">Tarde (12pm - 5pm)</option>
+                                <option value="evening">Noche (5pm - 8pm)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Dirección del Servicio</label>
+                        <textarea id="servAddress" rows="2" required placeholder="Dirección donde se realizará el servicio..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción del Problema</label>
+                        <textarea id="servDesc" rows="3" required placeholder="¿Qué problema reporta el cliente?"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Prioridad</label>
+                            <select id="servPriority">
+                                <option value="low">Baja</option>
+                                <option value="medium" selected>Media</option>
+                                <option value="high">Alta</option>
+                                <option value="urgent">Urgente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Asignar Técnico (Opcional)</label>
+                            <select id="servTechnician">
+                                <option value="">Auto-asignar</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('service')">Cancelar</button>
+                <button class="btn-primary" onclick="saveService()">Crear Servicio</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración Supabase
+        const SUPABASE_URL = 'https://nuuehnixxoudctlzlwmi.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51dWVobml4eG91ZGN0bHpsd21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDM3NzYsImV4cCI6MjA4OTA3OTc3Nn0.DNc5wONm5QveZVTuz8zYtQMV6EzO2OsYU_ukDVsOB88';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentUser = null;
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkAuth();
+            await loadDashboardData();
+            await loadTechniciansForSelect();
+            await loadCustomersForSelect();
+        });
+
+        // Verificar autenticación
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                window.location.href = '../../login.html';
+                return;
+            }
+
+            // Verificar que sea admin
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+            if (!profile || profile.role !== 'admin') {
+                await supabase.auth.signOut();
+                window.location.href = '../../login.html';
+                return;
+            }
+
+            currentUser = profile;
+            
+            // Actualizar UI con datos del usuario
+            document.getElementById('userName').textContent = profile.full_name;
+            document.getElementById('headerUserName').textContent = profile.full_name;
+            document.getElementById('userAvatar').textContent = profile.full_name.charAt(0).toUpperCase();
+        }
+
+        // Cargar datos del dashboard
+        async function loadDashboardData() {
+            try {
+                // Contar servicios totales
+                const { count: totalServices } = await supabase
+                    .from('services')
+                    .select('*', { count: 'exact', head: true });
+
+                // Servicios pendientes
+                const { count: pendingServices } = await supabase
+                    .from('services')
+                    .select('*', { count: 'exact', head: true })
+                    .in('status', ['pending', 'assigned', 'in_progress']);
+
+                // Completados hoy
+                const today = new Date().toISOString().split('T')[0];
+                const { count: completedToday } = await supabase
+                    .from('services')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'completed')
+                    .gte('completed_at', today);
+
+                // Técnicos activos
+                const { count: activeTechs } = await supabase
+                    .from('technicians')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('available', true);
+
+                // Actualizar UI
+                document.getElementById('totalServices').textContent = totalServices || 0;
+                document.getElementById('pendingServices').textContent = pendingServices || 0;
+                document.getElementById('completedServices').textContent = completedToday || 0;
+                document.getElementById('activeTechnicians').textContent = activeTechs || 0;
+
+                // Mostrar badge si hay pendientes
+                if (pendingServices > 0) {
+                    document.getElementById('pendingCount').textContent = pendingServices;
+                    document.getElementById('pendingCount').style.display = 'inline-block';
+                }
+
+                // Cargar servicios recientes
+                await loadRecentServices();
+
+            } catch (error) {
+                console.error('Error cargando dashboard:', error);
+            }
+        }
+
+        // Cargar servicios recientes
+        async function loadRecentServices() {
+            const { data: services, error } = await supabase
+                .from('services')
+                .select(`
+                    *,
+                    customers (
+                        profiles (full_name)
+                    ),
+                    technicians (
+                        profiles (full_name)
+                    )
+                `)
+                .order('created_at', { ascending: false })
+                .limit(10);
+
+            if (error) {
+                console.error('Error cargando servicios:', error);
+                return;
+            }
+
+            const tbody = document.getElementById('servicesTable');
+            tbody.innerHTML = '';
+
+            const statusLabels = {
+                'pending': { text: 'Pendiente', class: 'badge-pending' },
+                'assigned': { text: 'Asignado', class: 'badge-pending' },
+                'in_progress': { text: 'En Progreso', class: 'badge-progress' },
+                'completed': { text: 'Completado', class: 'badge-completed' },
+                'cancelled': { text: 'Cancelado', class: 'badge-urgent' }
+            };
+
+            services.forEach(service => {
+                const status = statusLabels[service.status] || { text: service.status, class: 'badge-pending' };
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${service.service_number || 'N/A'}</strong></td>
+                    <td>${service.customers?.profiles?.full_name || 'N/A'}</td>
+                    <td>${formatServiceType(service.service_type)}</td>
+                    <td><span class="badge ${status.class}">${status.text}</span></td>
+                    <td>${service.technicians?.profiles?.full_name || 'Sin asignar'}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn-icon btn-view" onclick="viewService('${service.id}')" title="Ver">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-icon btn-edit" onclick="editService('${service.id}')" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Formatear tipo de servicio
+        function formatServiceType(type) {
+            const types = {
+                'diagnostic': 'Diagnóstico',
+                'ac_repair': 'Reparación AC',
+                'ac_installation': 'Instalación AC',
+                'ac_maintenance': 'Mantenimiento AC',
+                'frost_repair': 'Reparación Frost',
+                'frost_maintenance': 'Mant. Frost',
+                'emergency': 'Emergencia'
+            };
+            return types[type] || type;
+        }
+
+        // Cargar técnicos para select
+        async function loadTechniciansForSelect() {
+            const { data: technicians } = await supabase
+                .from('technicians')
+                .select(`
+                    id,
+                    profiles (full_name)
+                `)
+                .eq('available', true);
+
+            const select = document.getElementById('servTechnician');
+            select.innerHTML = '<option value="">Auto-asignar</option>';
+            
+            technicians?.forEach(tech => {
+                const option = document.createElement('option');
+                option.value = tech.id;
+                option.textContent = tech.profiles.full_name;
+                select.appendChild(option);
+            });
+        }
+
+        // Cargar clientes para select
+        async function loadCustomersForSelect() {
+            const { data: customers } = await supabase
+                .from('customers')
+                .select(`
+                    id,
+                    profiles (full_name)
+                `)
+                .eq('profiles.status', 'active');
+
+            const select = document.getElementById('servCustomer');
+            select.innerHTML = '<option value="">Seleccionar cliente...</option>';
+            
+            customers?.forEach(cust => {
+                const option = document.createElement('option');
+                option.value = cust.id;
+                option.textContent = cust.profiles.full_name;
+                select.appendChild(option);
+            });
+        }
+
+        // Modal functions
+        function openModal(type) {
+            document.getElementById(type + 'Modal').classList.add('active');
+        }
+
+        function closeModal(type) {
+            document.getElementById(type + 'Modal').classList.remove('active');
+            document.getElementById(type + 'Form').reset();
+        }
+
+        // Guardar técnico
+        async function saveTechnician() {
+            const btn = event.target;
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                const email = document.getElementById('techEmail').value;
+                const password = generateTempPassword();
+                
+                // 1. Crear usuario en Auth
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: document.getElementById('techName').value,
+                            role: 'technician'
+                        }
+                    }
+                });
+
+                if (authError) throw authError;
+
+                // 2. Actualizar perfil con datos adicionales
+                await supabase
+                    .from('profiles')
+                    .update({
+                        phone: document.getElementById('techPhone').value
+                    })
+                    .eq('id', authData.user.id);
+
+                // 3. Actualizar datos de técnico
+                const specs = Array.from(document.getElementById('techSpec').selectedOptions).map(o => o.value);
+                
+                await supabase
+                    .from('technicians')
+                    .update({
+                        employee_code: document.getElementById('techCode').value,
+                        specialization: specs,
+                        service_zones: document.getElementById('techZones').value.split(',').map(z => z.trim())
+                    })
+                    .eq('id', authData.user.id);
+
+                alert('Técnico creado exitosamente. Contraseña temporal: ' + password);
+                closeModal('technician');
+                loadDashboardData();
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+
+        // Guardar cliente
+        async function saveCustomer() {
+            const btn = event.target;
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                const email = document.getElementById('custEmail').value;
+                const password = generateTempPassword();
+                
+                // 1. Crear usuario
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: document.getElementById('custName').value,
+                            role: 'customer'
+                        }
+                    }
+                });
+
+                if (authError) throw authError;
+
+                // 2. Actualizar datos de cliente
+                await supabase
+                    .from('customers')
+                    .update({
+                        customer_type: document.getElementById('custType').value,
+                        phone: document.getElementById('custPhone').value,
+                        address: document.getElementById('custAddress').value,
+                        city: document.getElementById('custCity').value,
+                        district: document.getElementById('custDistrict').value
+                    })
+                    .eq('id', authData.user.id);
+
+                alert('Cliente creado exitosamente');
+                closeModal('customer');
+                loadCustomersForSelect();
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+
+        // Guardar servicio
+        async function saveService() {
+            const btn = event.target;
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                const serviceData = {
+                    customer_id: document.getElementById('servCustomer').value,
+                    service_type: document.getElementById('servType').value,
+                    priority: document.getElementById('servPriority').value,
+                    customer_description: document.getElementById('servDesc').value,
+                    address: document.getElementById('servAddress').value,
+                    requested_date: document.getElementById('servDate').value,
+                    requested_time: document.getElementById('servTime').value,
+                    status: document.getElementById('servTechnician').value ? 'assigned' : 'pending',
+                    technician_id: document.getElementById('servTechnician').value || null,
+                    created_by: currentUser.id,
+                    assigned_by: document.getElementById('servTechnician').value ? currentUser.id : null,
+                    assigned_at: document.getElementById('servTechnician').value ? new Date().toISOString() : null
+                };
+
+                const { error } = await supabase
+                    .from('services')
+                    .insert(serviceData);
+
+                if (error) throw error;
+
+                alert('Servicio creado exitosamente');
+                closeModal('service');
+                loadDashboardData();
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+
+        // Generar contraseña temporal
+        function generateTempPassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            let password = '';
+            for (let i = 0; i < 10; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+
+        // Logout
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = '../../login.html';
+        }
+
+        // Cerrar modales al hacer click fuera
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>

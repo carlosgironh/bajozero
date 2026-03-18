@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Técnico | Bajo Zero</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .tech-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .tech-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .tech-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .tech-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .tech-details h1 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .tech-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .btn-logout {
+            padding: 0.75rem 1.5rem;
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #fecaca;
+        }
+
+        /* Stats Cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Service Cards */
+        .section-title {
+            color: white;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .services-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border-left: 4px solid #667eea;
+        }
+
+        .service-card.urgent {
+            border-left-color: #ef4444;
+            animation: urgentPulse 2s infinite;
+        }
+
+        @keyframes urgentPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(239, 68, 68, 0.2); }
+            50% { box-shadow: 0 4px 30px rgba(239, 68, 68, 0.4); }
+        }
+
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .service-number {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .service-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #f3e8ff;
+            color: #7c3aed;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .service-customer {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .customer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .customer-info h4 {
+            font-size: 1rem;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .customer-info p {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .service-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #475569;
+        }
+
+        .detail-item i {
+            color: #667eea;
+            width: 16px;
+        }
+
+        .service-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+
+        .service-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 0.875rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-complete {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-pause {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-navigate {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Sidebar */
+        .sidebar-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .availability-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: #cbd5e1;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #10b981;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+        }
+
+        .schedule-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-time {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 60px;
+        }
+
+        .schedule-service {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .schedule-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-pending { background: #f59e0b; }
+        .status-progress { background: #3b82f6; }
+        .status-completed { background: #10b981; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: white;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tech-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
+        /* Loading State */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="tech-container">
+        <!-- Header -->
+        <header class="tech-header">
+            <div class="tech-info">
+                <div class="tech-avatar" id="techAvatar">T</div>
+                <div class="tech-details">
+                    <h1 id="techName">Cargando...</h1>
+                    <div class="tech-status">
+                        <span class="status-dot"></span>
+                        <span id="techStatusText">En línea</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+            </button>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value" id="statToday">0</div>
+                <div class="stat-label">Servicios Hoy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statWeek">0</div>
+                <div class="stat-label">Esta Semana</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statMonth">0</div>
+                <div class="stat-label">Este Mes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statRating">5.0</div>
+                <div class="stat-label">Calificación</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content-grid">
+            <!-- Services List -->
+            <div>
+                <h2 class="section-title">
+                    <i class="fas fa-clipboard-list"></i>
+                    Mis Servicios Asignados
+                </h2>
+                <div class="services-list" id="servicesList">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div>
+                <!-- Availability -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-toggle-on"></i>
+                        Mi Disponibilidad
+                    </h3>
+                    <div class="availability-toggle">
+                        <div>
+                            <div style="font-weight: 600; color: #1e293b;">Estado Actual</div>
+                            <div style="font-size: 0.875rem; color: #64748b;" id="availabilityText">Disponible</div>
+                        </div>
+                        <div class="toggle-switch active" id="availabilityToggle" onclick="toggleAvailability()"></div>
+                    </div>
+                </div>
+
+                <!-- Today's Schedule -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-clock"></i>
+                        Agenda de Hoy
+                    </h3>
+                    <div id="todaySchedule">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Resumen
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #64748b;">Completados</span>
+                            <span style="font-weight: 700; color: #10b981;" id="completedCount">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #64748b;">Pendientes</span>
+                            <span style="font-weight: 700; color: #f59e0b;" id="pendingCount">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #64748b;">Tiempo Promedio</span>
+                            <span style="font-weight: 700; color: #667eea;" id="avgTime">45 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración Supabase
+        const SUPABASE_URL = 'https://nuuehnixxoudctlzlwmi.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51dWVobml4eG91ZGN0bHpsd21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDM3NzYsImV4cCI6MjA4OTA3OTc3Nn0.DNc5wONm5QveZVTuz8zYtQMV6EzO2OsYU_ukDVsOB88';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentUser = null;
+        let currentTech = null;
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkAuth();
+            await loadTechData();
+            await loadServices();
+            await loadStats();
+            startLocationTracking();
+        });
+
+        // Verificar autenticación
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                window.location.href = '../../login.html';
+                return;
+            }
+
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+            if (!profile || profile.role !== 'technician') {
+                await supabase.auth.signOut();
+                window.location.href = '../../login.html';
+                return;
+            }
+
+            currentUser = profile;
+            document.getElementById('techName').textContent = profile.full_name;
+            document.getElementById('techAvatar').textContent = profile.full_name.charAt(0).toUpperCase();
+        }
+
+        // Cargar datos del técnico
+        async function loadTechData() {
+            const { data: tech } = await supabase
+                .from('technicians')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (tech) {
+                currentTech = tech;
+                
+                // Actualizar toggle de disponibilidad
+                const toggle = document.getElementById('availabilityToggle');
+                const text = document.getElementById('availabilityText');
+                
+                if (tech.available) {
+                    toggle.classList.add('active');
+                    text.textContent = 'Disponible';
+                } else {
+                    toggle.classList.remove('active');
+                    text.textContent = 'No Disponible';
+                }
+
+                document.getElementById('statRating').textContent = tech.rating.toFixed(1);
+            }
+        }
+
+        // Cargar servicios asignados
+        async function loadServices() {
+            const { data: services, error } = await supabase
+                .from('services')
+                .select(`
+                    *,
+                    customers (
+                        profiles (full_name, phone),
+                        address
+                    )
+                `)
+                .eq('technician_id', currentUser.id)
+                .in('status', ['assigned', 'in_progress', 'paused'])
+                .order('requested_date', { ascending: true });
+
+            if (error) {
+                console.error('Error:', error);
+                return;
+            }
+
+            const container = document.getElementById('servicesList');
+            
+            if (!services || services.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-check"></i>
+                        <h3>No tienes servicios pendientes</h3>
+                        <p>Los nuevos servicios aparecerán aquí cuando te sean asignados</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            
+            const typeIcons = {
+                'diagnostic': 'fa-stethoscope',
+                'ac_repair': 'fa-tools',
+                'ac_installation': 'fa-wind',
+                'ac_maintenance': 'fa-fan',
+                'frost_repair': 'fa-snowflake',
+                'emergency': 'fa-ambulance'
+            };
+
+            const typeLabels = {
+                'diagnostic': 'Diagnóstico',
+                'ac_repair': 'Reparación AC',
+                'ac_installation': 'Instalación AC',
+                'ac_maintenance': 'Mantenimiento AC',
+                'frost_repair': 'Reparación Frost',
+                'emergency': 'Emergencia'
+            };
+
+            services.forEach(service => {
+                const isUrgent = service.priority === 'urgent' || service.priority === 'high';
+                const customer = service.customers;
+                
+                const card = document.createElement('div');
+                card.className = `service-card ${isUrgent ? 'urgent' : ''}`;
+                
+                let actionButtons = '';
+                
+                if (service.status === 'assigned') {
+                    actionButtons = `
+                        <button class="btn-action btn-start" onclick="startService('${service.id}')">
+                            <i class="fas fa-play"></i> Iniciar
+                        </button>
+                        <button class="btn-action btn-navigate" onclick="navigateTo('${service.address}')">
+                            <i class="fas fa-map-marker-alt"></i> Navegar
+                        </button>
+                    `;
+                } else if (service.status === 'in_progress') {
+                    actionButtons = `
+                        <button class="btn-action btn-complete" onclick="completeService('${service.id}')">
+                            <i class="fas fa-check"></i> Completar
+                        </button>
+                        <button class="btn-action btn-pause" onclick="pauseService('${service.id}')">
+                            <i class="fas fa-pause"></i> Pausar
+                        </button>
+                    `;
+                } else if (service.status === 'paused') {
+                    actionButtons = `
+                        <button class="btn-action btn-start" onclick="resumeService('${service.id}')">
+                            <i class="fas fa-play"></i> Reanudar
+                        </button>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="service-header">
+                        <div>
+                            <div class="service-number">${service.service_number}</div>
+                            <span class="service-type">
+                                <i class="fas ${typeIcons[service.service_type] || 'fa-wrench'}"></i>
+                                ${typeLabels[service.service_type] || service.service_type}
+                            </span>
+                        </div>
+                        ${isUrgent ? '<span style="color: #ef4444; font-weight: 600;"><i class="fas fa-exclamation-circle"></i> URGENTE</span>' : ''}
+                    </div>
+                    
+                    <div class="service-customer">
+                        <div class="customer-avatar">
+                            ${customer?.profiles?.full_name?.charAt(0).toUpperCase() || 'C'}
+                        </div>
+                        <div class="customer-info">
+                            <h4>${customer?.profiles?.full_name || 'Cliente'}</h4>
+                            <p><i class="fas fa-phone"></i> ${customer?.profiles?.phone || 'Sin teléfono'}</p>
+                        </div>
+                    </div>
+
+                    <div class="service-details">
+                        <div class="detail-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>${new Date(service.requested_date).toLocaleDateString('es-PA')}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <span>${service.requested_time === 'morning' ? 'Mañana' : service.requested_time === 'afternoon' ? 'Tarde' : 'Noche'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${service.zone || 'Panamá'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-money-bill"></i>
+                            <span>$${service.diagnostic_fee}</span>
+                        </div>
+                    </div>
+
+                    <div class="service-description">
+                        <strong>Problema reportado:</strong><br>
+                        ${service.customer_description}
+                    </div>
+
+                    <div class="service-actions">
+                        ${actionButtons}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // Cargar estadísticas
+        async function loadStats() {
+            const today = new Date().toISOString().split('T')[0];
+            const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+            const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+            // Hoy
+            const { count: todayCount } = await supabase
+                .from('services')
+                .select('*', { count: 'exact', head: true })
+                .eq('technician_id', currentUser.id)
+                .gte('created_at', today);
+
+            // Semana
+            const { count: weekCount } = await supabase
+                .from('services')
+                .select('*', { count: 'exact', head: true })
+                .eq('technician_id', currentUser.id)
+                .gte('created_at', weekAgo);
+
+            // Mes
+            const { count: monthCount } = await supabase
+                .from('services')
+                .select('*', { count: 'exact', head: true })
+                .eq('technician_id', currentUser.id)
+                .gte('created_at', monthAgo);
+
+            document.getElementById('statToday').textContent = todayCount || 0;
+            document.getElementById('statWeek').textContent = weekCount || 0;
+            document.getElementById('statMonth').textContent = monthCount || 0;
+
+            // Contadores para sidebar
+            const { count: completed } = await supabase
+                .from('services')
+                .select('*', { count: 'exact', head: true })
+                .eq('technician_id', currentUser.id)
+                .eq('status', 'completed')
+                .gte('created_at', today);
+
+            const { count: pending } = await supabase
+                .from('services')
+                .select('*', { count: 'exact', head: true })
+                .eq('technician_id', currentUser.id)
+                .in('status', ['assigned', 'in_progress']);
+
+            document.getElementById('completedCount').textContent = completed || 0;
+            document.getElementById('pendingCount').textContent = pending || 0;
+        }
+
+        // Acciones de servicio
+        async function startService(serviceId) {
+            await updateServiceStatus(serviceId, 'in_progress', 'started_at');
+        }
+
+        async function completeService(serviceId) {
+            const notes = prompt('Notas del trabajo realizado:');
+            if (notes === null) return;
+
+            await updateServiceStatus(serviceId, 'completed', 'completed_at', {
+                work_performed: notes,
+                actual_duration: calculateDuration(serviceId)
+            });
+        }
+
+        async function pauseService(serviceId) {
+            const reason = prompt('Motivo de la pausa:');
+            if (reason === null) return;
+
+            await updateServiceStatus(serviceId, 'paused', null, {
+                notes: reason
+            });
+        }
+
+        async function resumeService(serviceId) {
+            await updateServiceStatus(serviceId, 'in_progress');
+        }
+
+        async function updateServiceStatus(serviceId, status, timestampField = null, extraData = {}) {
+            try {
+                const updateData = {
+                    status: status,
+                    ...extraData
+                };
+
+                if (timestampField) {
+                    updateData[timestampField] = new Date().toISOString();
+                }
+
+                const { error } = await supabase
+                    .from('services')
+                    .update(updateData)
+                    .eq('id', serviceId);
+
+                if (error) throw error;
+
+                // Recargar datos
+                await loadServices();
+                await loadStats();
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Toggle disponibilidad
+        async function toggleAvailability() {
+            const newStatus = !currentTech?.available;
+            
+            const { error } = await supabase
+                .from('technicians')
+                .update({ available: newStatus })
+                .eq('id', currentUser.id);
+
+            if (error) {
+                alert('Error actualizando estado');
+                return;
+            }
+
+            await loadTechData();
+        }
+
+        // Navegación
+        function navigateTo(address) {
+            const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+            window.open(url, '_blank');
+        }
+
+        // Tracking de ubicación
+        function startLocationTracking() {
+            if (!navigator.geolocation) return;
+
+            navigator.geolocation.watchPosition(
+                async (position) => {
+                    await supabase
+                        .from('technicians')
+                        .update({
+                            current_location: {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                                updated_at: new Date().toISOString()
+                            },
+                            last_location_update: new Date().toISOString()
+                        })
+                        .eq('id', currentUser.id);
+                },
+                (error) => console.error('Error de geolocalización:', error),
+                { enableHighAccuracy: true, maximumAge: 30000, timeout: 27000 }
+            );
+        }
+
+        // Logout
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = '../../login.html';
+        }
+
+        // Helpers
+        function calculateDuration(serviceId) {
+            // Calcular duración basada en started_at
+            return 60; // Placeholder
+        }
+    </script>
+</body>
+</html>

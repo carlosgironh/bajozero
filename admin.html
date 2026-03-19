@@ -1180,58 +1180,76 @@
         }
         
         async function saveTechnician(e) {
-            e.preventDefault();
-            const btn = document.getElementById('saveTechBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Creando...';
-            btn.disabled = true;
-        
-            try {
-                const email = document.getElementById('techEmail').value;
-                const password = document.getElementById('techPassword').value;
-                const fullName = document.getElementById('techFullName').value;
-        
-                // 1. Crear usuario en Auth
-                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            full_name: fullName,
-                            role: 'technician'
-                        }
-                    }
-                });
-        
-                if (authError) throw authError;
-        
-                // 2. El trigger creará automáticamente el perfil y technician
-                // Pero actualizamos datos adicionales
-                const { error: updateError } = await supabaseClient
-                    .from('inspectors')
-                    .update({
-                        phone: document.getElementById('techPhone').value,
-                        specialty: document.getElementById('techSpecialty').value,
-                        is_active: true
-                    })
-                    .eq('id', authData.user.id);
-        
-                if (updateError) throw updateError;
-        
-                alert(`Técnico creado exitosamente.\\n\\nEmail: ${email}\\nContraseña temporal: ${password}\\n\\nEl técnico deberá cambiar su contraseña al iniciar sesión.`);
-                
-                closeTechnicianModal();
-                loadTechnicians();
-                loadTechniciansList();
-        
-            } catch (error) {
-                console.error('Error creating technician:', error);
-                alert('Error al crear técnico: ' + error.message);
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
+			e.preventDefault();
+			const btn = document.getElementById('saveTechBtn');
+			const originalText = btn.innerHTML;
+			btn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Creando...';
+			btn.disabled = true;
+
+			try {
+				const email = document.getElementById('techEmail').value;
+				const password = document.getElementById('techPassword').value;
+				const fullName = document.getElementById('techFullName').value;
+				const phone = document.getElementById('techPhone').value;
+				const specialty = document.getElementById('techSpecialty').value;
+
+				// 1. Crear usuario en Auth
+				const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+					email: email,
+					password: password,
+					options: {
+						data: {
+							full_name: fullName,
+							role: 'technician'
+						}
+					}
+				});
+
+				if (authError) throw authError;
+
+				// 2. Esperar un momento para que el trigger cree el registro
+				await new Promise(resolve => setTimeout(resolve, 500));
+
+				// 3. Actualizar con datos adicionales (el trigger ya creó el registro base)
+				const { error: updateError } = await supabaseClient
+					.from('inspectors')
+					.update({
+						phone: phone,
+						specialty: specialty
+					})
+					.eq('id', authData.user.id);
+
+				// Si no existe (el trigger falló), crearlo manualmente
+				if (updateError) {
+					const { error: insertError } = await supabaseClient
+						.from('inspectors')
+						.insert({
+							id: authData.user.id,
+							auth_user_id: authData.user.id,
+							full_name: fullName,
+							email: email,
+							phone: phone,
+							specialty: specialty,
+							is_active: true
+						});
+					
+					if (insertError) throw insertError;
+				}
+
+				alert(`Técnico creado exitosamente.\n\nEmail: ${email}\nContraseña temporal: ${password}\n\nEl técnico deberá cambiar su contraseña al iniciar sesión.`);
+				
+				closeTechnicianModal();
+				loadTechnicians();
+				loadTechniciansList();
+
+			} catch (error) {
+				console.error('Error creating technician:', error);
+				alert('Error al crear técnico: ' + error.message);
+			} finally {
+				btn.innerHTML = originalText;
+				btn.disabled = false;
+			}
+		}
         
         // ==================== CREAR CLIENTES ====================
         

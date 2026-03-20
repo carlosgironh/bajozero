@@ -634,10 +634,7 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre de Empresa</label>
                         <input type="text" id="newClientCompany" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Opcional">
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">RUC (si aplica)</label>
-                        <input type="text" id="newClientRUC" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Opcional">
-                    </div>
+                    <!-- CAMPO RUC ELIMINADO - NO EXISTE EN LA BASE DE DATOS -->
                 </div>
                 <div class="pt-4 border-t flex gap-3">
                     <button type="button" onclick="closeClientModal()" class="flex-1 px-4 py-3 border border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition">
@@ -1011,7 +1008,7 @@
                     equipment_brand: document.getElementById('equipmentBrand').value,
                     equipment_model: document.getElementById('equipmentModel').value,
                     equipment_capacity: document.getElementById('equipmentCapacity').value,
-                    assigned_technician_id: document.getElementById('assignedTechnician').value,
+                    inspector_id: document.getElementById('assignedTechnician').value,
                     priority: document.getElementById('priority').value,
                     technician_notes: document.getElementById('technicianNotes').value,
                     status: 'asignada',
@@ -1156,7 +1153,7 @@
             });
         }
         
-        // ==================== CREAR TÉCNICOS ====================
+        // ==================== CREAR TÉCNICOS (Edge Function con JWT) ====================
         
         function openTechnicianModal() {
             document.getElementById('technicianModal').classList.remove('hidden');
@@ -1179,79 +1176,79 @@
             document.getElementById('techPassword').value = password;
         }
         
+        // CREAR TÉCNICO (llamada a Edge Function con JWT verification)
         async function saveTechnician(e) {
-			e.preventDefault();
-			const btn = document.getElementById('saveTechBtn');
-			const originalText = btn.innerHTML;
-			btn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Creando...';
-			btn.disabled = true;
+            e.preventDefault();
+            const btn = document.getElementById('saveTechBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Verificando...';
+            btn.disabled = true;
 
-			try {
-				const email = document.getElementById('techEmail').value;
-				const password = document.getElementById('techPassword').value;
-				const fullName = document.getElementById('techFullName').value;
-				const phone = document.getElementById('techPhone').value;
-				const specialty = document.getElementById('techSpecialty').value;
+            const email = document.getElementById('techEmail').value;
 
-				// 1. Crear usuario en Auth
-				const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-					email: email,
-					password: password,
-					options: {
-						data: {
-							full_name: fullName,
-							role: 'technician'
-						}
-					}
-				});
+            try {
+                // Obtener sesión actual
+                const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+                
+                if (sessionError || !sessionData.session) {
+                    throw new Error('No hay sesión activa. Por favor inicie sesión nuevamente.');
+                }
 
-				if (authError) throw authError;
+                // Verificar primero si el email ya existe en inspectors
+                const { data: existingInspector, error: searchError } = await supabaseClient
+                    .from('inspectors')
+                    .select('id, email, full_name, is_active')
+                    .eq('email', email)
+                    .maybeSingle();
 
-				// 2. Esperar un momento para que el trigger cree el registro
-				await new Promise(resolve => setTimeout(resolve, 500));
+                if (existingInspector) {
+                    throw new Error(`Ya existe un técnico con este email: ${existingInspector.full_name}. Use otro email.`);
+                }
 
-				// 3. Actualizar con datos adicionales (el trigger ya creó el registro base)
-				const { error: updateError } = await supabaseClient
-					.from('inspectors')
-					.update({
-						phone: phone,
-						specialty: specialty
-					})
-					.eq('id', authData.user.id);
+                // Llamar a Edge Function con JWT
+                btn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Creando...';
 
-				// Si no existe (el trigger falló), crearlo manualmente
-				if (updateError) {
-					const { error: insertError } = await supabaseClient
-						.from('inspectors')
-						.insert({
-							id: authData.user.id,
-							auth_user_id: authData.user.id,
-							full_name: fullName,
-							email: email,
-							phone: phone,
-							specialty: specialty,
-							is_active: true
-						});
-					
-					if (insertError) throw insertError;
-				}
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/create-technician`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${sessionData.session.access_token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: document.getElementById('techPassword').value,
+                        full_name: document.getElementById('techFullName').value,
+                        phone: document.getElementById('techPhone').value,
+                        specialty: document.getElementById('techSpecialty').value
+                    })
+                });
 
-				alert(`Técnico creado exitosamente.\n\nEmail: ${email}\nContraseña temporal: ${password}\n\nEl técnico deberá cambiar su contraseña al iniciar sesión.`);
-				
-				closeTechnicianModal();
-				loadTechnicians();
-				loadTechniciansList();
+                const result = await response.json();
 
-			} catch (error) {
-				console.error('Error creating technician:', error);
-				alert('Error al crear técnico: ' + error.message);
-			} finally {
-				btn.innerHTML = originalText;
-				btn.disabled = false;
-			}
-		}
+                if (!response.ok) {
+                    // Manejar error específico de email duplicado en auth
+                    if (result.auth_existing || (result.error && result.error.includes('already'))) {
+                        throw new Error('Este email ya está registrado en el sistema de autenticación. Use otro email.');
+                    }
+                    throw new Error(result.error || `Error ${response.status}: Error al crear técnico`);
+                }
+
+                alert(`✅ Técnico creado exitosamente.\n\n📧 Email: ${email}\n🔑 Contraseña temporal: ${result.temp_password || document.getElementById('techPassword').value}\n\nEl técnico debe cambiar su contraseña al iniciar sesión.`);
+                
+                closeTechnicianModal();
+                loadTechnicians();
+                loadTechniciansList();
+
+            } catch (error) {
+                console.error('Error creating technician:', error);
+                alert('❌ Error: ' + error.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
         
-        // ==================== CREAR CLIENTES ====================
+        // ==================== CREAR CLIENTES (Edge Function con JWT) ====================
         
         function openClientModal() {
             document.getElementById('clientModal').classList.remove('hidden');
@@ -1265,40 +1262,63 @@
             document.getElementById('clientForm').reset();
         }
         
+        // CREAR CLIENTE (llamada a Edge Function con JWT verification)
         async function saveNewClient(e) {
             e.preventDefault();
             const btn = document.getElementById('saveClientBtn');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Creando...';
             btn.disabled = true;
-        
+
             try {
-                const clientData = {
+                // Obtener sesión actual
+                const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+                
+                if (sessionError || !sessionData.session) {
+                    throw new Error('No hay sesión activa. Por favor inicie sesión nuevamente.');
+                }
+
+                // Construir body solo con campos que existen en la base de datos
+                const bodyData = {
                     contact_name: document.getElementById('newClientName').value,
-                    phone: document.getElementById('newClientPhone').value,
-                    email: document.getElementById('newClientEmail').value,
-                    address: document.getElementById('newClientAddress').value,
-                    company_name: document.getElementById('newClientCompany').value,
-                    ruc: document.getElementById('newClientRUC').value
+                    phone: document.getElementById('newClientPhone').value
                 };
-        
-                const { data: newClient, error } = await supabaseClient
-                    .from('clients')
-                    .insert(clientData)
-                    .select()
-                    .single();
-        
-                if (error) throw error;
-        
-                alert('Cliente creado exitosamente');
+
+                // Agregar campos opcionales solo si tienen valor
+                const email = document.getElementById('newClientEmail').value;
+                const address = document.getElementById('newClientAddress').value;
+                const company = document.getElementById('newClientCompany').value;
+
+                if (email) bodyData.email = email;
+                if (address) bodyData.address = address;
+                if (company) bodyData.company_name = company;
+                // NOTA: No enviamos 'ruc' porque la columna no existe en la BD
+
+                // Llamar a Edge Function con JWT
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/create-client`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${sessionData.session.access_token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(bodyData)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || `Error ${response.status}: Error al crear cliente`);
+                }
+
+                alert('✅ Cliente creado exitosamente');
                 
                 closeClientModal();
                 loadClients();
                 loadClientsList();
-        
+
             } catch (error) {
                 console.error('Error creating client:', error);
-                alert('Error al crear cliente: ' + error.message);
+                alert('❌ Error: ' + error.message);
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;

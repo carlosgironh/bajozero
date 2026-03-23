@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>A3 Solution | Sistema de Cotizaciones</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+body { font-family: 'Inter', sans-serif; }
+
+@page { size: letter; margin: 0.5in; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; }
+  .sheet {
+    width: 8.5in;
+    height: 11in;
+    box-shadow: none;
+    margin: 0;
+  }
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+
+.fade-in { animation: fadeIn 0.3s ease-in; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.status-badge {
+  @apply px-2 py-1 rounded-full text-xs font-bold;
+}
+.status-pendiente { @apply bg-yellow-500/20 text-yellow-300 border border-yellow-500/30; }
+.status-facturado { @apply bg-green-500/20 text-green-300 border border-green-500/30; }
+.status-dgi { @apply bg-blue-500/20 text-blue-300 border border-blue-500/30; }
+.status-anulado { @apply bg-red-500/20 text-red-300 border border-red-500/30; }
+</style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-[#0B1220] via-[#0E1A33] to-[#0B1220] text-white">
+
+<div class="max-w-[1600px] mx-auto p-6 grid lg:grid-cols-4 gap-6">
+
+<!-- SIDEBAR: HISTORIAL -->
+<section class="no-print lg:col-span-1 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl flex flex-col h-[calc(100vh-3rem)]">
+  
+  <div class="flex justify-between items-center border-b border-white/20 pb-4 mb-4">
+    <h1 class="text-xl font-black flex items-center gap-2">
+      <i class="fas fa-history text-[#4FA3FF]"></i> Historial
+    </h1>
+    <span id="totalCount" class="text-xs bg-white/20 px-2 py-1 rounded-full">0</span>
+  </div>
+
+  <!-- Filtros -->
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <select id="filterStatus" onchange="renderHistory()" class="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-xs">
+      <option value="all">Todos</option>
+      <option value="pendiente">Pendientes</option>
+      <option value="facturado">Facturados</option>
+      <option value="dgi">Fact. DGI</option>
+      <option value="anulado">Anulados</option>
+    </select>
+    <input type="text" id="searchClient" placeholder="Buscar..." oninput="renderHistory()" 
+      class="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-xs">
+  </div>
+
+  <!-- Lista de cotizaciones -->
+  <div id="historyList" class="flex-1 overflow-y-auto space-y-2 pr-1">
+    <!-- Se llena dinámicamente -->
+  </div>
+
+  <!-- Stats -->
+  <div class="mt-4 pt-4 border-t border-white/20 text-xs space-y-1">
+    <div class="flex justify-between text-blue-200">
+      <span>Total Cotizado:</span>
+      <span id="statsTotal" class="font-mono">B/. 0.00</span>
+    </div>
+    <div class="flex justify-between text-green-200">
+      <span>Facturado:</span>
+      <span id="statsInvoiced" class="font-mono">B/. 0.00</span>
+    </div>
+  </div>
+</section>
+
+<!-- PANEL CONTROL -->
+<section class="no-print lg:col-span-1 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 space-y-4 shadow-2xl overflow-y-auto h-[calc(100vh-3rem)]">
+
+  <div class="flex justify-between items-center border-b border-white/20 pb-4">
+    <h1 class="text-xl font-black">A3 Solution</h1>
+    <span class="text-xs font-bold px-3 py-1 rounded-full bg-gradient-to-r from-[#1E6FD9] to-[#4FA3FF]">
+      Cotizador PRO
+    </span>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="text-[10px] uppercase font-bold text-blue-200">Cotización #</label>
+      <input id="qNumber" readonly
+        class="w-full p-2 rounded-lg bg-white/30 font-mono font-bold cursor-not-allowed opacity-80">
+    </div>
+    <div>
+      <label class="text-[10px] uppercase font-bold text-blue-200">Fecha</label>
+      <input type="date" id="qDate" class="w-full p-2 rounded-lg bg-white/20">
+    </div>
+  </div>
+
+  <div>
+    <label class="text-[10px] uppercase font-bold text-blue-200">Cliente</label>
+    <input id="client" placeholder="Nombre o Razón Social"
+      class="w-full p-3 rounded-lg bg-white/20 mb-2">
+    <input id="clientRuc" placeholder="RUC / Cédula"
+      class="w-full p-3 rounded-lg bg-white/20 font-mono text-sm">
+  </div>
+
+  <!-- Estado de Facturación -->
+  <div class="bg-white/10 p-4 rounded-xl border border-white/20">
+    <label class="text-[10px] uppercase font-bold text-blue-200 mb-2 block">Estado</label>
+    <select id="invoiceStatus" onchange="updatePreview()" class="w-full p-2 rounded-lg bg-white/20 text-sm">
+      <option value="pendiente">🟡 Pendiente</option>
+      <option value="facturado">🟢 Facturado Normal</option>
+      <option value="dgi">🔵 Factura DGI</option>
+      <option value="anulado">🔴 Anulado</option>
+    </select>
+    
+    <div id="invoiceDetails" class="mt-3 space-y-2 hidden">
+      <input id="invoiceNumber" placeholder="N° Factura" 
+        class="w-full p-2 rounded-lg bg-white/20 text-sm font-mono">
+      <input type="date" id="invoiceDate" 
+        class="w-full p-2 rounded-lg bg-white/20 text-sm">
+    </div>
+  </div>
+
+  <!-- ITBMS -->
+  <div class="flex items-center gap-3 bg-white/10 p-4 rounded-xl border border-white/20">
+    <input type="checkbox" id="applyTax" checked onchange="updatePreview()"
+      class="w-5 h-5 accent-blue-500">
+    <label for="applyTax" class="text-sm font-bold text-blue-200">
+      Aplicar ITBMS (7%)
+    </label>
+  </div>
+
+  <div class="bg-white/10 p-4 rounded-2xl border border-white/20">
+    <h3 class="text-[10px] uppercase font-black text-blue-200 mb-2 flex justify-between">
+      Servicios
+      <span id="itemCount" class="text-white/60">0 items</span>
+    </h3>
+    <div id="items" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+    <button onclick="addItem()"
+      class="w-full mt-3 py-2 rounded-xl border border-dashed border-blue-300 text-blue-200 font-bold text-xs hover:bg-white/10">
+      + Agregar servicio
+    </button>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3">
+    <button onclick="saveQuote()" id="btnSave"
+      class="py-3 rounded-2xl font-bold bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 transition-all">
+      <i class="fas fa-save mr-2"></i>Guardar
+    </button>
+    <button onclick="printQuote()"
+      class="py-3 rounded-2xl font-bold bg-gradient-to-r from-[#1E6FD9] to-[#4FA3FF] hover:from-[#4FA3FF] hover:to-[#1E6FD9] transition-all">
+      <i class="fas fa-print mr-2"></i>PDF
+    </button>
+  </div>
+
+  <button onclick="newQuote()" class="w-full py-2 rounded-xl border border-white/20 text-sm hover:bg-white/10 transition-all">
+    <i class="fas fa-plus mr-2"></i>Nueva Cotización
+  </button>
+</section>
+
+<!-- PDF PREVIEW -->
+<section class="sheet bg-white rounded-3xl shadow-2xl p-14 lg:col-span-2 flex flex-col text-slate-900 relative">
+
+<!-- Marca de agua si está anulado -->
+<div id="watermark" class="hidden absolute inset-0 flex items-center justify-center pointer-events-none opacity-10 rotate-[-45deg]">
+  <span class="text-8xl font-black text-red-600 border-4 border-red-600 px-8 py-4">ANULADO</span>
+</div>
+
+<header class="flex justify-between mb-12">
+  <div class="flex gap-5 items-center">
+    <div class="h-20 w-20 bg-gradient-to-br from-[#1E6FD9] to-[#4FA3FF] rounded-xl flex items-center justify-center text-white font-black text-2xl">
+      A3
+    </div>
+    <div>
+      <h2 class="text-3xl font-black text-[#1E6FD9]">A3 Solution</h2>
+      <p class="font-bold text-sm">RUC: 8-963-952 DV 35</p>
+      <p class="text-xs text-slate-500">Panamá</p>
+    </div>
+  </div>
+  <div class="text-right">
+    <p class="text-5xl font-black text-slate-100">COTIZACIÓN</p>
+    <p class="font-mono font-bold text-lg"># <span id="pvNumber"></span></p>
+    <p class="text-xs text-slate-500" id="pvDate"></p>
+    <div id="pvStatus" class="mt-2 inline-block px-3 py-1 rounded-full text-xs font-bold bg-slate-100"></div>
+  </div>
+</header>
+
+<section class="mb-10 bg-slate-50 p-6 rounded-2xl border">
+  <p class="text-xs uppercase font-bold text-slate-400">Cliente</p>
+  <p id="pvClient" class="text-2xl font-black uppercase"></p>
+  <p id="pvRuc" class="font-mono text-xs text-slate-500"></p>
+</section>
+
+<table class="w-full mb-12">
+<thead>
+<tr class="border-b-4 border-[#1E6FD9] text-xs uppercase font-black">
+  <th class="text-left py-3 w-12">#</th>
+  <th class="text-left py-3">Descripción</th>
+  <th class="text-right py-3">Importe B/.</th>
+</tr>
+</thead>
+<tbody id="pvTable"></tbody>
+</table>
+
+<!-- Info de factura si aplica -->
+<div id="pvInvoiceInfo" class="hidden mb-8 p-4 bg-blue-50 rounded-xl border border-blue-200">
+  <p class="text-xs uppercase font-bold text-blue-600 mb-1">Documento Fiscal</p>
+  <p class="font-mono font-bold text-blue-900">Factura #<span id="pvInvNumber"></span></p>
+  <p class="text-xs text-blue-600" id="pvInvDate"></p>
+</div>
+
+<footer class="mt-auto flex justify-between border-t pt-8">
+  <div class="w-80 space-y-2">
+    <div class="flex justify-between">
+      <span>Subtotal</span>
+      <span id="sub" class="font-mono"></span>
+    </div>
+    <div class="flex justify-between text-slate-500" id="taxRow">
+      <span>ITBMS 7%</span>
+      <span id="tax" class="font-mono"></span>
+    </div>
+    <div class="flex justify-between text-2xl font-black border-t pt-3">
+      <span>Total</span>
+      <span id="total" class="font-mono"></span>
+    </div>
+  </div>
+</footer>
+
+</section>
+</div>
+
+<script>
+// ============================================
+// CAPA DE DATOS - Fácil migración a Supabase
+// ============================================
+
+const DB = {
+  // Actualmente usa localStorage, cambiar a Supabase es trivial
+  async getAll() {
+    const data = localStorage.getItem('a3_quotes_v2');
+    return data ? JSON.parse(data) : [];
+  },
+  
+  async getById(id) {
+    const quotes = await this.getAll();
+    return quotes.find(q => q.id === id);
+  },
+  
+  async save(quote) {
+    const quotes = await this.getAll();
+    const index = quotes.findIndex(q => q.id === quote.id);
+    
+    if (index >= 0) {
+      quotes[index] = { ...quotes[index], ...quote, updatedAt: new Date().toISOString() };
+    } else {
+      quotes.push({ ...quote, createdAt: new Date().toISOString() });
+    }
+    
+    localStorage.setItem('a3_quotes_v2', JSON.stringify(quotes));
+    return quote;
+  },
+  
+  async delete(id) {
+    const quotes = await this.getAll();
+    const filtered = quotes.filter(q => q.id !== id);
+    localStorage.setItem('a3_quotes_v2', JSON.stringify(filtered));
+  },
+  
+  // Para migración futura a Supabase:
+  // 1. Reemplazar estos métodos con llamadas a supabase.from('quotes')
+  // 2. Mismo interface, cero cambios en el resto del código
+  
+  async exportToJSON() {
+    const quotes = await this.getAll();
+    return JSON.stringify(quotes, null, 2);
+  }
+};
+
+// ============================================
+// ESTADO DE LA APLICACIÓN
+// ============================================
+
+let currentQuote = null;
+let items = [];
+
+// ============================================
+// INICIALIZACIÓN
+// ============================================
+
+async function init() {
+  // Generar nuevo número
+  const quotes = await DB.getAll();
+  const nextNum = 1001 + quotes.length;
+  
+  currentQuote = {
+    id: crypto.randomUUID(),
+    number: "A3-" + nextNum,
+    date: new Date().toISOString().split('T')[0],
+    client: '',
+    clientRuc: '',
+    items: [],
+    applyTax: true,
+    status: 'pendiente',
+    invoiceNumber: '',
+    invoiceDate: '',
+    subtotal: 0,
+    tax: 0,
+    total: 0
+  };
+  
+  items = [{ desc: '', price: 0 }];
+  
+  renderForm();
+  renderHistory();
+  updatePreview();
+}
+
+// ============================================
+// RENDERIZADO
+// ============================================
+
+function renderForm() {
+  document.getElementById('qNumber').value = currentQuote.number;
+  document.getElementById('qDate').value = currentQuote.date;
+  document.getElementById('client').value = currentQuote.client;
+  document.getElementById('clientRuc').value = currentQuote.clientRuc;
+  document.getElementById('applyTax').checked = currentQuote.applyTax;
+  document.getElementById('invoiceStatus').value = currentQuote.status;
+  
+  // Mostrar/ocultar campos de factura
+  const showInvoice = currentQuote.status !== 'pendiente' && currentQuote.status !== 'anulado';
+  document.getElementById('invoiceDetails').classList.toggle('hidden', !showInvoice);
+  document.getElementById('invoiceNumber').value = currentQuote.invoiceNumber || '';
+  document.getElementById('invoiceDate').value = currentQuote.invoiceDate || '';
+  
+  renderItems();
+}
+
+function renderItems() {
+  const container = document.getElementById("items");
+  container.innerHTML = '';
+  
+  items.forEach((item, index) => {
+    const div = document.createElement('div');
+    div.className = 'flex gap-2 fade-in';
+    div.innerHTML = `
+      <input class="flex-1 p-2 rounded bg-white/20 text-sm"
+        placeholder="Descripción del servicio"
+        value="${item.desc}"
+        oninput="updateItem(${index}, 'desc', this.value)">
+      <input type="number" step="0.01" class="w-24 p-2 rounded bg-white/20 text-sm text-right"
+        placeholder="0.00"
+        value="${item.price || ''}"
+        oninput="updateItem(${index}, 'price', this.value)">
+      <button onclick="removeItem(${index})" class="px-2 text-red-400 hover:text-red-300">
+        <i class="fas fa-trash"></i>
+      </button>
+    `;
+    container.appendChild(div);
+  });
+  
+  document.getElementById('itemCount').textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
+}
+
+async function renderHistory() {
+  const quotes = await DB.getAll();
+  const filter = document.getElementById('filterStatus').value;
+  const search = document.getElementById('searchClient').value.toLowerCase();
+  
+  const filtered = quotes
+    .filter(q => filter === 'all' || q.status === filter)
+    .filter(q => !search || 
+      (q.client && q.client.toLowerCase().includes(search)) ||
+      q.number.toLowerCase().includes(search))
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+  const container = document.getElementById('historyList');
+  container.innerHTML = '';
+  
+  filtered.forEach(quote => {
+    const div = document.createElement('div');
+    div.className = 'bg-white/5 hover:bg-white/10 p-3 rounded-xl cursor-pointer transition-all border border-white/10';
+    div.onclick = () => loadQuote(quote.id);
+    
+    const statusColors = {
+      pendiente: 'status-pendiente',
+      facturado: 'status-facturado',
+      dgi: 'status-dgi',
+      anulado: 'status-anulado'
+    };
+    
+    div.innerHTML = `
+      <div class="flex justify-between items-start mb-1">
+        <span class="font-mono font-bold text-sm text-blue-300">${quote.number}</span>
+        <span class="${statusColors[quote.status] || 'status-pendiente'} status-badge">
+          ${quote.status}
+        </span>
+      </div>
+      <p class="text-sm font-medium truncate">${quote.client || 'Sin cliente'}</p>
+      <div class="flex justify-between items-center mt-2 text-xs text-white/60">
+        <span>${new Date(quote.date).toLocaleDateString('es-PA')}</span>
+        <span class="font-mono">B/. ${quote.total?.toFixed(2) || '0.00'}</span>
+      </div>
+      ${quote.invoiceNumber ? `<div class="mt-1 text-xs text-blue-300">Fact: ${quote.invoiceNumber}</div>` : ''}
+    `;
+    container.appendChild(div);
+  });
+  
+  document.getElementById('totalCount').textContent = filtered.length;
+  
+  // Stats
+  const stats = quotes.reduce((acc, q) => {
+    acc.total += q.total || 0;
+    if (q.status === 'facturado' || q.status === 'dgi') acc.invoiced += q.total || 0;
+    return acc;
+  }, { total: 0, invoiced: 0 });
+  
+  document.getElementById('statsTotal').textContent = `B/. ${stats.total.toFixed(2)}`;
+  document.getElementById('statsInvoiced').textContent = `B/. ${stats.invoiced.toFixed(2)}`;
+}
+
+// ============================================
+// ACCIONES
+// ============================================
+
+function addItem() {
+  items.push({ desc: '', price: 0 });
+  renderItems();
+  updatePreview();
+}
+
+function removeItem(index) {
+  if (items.length > 1) {
+    items.splice(index, 1);
+    renderItems();
+    updatePreview();
+  }
+}
+
+function updateItem(index, field, value) {
+  items[index][field] = field === 'price' ? parseFloat(value) || 0 : value;
+  updatePreview();
+}
+
+function updatePreview() {
+  // Actualizar estado
+  currentQuote.client = document.getElementById('client').value;
+  currentQuote.clientRuc = document.getElementById('clientRuc').value;
+  currentQuote.date = document.getElementById('qDate').value;
+  currentQuote.applyTax = document.getElementById('applyTax').checked;
+  currentQuote.status = document.getElementById('invoiceStatus').value;
+  currentQuote.invoiceNumber = document.getElementById('invoiceNumber').value;
+  currentQuote.invoiceDate = document.getElementById('invoiceDate').value;
+  
+  // Mostrar/ocultar campos de factura
+  const showInvoice = currentQuote.status !== 'pendiente' && currentQuote.status !== 'anulado';
+  document.getElementById('invoiceDetails').classList.toggle('hidden', !showInvoice);
+  
+  // Preview
+  document.getElementById('pvNumber').textContent = currentQuote.number;
+  document.getElementById('pvDate').textContent = new Date(currentQuote.date).toLocaleDateString('es-PA', {
+    year: 'numeric', month: 'long', day: 'numeric'
+  });
+  document.getElementById('pvClient').textContent = currentQuote.client || "CLIENTE";
+  document.getElementById('pvRuc').textContent = currentQuote.clientRuc || "";
+  
+  // Status badge
+  const statusEl = document.getElementById('pvStatus');
+  const statusText = {
+    pendiente: '🟡 PENDIENTE',
+    facturado: '🟢 FACTURADO',
+    dgi: '🔵 FACTURA DGI',
+    anulado: '🔴 ANULADO'
+  };
+  statusEl.textContent = statusText[currentQuote.status];
+  statusEl.className = `mt-2 inline-block px-3 py-1 rounded-full text-xs font-bold ${
+    currentQuote.status === 'anulado' ? 'bg-red-100 text-red-700' :
+    currentQuote.status === 'facturado' ? 'bg-green-100 text-green-700' :
+    currentQuote.status === 'dgi' ? 'bg-blue-100 text-blue-700' :
+    'bg-yellow-100 text-yellow-700'
+  }`;
+  
+  // Watermark anulado
+  document.getElementById('watermark').classList.toggle('hidden', currentQuote.status !== 'anulado');
+  
+  // Tabla
+  let subtotal = 0;
+  const tbody = document.getElementById('pvTable');
+  tbody.innerHTML = '';
+  
+  items.forEach((item, i) => {
+    subtotal += item.price;
+    if (item.desc || item.price) {
+      tbody.innerHTML += `
+        <tr class="border-b border-slate-100">
+          <td class="py-3 text-slate-400">${i + 1}</td>
+          <td class="py-3">${item.desc || ''}</td>
+          <td class="py-3 text-right font-mono">${item.price.toFixed(2)}</td>
+        </tr>`;
+    }
+  });
+  
+  // Cálculos
+  const tax = currentQuote.applyTax ? subtotal * 0.07 : 0;
+  const total = subtotal + tax;
+  
+  document.getElementById('taxRow').style.display = currentQuote.applyTax ? 'flex' : 'none';
+  document.getElementById('sub').textContent = "B/. " + subtotal.toFixed(2);
+  document.getElementById('tax').textContent = "B/. " + tax.toFixed(2);
+  document.getElementById('total').textContent = "B/. " + total.toFixed(2);
+  
+  // Guardar en objeto
+  currentQuote.items = items;
+  currentQuote.subtotal = subtotal;
+  currentQuote.tax = tax;
+  currentQuote.total = total;
+  
+  // Info de factura en preview
+  const invInfo = document.getElementById('pvInvoiceInfo');
+  if (currentQuote.invoiceNumber && showInvoice) {
+    invInfo.classList.remove('hidden');
+    document.getElementById('pvInvNumber').textContent = currentQuote.invoiceNumber;
+    document.getElementById('pvInvDate').textContent = currentQuote.invoiceDate ? 
+      new Date(currentQuote.invoiceDate).toLocaleDateString('es-PA') : '';
+  } else {
+    invInfo.classList.add('hidden');
+  }
+}
+
+async function saveQuote() {
+  if (!currentQuote.client) {
+    alert('Por favor ingrese el nombre del cliente');
+    return;
+  }
+  
+  if (items.every(i => !i.desc && !i.price)) {
+    alert('Agregue al menos un servicio');
+    return;
+  }
+  
+  await DB.save(currentQuote);
+  await renderHistory();
+  
+  // Feedback visual
+  const btn = document.getElementById('btnSave');
+  const original = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-check mr-2"></i>Guardado!';
+  btn.classList.add('bg-green-600');
+  setTimeout(() => {
+    btn.innerHTML = original;
+    btn.classList.remove('bg-green-600');
+  }, 1500);
+}
+
+async function loadQuote(id) {
+  const quote = await DB.getById(id);
+  if (!quote) return;
+  
+  currentQuote = { ...quote };
+  items = quote.items.map(i => ({ ...i }));
+  
+  renderForm();
+  updatePreview();
+}
+
+function newQuote() {
+  init();
+}
+
+function printQuote() {
+  window.print();
+}
+
+// ============================================
+// UTILIDADES PARA MIGRACIÓN
+// ============================================
+
+async function exportData() {
+  const json = await DB.exportToJSON();
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `a3_backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+}
+
+// Iniciar
+init();
+
+// Exponer para debugging
+window.DB = DB;
+window.exportData = exportData;
+</script>
+
+</body>
+</html>

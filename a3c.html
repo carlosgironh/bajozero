@@ -2,15 +2,18 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>A3 Solution | Sistema de Cotizaciones</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A3 Solution | Sistema de Cotizaciones PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-body { font-family: 'Inter', sans-serif; }
+* { -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Inter', sans-serif; overscroll-behavior: none; }
 
 @page { size: letter; margin: 0.5in; }
 
@@ -18,251 +21,456 @@ body { font-family: 'Inter', sans-serif; }
   .no-print { display: none !important; }
   body { background: white !important; }
   .sheet {
-    width: 8.5in;
-    height: 11in;
-    box-shadow: none;
-    margin: 0;
+    width: 8.5in !important;
+    height: 11in !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
   }
 }
 
-/* Scrollbar personalizado */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+/* Mobile optimizations */
+.touch-manipulation { touch-action: manipulation; }
+input, select, button { font-size: 16px; }
 
-.fade-in { animation: fadeIn 0.3s ease-in; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 
-.status-badge {
-  @apply px-2 py-1 rounded-full text-xs font-bold;
+.fade-in { animation: fadeIn 0.2s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+.sidebar {
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.status-pendiente { @apply bg-yellow-500/20 text-yellow-300 border border-yellow-500/30; }
-.status-facturado { @apply bg-green-500/20 text-green-300 border border-green-500/30; }
-.status-dgi { @apply bg-blue-500/20 text-blue-300 border border-blue-500/30; }
-.status-anulado { @apply bg-red-500/20 text-red-300 border border-red-500/30; }
+.sidebar.open { transform: translateX(0); }
+
+.item-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.2s;
+}
+.item-card:focus-within {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.profit-positive { color: #4ade80; }
+.profit-negative { color: #f87171; }
+
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 20px); }
+
+/* Toggle switch */
+.toggle-checkbox:checked { right: 0; border-color: #3B82F6; }
+.toggle-checkbox:checked + .toggle-label { background-color: #3B82F6; }
 </style>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-[#0B1220] via-[#0E1A33] to-[#0B1220] text-white">
+<body class="bg-gradient-to-br from-[#0B1220] via-[#0E1A33] to-[#0B1220] text-white min-h-screen">
 
-<div class="max-w-[1600px] mx-auto p-6 grid lg:grid-cols-4 gap-6">
+<!-- OVERLAY -->
+<div id="overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300" onclick="closeAllModals()"></div>
 
-<!-- SIDEBAR: HISTORIAL -->
-<section class="no-print lg:col-span-1 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl flex flex-col h-[calc(100vh-3rem)]">
+<!-- SIDEBAR HISTORIAL -->
+<aside id="historySidebar" class="sidebar fixed left-0 top-0 h-full w-full sm:w-96 bg-[#0B1220] border-r border-white/10 z-50 flex flex-col">
+  <div class="flex items-center justify-between p-4 border-b border-white/10 bg-white/5">
+    <h2 class="text-lg font-bold flex items-center gap-2">
+      <i class="fas fa-history text-blue-400"></i>
+      Historial de Cotizaciones
+    </h2>
+    <button onclick="toggleHistory()" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-all">
+      <i class="fas fa-times text-lg"></i>
+    </button>
+  </div>
   
-  <div class="flex justify-between items-center border-b border-white/20 pb-4 mb-4">
-    <h1 class="text-xl font-black flex items-center gap-2">
-      <i class="fas fa-history text-[#4FA3FF]"></i> Historial
-    </h1>
-    <span id="totalCount" class="text-xs bg-white/20 px-2 py-1 rounded-full">0</span>
-  </div>
-
-  <!-- Filtros -->
-  <div class="grid grid-cols-2 gap-2 mb-4">
-    <select id="filterStatus" onchange="renderHistory()" class="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-xs">
-      <option value="all">Todos</option>
-      <option value="pendiente">Pendientes</option>
-      <option value="facturado">Facturados</option>
-      <option value="dgi">Fact. DGI</option>
-      <option value="anulado">Anulados</option>
-    </select>
-    <input type="text" id="searchClient" placeholder="Buscar..." oninput="renderHistory()" 
-      class="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-xs">
-  </div>
-
-  <!-- Lista de cotizaciones -->
-  <div id="historyList" class="flex-1 overflow-y-auto space-y-2 pr-1">
-    <!-- Se llena dinámicamente -->
-  </div>
-
-  <!-- Stats -->
-  <div class="mt-4 pt-4 border-t border-white/20 text-xs space-y-1">
-    <div class="flex justify-between text-blue-200">
-      <span>Total Cotizado:</span>
-      <span id="statsTotal" class="font-mono">B/. 0.00</span>
-    </div>
-    <div class="flex justify-between text-green-200">
-      <span>Facturado:</span>
-      <span id="statsInvoiced" class="font-mono">B/. 0.00</span>
-    </div>
-  </div>
-</section>
-
-<!-- PANEL CONTROL -->
-<section class="no-print lg:col-span-1 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 space-y-4 shadow-2xl overflow-y-auto h-[calc(100vh-3rem)]">
-
-  <div class="flex justify-between items-center border-b border-white/20 pb-4">
-    <h1 class="text-xl font-black">A3 Solution</h1>
-    <span class="text-xs font-bold px-3 py-1 rounded-full bg-gradient-to-r from-[#1E6FD9] to-[#4FA3FF]">
-      Cotizador PRO
-    </span>
-  </div>
-
-  <div class="grid grid-cols-2 gap-4">
-    <div>
-      <label class="text-[10px] uppercase font-bold text-blue-200">Cotización #</label>
-      <input id="qNumber" readonly
-        class="w-full p-2 rounded-lg bg-white/30 font-mono font-bold cursor-not-allowed opacity-80">
-    </div>
-    <div>
-      <label class="text-[10px] uppercase font-bold text-blue-200">Fecha</label>
-      <input type="date" id="qDate" class="w-full p-2 rounded-lg bg-white/20">
-    </div>
-  </div>
-
-  <div>
-    <label class="text-[10px] uppercase font-bold text-blue-200">Cliente</label>
-    <input id="client" placeholder="Nombre o Razón Social"
-      class="w-full p-3 rounded-lg bg-white/20 mb-2">
-    <input id="clientRuc" placeholder="RUC / Cédula"
-      class="w-full p-3 rounded-lg bg-white/20 font-mono text-sm">
-  </div>
-
-  <!-- Estado de Facturación -->
-  <div class="bg-white/10 p-4 rounded-xl border border-white/20">
-    <label class="text-[10px] uppercase font-bold text-blue-200 mb-2 block">Estado</label>
-    <select id="invoiceStatus" onchange="updatePreview()" class="w-full p-2 rounded-lg bg-white/20 text-sm">
-      <option value="pendiente">🟡 Pendiente</option>
-      <option value="facturado">🟢 Facturado Normal</option>
+  <div class="p-4 space-y-3 border-b border-white/10">
+    <select id="filterStatus" onchange="renderHistory()" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:outline-none">
+      <option value="all">Todos los estados</option>
+      <option value="pendiente">🟡 Pendientes</option>
+      <option value="facturado">🟢 Facturados</option>
       <option value="dgi">🔵 Factura DGI</option>
-      <option value="anulado">🔴 Anulado</option>
+      <option value="anulado">🔴 Anulados</option>
     </select>
-    
-    <div id="invoiceDetails" class="mt-3 space-y-2 hidden">
-      <input id="invoiceNumber" placeholder="N° Factura" 
-        class="w-full p-2 rounded-lg bg-white/20 text-sm font-mono">
-      <input type="date" id="invoiceDate" 
-        class="w-full p-2 rounded-lg bg-white/20 text-sm">
+    <div class="relative">
+      <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-white/40"></i>
+      <input type="text" id="searchClient" placeholder="Buscar cliente o #cotización..." oninput="renderHistory()" 
+        class="w-full bg-white/10 border border-white/20 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-blue-400 focus:outline-none">
     </div>
   </div>
 
-  <!-- ITBMS -->
-  <div class="flex items-center gap-3 bg-white/10 p-4 rounded-xl border border-white/20">
-    <input type="checkbox" id="applyTax" checked onchange="updatePreview()"
-      class="w-5 h-5 accent-blue-500">
-    <label for="applyTax" class="text-sm font-bold text-blue-200">
-      Aplicar ITBMS (7%)
-    </label>
-  </div>
+  <div id="historyList" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
 
-  <div class="bg-white/10 p-4 rounded-2xl border border-white/20">
-    <h3 class="text-[10px] uppercase font-black text-blue-200 mb-2 flex justify-between">
-      Servicios
-      <span id="itemCount" class="text-white/60">0 items</span>
-    </h3>
-    <div id="items" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
-    <button onclick="addItem()"
-      class="w-full mt-3 py-2 rounded-xl border border-dashed border-blue-300 text-blue-200 font-bold text-xs hover:bg-white/10">
-      + Agregar servicio
+  <div class="p-4 border-t border-white/10 bg-white/5 safe-bottom">
+    <div class="grid grid-cols-2 gap-4 mb-3 text-sm">
+      <div class="bg-white/10 rounded-xl p-3">
+        <div class="text-white/50 text-xs mb-1">Total Cotizado</div>
+        <div id="statsTotal" class="font-mono font-bold text-blue-300">B/. 0.00</div>
+      </div>
+      <div class="bg-white/10 rounded-xl p-3">
+        <div class="text-white/50 text-xs mb-1">Facturado</div>
+        <div id="statsInvoiced" class="font-mono font-bold text-green-300">B/. 0.00</div>
+      </div>
+    </div>
+    <button onclick="exportData()" class="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-bold transition-all flex items-center justify-center gap-2">
+      <i class="fas fa-download"></i> Exportar Backup
     </button>
   </div>
+</aside>
 
-  <div class="grid grid-cols-2 gap-3">
-    <button onclick="saveQuote()" id="btnSave"
-      class="py-3 rounded-2xl font-bold bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 transition-all">
-      <i class="fas fa-save mr-2"></i>Guardar
-    </button>
-    <button onclick="printQuote()"
-      class="py-3 rounded-2xl font-bold bg-gradient-to-r from-[#1E6FD9] to-[#4FA3FF] hover:from-[#4FA3FF] hover:to-[#1E6FD9] transition-all">
-      <i class="fas fa-print mr-2"></i>PDF
-    </button>
+<!-- MODAL CATÁLOGO -->
+<div id="catalogModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 sm:p-6">
+  <div class="bg-[#0B1220] border border-white/20 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl fade-in">
+    <div class="flex items-center justify-between p-4 border-b border-white/10">
+      <div>
+        <h2 class="text-lg font-bold flex items-center gap-2">
+          <i class="fas fa-boxes text-blue-400"></i>
+          Catálogo de Productos
+        </h2>
+        <p class="text-xs text-white/50 mt-1">Gestiona tus productos y categorías</p>
+      </div>
+      <button onclick="closeCatalog()" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center">
+        <i class="fas fa-times text-lg"></i>
+      </button>
+    </div>
+    
+    <div class="p-4 border-b border-white/10 space-y-3">
+      <div class="flex gap-2">
+        <div class="relative flex-1">
+          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-white/40"></i>
+          <input type="text" id="catalogSearch" placeholder="Buscar producto..." oninput="renderCatalog()"
+            class="w-full bg-white/10 border border-white/20 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-blue-400 focus:outline-none">
+        </div>
+        <select id="catalogCategory" onchange="renderCatalog()" class="bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:outline-none">
+          <option value="all">Todas las categorías</option>
+        </select>
+      </div>
+      
+      <div class="flex gap-2">
+        <button onclick="openNewProductForm()" class="flex-1 py-2.5 rounded-lg bg-blue-500/20 text-blue-300 text-sm font-bold hover:bg-blue-500/30 transition-all">
+          <i class="fas fa-plus mr-2"></i>Nuevo Producto
+        </button>
+        <button onclick="openCategoryManager()" class="px-4 py-2.5 rounded-lg bg-white/10 text-white/70 text-sm font-bold hover:bg-white/20 transition-all">
+          <i class="fas fa-tags"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="catalogList" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
   </div>
-
-  <button onclick="newQuote()" class="w-full py-2 rounded-xl border border-white/20 text-sm hover:bg-white/10 transition-all">
-    <i class="fas fa-plus mr-2"></i>Nueva Cotización
-  </button>
-</section>
-
-<!-- PDF PREVIEW -->
-<section class="sheet bg-white rounded-3xl shadow-2xl p-14 lg:col-span-2 flex flex-col text-slate-900 relative">
-
-<!-- Marca de agua si está anulado -->
-<div id="watermark" class="hidden absolute inset-0 flex items-center justify-center pointer-events-none opacity-10 rotate-[-45deg]">
-  <span class="text-8xl font-black text-red-600 border-4 border-red-600 px-8 py-4">ANULADO</span>
 </div>
 
-<header class="flex justify-between mb-12">
-  <div class="flex gap-5 items-center">
-    <div class="h-20 w-20 bg-gradient-to-br from-[#1E6FD9] to-[#4FA3FF] rounded-xl flex items-center justify-center text-white font-black text-2xl">
-      A3
+<!-- MODAL GESTIÓN DE CATEGORÍAS -->
+<div id="categoryModal" class="fixed inset-0 z-[55] hidden flex items-center justify-center p-4">
+  <div class="bg-[#0B1220] border border-white/20 rounded-2xl w-full max-w-md p-6 shadow-2xl fade-in">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-bold">Gestionar Categorías</h3>
+      <button onclick="closeCategoryManager()" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
-    <div>
-      <h2 class="text-3xl font-black text-[#1E6FD9]">A3 Solution</h2>
-      <p class="font-bold text-sm">RUC: 8-963-952 DV 35</p>
-      <p class="text-xs text-slate-500">Panamá</p>
+    
+    <div class="space-y-3 mb-4">
+      <div class="flex gap-2">
+        <input id="newCategoryName" placeholder="Nueva categoría..." 
+          class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-sm focus:border-blue-400 focus:outline-none">
+        <button onclick="addCategory()" class="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-sm font-bold transition-all">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div id="categoryList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+    
+    <button onclick="closeCategoryManager()" class="w-full mt-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-bold transition-all">
+      Cerrar
+    </button>
+  </div>
+</div>
+
+<!-- MODAL NUEVO PRODUCTO -->
+<div id="productModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
+  <div class="bg-[#0B1220] border border-white/20 rounded-2xl w-full max-w-md p-6 shadow-2xl fade-in">
+    <h3 class="text-lg font-bold mb-4">Nuevo Producto</h3>
+    <div class="space-y-4">
+      <div>
+        <label class="text-xs uppercase text-white/50 block mb-2">Nombre</label>
+        <input id="newProdName" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:outline-none" placeholder="Nombre del producto">
+      </div>
+      <div>
+        <label class="text-xs uppercase text-white/50 block mb-2">Categoría</label>
+        <select id="newProdCategory" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:outline-none">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs uppercase text-white/50 block mb-2">Costo Base</label>
+          <input type="number" step="0.01" id="newProdCost" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:outline-none" placeholder="0.00">
+        </div>
+        <div>
+          <label class="text-xs uppercase text-white/50 block mb-2">Margen %</label>
+          <input type="number" id="newProdMargin" value="30" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:outline-none" placeholder="30">
+        </div>
+      </div>
+      <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
+        <input type="checkbox" id="newProdTax" checked class="w-5 h-5 rounded accent-blue-500">
+        <label for="newProdTax" class="text-sm">Aplica ITBMS (7%)</label>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-6">
+      <button onclick="closeProductModal()" class="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-bold transition-all">Cancelar</button>
+      <button onclick="saveNewProduct()" class="flex-1 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-sm font-bold transition-all">Guardar</button>
     </div>
   </div>
-  <div class="text-right">
-    <p class="text-5xl font-black text-slate-100">COTIZACIÓN</p>
-    <p class="font-mono font-bold text-lg"># <span id="pvNumber"></span></p>
-    <p class="text-xs text-slate-500" id="pvDate"></p>
-    <div id="pvStatus" class="mt-2 inline-block px-3 py-1 rounded-full text-xs font-bold bg-slate-100"></div>
+</div>
+
+<!-- HEADER -->
+<header class="no-print fixed top-0 left-0 right-0 h-16 bg-[#0B1220]/95 backdrop-blur-xl border-b border-white/10 z-30 flex items-center justify-between px-4">
+  <div class="flex items-center gap-3">
+    <button onclick="toggleHistory()" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all touch-manipulation">
+      <i class="fas fa-bars text-lg"></i>
+    </button>
+    <div class="flex items-center gap-2">
+      <div class="h-8 w-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center font-black text-sm shadow-lg shadow-blue-500/20">A3</div>
+      <span class="font-bold hidden sm:block">Solution</span>
+    </div>
+  </div>
+  
+  <div class="flex items-center gap-2">
+    <span id="docNumber" class="font-mono text-sm bg-white/10 px-3 py-1.5 rounded-lg border border-white/10"></span>
+    <button onclick="openCatalog()" class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 flex items-center justify-center transition-all touch-manipulation">
+      <i class="fas fa-boxes"></i>
+    </button>
   </div>
 </header>
 
-<section class="mb-10 bg-slate-50 p-6 rounded-2xl border">
-  <p class="text-xs uppercase font-bold text-slate-400">Cliente</p>
-  <p id="pvClient" class="text-2xl font-black uppercase"></p>
-  <p id="pvRuc" class="font-mono text-xs text-slate-500"></p>
-</section>
+<!-- MAIN CONTENT -->
+<main class="pt-20 pb-24 px-4 max-w-7xl mx-auto">
+  <div class="grid lg:grid-cols-2 gap-6">
+    
+    <!-- LEFT PANEL: FORM (DATOS INTERNOS) -->
+    <section class="no-print space-y-4">
+      
+      <!-- General Info -->
+      <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-5 shadow-xl">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-sm font-bold uppercase text-white/70 flex items-center gap-2">
+            <i class="fas fa-info-circle text-blue-400"></i> Información General
+          </h3>
+          <button onclick="newQuote()" class="text-xs px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all touch-manipulation">
+            <i class="fas fa-plus mr-1"></i>Nueva
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label class="text-[10px] uppercase text-white/50 block mb-1.5 font-medium">Fecha</label>
+            <input type="date" id="qDate" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2.5 text-sm focus:border-blue-400 focus:outline-none transition-all">
+          </div>
+          <div>
+            <label class="text-[10px] uppercase text-white/50 block mb-1.5 font-medium">Estado</label>
+            <select id="invoiceStatus" onchange="updatePreview()" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2.5 text-sm focus:border-blue-400 focus:outline-none transition-all">
+              <option value="pendiente">🟡 Pendiente</option>
+              <option value="facturado">🟢 Facturado</option>
+              <option value="dgi">🔵 Factura DGI</option>
+              <option value="anulado">🔴 Anulado</option>
+            </select>
+          </div>
+        </div>
 
-<table class="w-full mb-12">
-<thead>
-<tr class="border-b-4 border-[#1E6FD9] text-xs uppercase font-black">
-  <th class="text-left py-3 w-12">#</th>
-  <th class="text-left py-3">Descripción</th>
-  <th class="text-right py-3">Importe B/.</th>
-</tr>
-</thead>
-<tbody id="pvTable"></tbody>
-</table>
+        <div class="space-y-3">
+          <div>
+            <label class="text-[10px] uppercase text-white/50 block mb-1.5 font-medium">Cliente</label>
+            <input id="client" placeholder="Nombre o Razón Social" oninput="updatePreview()"
+              class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:outline-none transition-all">
+          </div>
+          <input id="clientRuc" placeholder="RUC / Cédula" oninput="updatePreview()"
+            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-sm font-mono focus:border-blue-400 focus:outline-none transition-all">
+        </div>
 
-<!-- Info de factura si aplica -->
-<div id="pvInvoiceInfo" class="hidden mb-8 p-4 bg-blue-50 rounded-xl border border-blue-200">
-  <p class="text-xs uppercase font-bold text-blue-600 mb-1">Documento Fiscal</p>
-  <p class="font-mono font-bold text-blue-900">Factura #<span id="pvInvNumber"></span></p>
-  <p class="text-xs text-blue-600" id="pvInvDate"></p>
-</div>
+        <div id="invoiceFields" class="hidden mt-4 pt-4 border-t border-white/10 grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] uppercase text-white/50 block mb-1.5 font-medium">N° Factura</label>
+            <input id="invoiceNumber" placeholder="000-000-000000" oninput="updatePreview()"
+              class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2.5 text-sm font-mono focus:border-blue-400 focus:outline-none transition-all">
+          </div>
+          <div>
+            <label class="text-[10px] uppercase text-white/50 block mb-1.5 font-medium">Fecha Factura</label>
+            <input type="date" id="invoiceDate" oninput="updatePreview()"
+              class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2.5 text-sm focus:border-blue-400 focus:outline-none transition-all">
+          </div>
+        </div>
+      </div>
 
-<footer class="mt-auto flex justify-between border-t pt-8">
-  <div class="w-80 space-y-2">
-    <div class="flex justify-between">
-      <span>Subtotal</span>
-      <span id="sub" class="font-mono"></span>
-    </div>
-    <div class="flex justify-between text-slate-500" id="taxRow">
-      <span>ITBMS 7%</span>
-      <span id="tax" class="font-mono"></span>
-    </div>
-    <div class="flex justify-between text-2xl font-black border-t pt-3">
-      <span>Total</span>
-      <span id="total" class="font-mono"></span>
-    </div>
+      <!-- Items List (DATOS INTERNOS) -->
+      <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-5 shadow-xl">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-sm font-bold uppercase text-white/70 flex items-center gap-2">
+            <i class="fas fa-lock text-yellow-400"></i> Gestión Interna de Items
+          </h3>
+          <div class="flex gap-2">
+            <button onclick="openCatalog()" class="text-xs px-3 py-1.5 rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-all touch-manipulation">
+              <i class="fas fa-boxes mr-1"></i>Catálogo
+            </button>
+            <span id="itemCount" class="text-xs bg-white/20 px-2 py-1 rounded-lg">0</span>
+          </div>
+        </div>
+
+        <div id="items" class="space-y-3 max-h-[50vh] overflow-y-auto pr-1"></div>
+        
+        <button onclick="addItem()"
+          class="w-full mt-4 py-3 rounded-xl border-2 border-dashed border-blue-400/50 text-blue-300 font-bold text-sm hover:bg-blue-400/10 hover:border-blue-400 transition-all touch-manipulation active:scale-95">
+          <i class="fas fa-plus mr-2"></i>Agregar Item Manual
+        </button>
+      </div>
+
+      <!-- Global Settings -->
+      <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-5 shadow-xl">
+        <h3 class="text-sm font-bold uppercase text-white/70 mb-3 flex items-center gap-2">
+          <i class="fas fa-cog text-blue-400"></i> Configuración Global
+        </h3>
+        <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+          <div>
+            <div class="text-sm font-medium">Margen de Ganancia Default</div>
+            <div class="text-xs text-white/50">Aplica a nuevos items</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="number" id="defaultMargin" value="30" min="0" max="999" 
+              class="w-16 bg-white/20 rounded-lg px-2 py-1 text-right font-mono text-sm focus:border-blue-400 focus:outline-none"
+              onchange="updateAllMargins()">
+            <span class="text-sm">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="grid grid-cols-2 gap-3 sticky bottom-4 safe-bottom">
+        <button onclick="saveQuote()" id="btnSave"
+          class="py-4 rounded-2xl font-bold bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 transition-all shadow-lg shadow-green-900/20 touch-manipulation active:scale-95 flex items-center justify-center gap-2">
+          <i class="fas fa-save"></i>
+          <span>GUARDAR</span>
+        </button>
+        <button onclick="printQuote()"
+          class="py-4 rounded-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-900/20 touch-manipulation active:scale-95 flex items-center justify-center gap-2">
+          <i class="fas fa-file-pdf"></i>
+          <span>PDF</span>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- RIGHT PANEL: PREVIEW (SOLO DATOS CLIENTE) -->
+    <section class="lg:sticky lg:top-20 h-fit">
+      <div class="sheet bg-white rounded-2xl shadow-2xl p-6 sm:p-10 lg:p-12 flex flex-col text-slate-900 min-h-[600px] relative overflow-hidden">
+        
+        <!-- Watermark -->
+        <div id="watermark" class="hidden absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.06] rotate-[-30deg] z-0">
+          <span class="text-[100px] sm:text-[140px] font-black text-red-600 border-8 border-red-600 px-8 py-4">ANULADO</span>
+        </div>
+
+        <div class="relative z-10 flex flex-col h-full">
+          <!-- Header -->
+          <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-6 border-b-2 border-slate-100 gap-4">
+            <div class="flex items-center gap-3">
+              <div class="h-14 w-14 sm:h-16 sm:w-16 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">
+                A3
+              </div>
+              <div>
+                <h2 class="text-xl sm:text-2xl font-black text-blue-600">A3 Solution</h2>
+                <p class="text-xs font-bold text-slate-600">RUC: 8-963-952 DV 35</p>
+                <p class="text-xs text-slate-400">Panamá</p>
+              </div>
+            </div>
+            <div class="text-left sm:text-right">
+              <p class="text-3xl sm:text-4xl font-black text-slate-100 leading-none">COTIZACIÓN</p>
+              <p class="font-mono font-bold text-lg text-slate-700 mt-1"># <span id="pvNumber"></span></p>
+              <p class="text-xs text-slate-400 mt-1" id="pvDate"></p>
+              <div id="pvStatus" class="mt-2 inline-block px-3 py-1 rounded-full text-[10px] font-bold"></div>
+            </div>
+          </header>
+
+          <!-- Client -->
+          <section class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <p class="text-[10px] uppercase font-bold text-slate-400 mb-1">Cliente</p>
+            <p id="pvClient" class="text-lg sm:text-xl font-black uppercase text-slate-800"></p>
+            <p id="pvRuc" class="font-mono text-xs text-slate-500 mt-1"></p>
+          </section>
+
+          <!-- Table (SIMPLIFICADA - SIN DATOS INTERNOS) -->
+          <div class="overflow-x-auto mb-6">
+            <table class="w-full min-w-[400px]">
+              <thead>
+                <tr class="border-b-2 border-blue-600 text-[10px] uppercase font-black text-slate-600">
+                  <th class="text-left py-3 w-10">#</th>
+                  <th class="text-left py-3">Descripción</th>
+                  <th class="text-right py-3 w-24">Precio Unit.</th>
+                  <th class="text-right py-3 w-16">Cant</th>
+                  <th class="text-right py-3 w-24">Total</th>
+                </tr>
+              </thead>
+              <tbody id="pvTable" class="text-sm"></tbody>
+            </table>
+          </div>
+
+          <!-- Totals Summary -->
+          <div class="mb-6 text-xs text-slate-500 space-y-1">
+            <div class="flex justify-between max-w-xs ml-auto">
+              <span>Subtotal:</span>
+              <span id="pvSubtotal" class="font-mono">B/. 0.00</span>
+            </div>
+            <div id="pvTaxRow" class="flex justify-between max-w-xs ml-auto">
+              <span>ITBMS (7%):</span>
+              <span id="pvTaxTotal" class="font-mono">B/. 0.00</span>
+            </div>
+          </div>
+
+          <!-- Invoice Info -->
+          <div id="pvInvoiceInfo" class="hidden mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+            <div class="flex items-center gap-2 mb-1">
+              <i class="fas fa-file-invoice text-blue-500"></i>
+              <p class="text-[10px] uppercase font-bold text-blue-600">Documento Fiscal</p>
+            </div>
+            <p class="font-mono font-bold text-blue-900">Factura #<span id="pvInvNumber"></span></p>
+            <p class="text-xs text-blue-600" id="pvInvDate"></p>
+          </div>
+
+          <!-- Final Total -->
+          <footer class="mt-auto border-t-2 border-slate-100 pt-6">
+            <div class="flex justify-between items-center">
+              <div class="text-xs text-slate-400">
+                <p>Gracias por su preferencia</p>
+              </div>
+              <div class="text-right">
+                <p class="text-xs text-slate-500 uppercase font-bold mb-1">Total a Pagar</p>
+                <p id="total" class="text-2xl sm:text-3xl font-black text-blue-600 font-mono">B/. 0.00</p>
+              </div>
+            </div>
+            
+            <div class="mt-8 pt-4 border-t border-slate-100 text-center text-[10px] sm:text-xs text-slate-400">
+              <p>A3 Solution • contacto@a3solution.com • Panamá</p>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </section>
+
   </div>
-</footer>
-
-</section>
-</div>
+</main>
 
 <script>
 // ============================================
-// CAPA DE DATOS - Fácil migración a Supabase
+// BASE DE DATOS
 // ============================================
 
 const DB = {
-  // Actualmente usa localStorage, cambiar a Supabase es trivial
-  async getAll() {
-    const data = localStorage.getItem('a3_quotes_v2');
+  async getQuotes() {
+    const data = localStorage.getItem('a3_quotes_v5');
     return data ? JSON.parse(data) : [];
   },
   
-  async getById(id) {
-    const quotes = await this.getAll();
-    return quotes.find(q => q.id === id);
-  },
-  
-  async save(quote) {
-    const quotes = await this.getAll();
+  async saveQuote(quote) {
+    const quotes = await this.getQuotes();
     const index = quotes.findIndex(q => q.id === quote.id);
     
     if (index >= 0) {
@@ -271,40 +479,86 @@ const DB = {
       quotes.push({ ...quote, createdAt: new Date().toISOString() });
     }
     
-    localStorage.setItem('a3_quotes_v2', JSON.stringify(quotes));
+    localStorage.setItem('a3_quotes_v5', JSON.stringify(quotes));
     return quote;
   },
   
-  async delete(id) {
-    const quotes = await this.getAll();
-    const filtered = quotes.filter(q => q.id !== id);
-    localStorage.setItem('a3_quotes_v2', JSON.stringify(filtered));
+  async getCatalog() {
+    const data = localStorage.getItem('a3_catalog_v2');
+    return data ? JSON.parse(data) : [];
   },
   
-  // Para migración futura a Supabase:
-  // 1. Reemplazar estos métodos con llamadas a supabase.from('quotes')
-  // 2. Mismo interface, cero cambios en el resto del código
+  async saveCatalogItem(item) {
+    const catalog = await this.getCatalog();
+    const existing = catalog.find(p => p.id === item.id);
+    
+    if (existing) {
+      if (existing.cost !== item.cost || existing.margin !== item.margin || existing.applyTax !== item.applyTax) {
+        item.priceHistory = [...(existing.priceHistory || []), {
+          date: new Date().toISOString(),
+          cost: existing.cost,
+          margin: existing.margin,
+          price: existing.price,
+          applyTax: existing.applyTax
+        }];
+      }
+      const idx = catalog.findIndex(p => p.id === item.id);
+      catalog[idx] = item;
+    } else {
+      item.priceHistory = [];
+      catalog.push(item);
+    }
+    
+    localStorage.setItem('a3_catalog_v2', JSON.stringify(catalog));
+    return item;
+  },
   
-  async exportToJSON() {
-    const quotes = await this.getAll();
-    return JSON.stringify(quotes, null, 2);
+  async deleteCatalogItem(id) {
+    const catalog = await this.getCatalog();
+    const filtered = catalog.filter(p => p.id !== id);
+    localStorage.setItem('a3_catalog_v2', JSON.stringify(filtered));
+  },
+  
+  async getCategories() {
+    const data = localStorage.getItem('a3_categories_v1');
+    if (data) return JSON.parse(data);
+    
+    // Default categories
+    const defaults = ['General', 'Cables', 'Equipos', 'Mano de Obra', 'Servicios'];
+    localStorage.setItem('a3_categories_v1', JSON.stringify(defaults));
+    return defaults;
+  },
+  
+  async saveCategories(categories) {
+    localStorage.setItem('a3_categories_v1', JSON.stringify(categories));
+  },
+  
+  exportToJSON() {
+    return JSON.stringify({
+      quotes: localStorage.getItem('a3_quotes_v5'),
+      catalog: localStorage.getItem('a3_catalog_v2'),
+      categories: localStorage.getItem('a3_categories_v1')
+    }, null, 2);
   }
 };
 
 // ============================================
-// ESTADO DE LA APLICACIÓN
+// ESTADO
 // ============================================
 
 let currentQuote = null;
 let items = [];
+let catalog = [];
+let categories = [];
 
 // ============================================
 // INICIALIZACIÓN
 // ============================================
 
 async function init() {
-  // Generar nuevo número
-  const quotes = await DB.getAll();
+  catalog = await DB.getCatalog();
+  categories = await DB.getCategories();
+  const quotes = await DB.getQuotes();
   const nextNum = 1001 + quotes.length;
   
   currentQuote = {
@@ -314,7 +568,6 @@ async function init() {
     client: '',
     clientRuc: '',
     items: [],
-    applyTax: true,
     status: 'pendiente',
     invoiceNumber: '',
     invoiceDate: '',
@@ -323,11 +576,12 @@ async function init() {
     total: 0
   };
   
-  items = [{ desc: '', price: 0 }];
+  items = [];
   
   renderForm();
   renderHistory();
   updatePreview();
+  updateCategorySelects();
 }
 
 // ============================================
@@ -335,16 +589,14 @@ async function init() {
 // ============================================
 
 function renderForm() {
-  document.getElementById('qNumber').value = currentQuote.number;
   document.getElementById('qDate').value = currentQuote.date;
   document.getElementById('client').value = currentQuote.client;
   document.getElementById('clientRuc').value = currentQuote.clientRuc;
-  document.getElementById('applyTax').checked = currentQuote.applyTax;
   document.getElementById('invoiceStatus').value = currentQuote.status;
+  document.getElementById('docNumber').textContent = currentQuote.number;
   
-  // Mostrar/ocultar campos de factura
   const showInvoice = currentQuote.status !== 'pendiente' && currentQuote.status !== 'anulado';
-  document.getElementById('invoiceDetails').classList.toggle('hidden', !showInvoice);
+  document.getElementById('invoiceFields').classList.toggle('hidden', !showInvoice);
   document.getElementById('invoiceNumber').value = currentQuote.invoiceNumber || '';
   document.getElementById('invoiceDate').value = currentQuote.invoiceDate || '';
   
@@ -355,30 +607,98 @@ function renderItems() {
   const container = document.getElementById("items");
   container.innerHTML = '';
   
+  if (items.length === 0) {
+    container.innerHTML = '<div class="text-center text-white/40 py-8 text-sm">Agrega items desde el catálogo o manualmente</div>';
+    document.getElementById('itemCount').textContent = '0';
+    return;
+  }
+  
   items.forEach((item, index) => {
     const div = document.createElement('div');
-    div.className = 'flex gap-2 fade-in';
+    div.className = 'item-card rounded-xl p-3 space-y-3 fade-in';
+    
+    const basePrice = item.cost * (1 + item.margin / 100);
+    const itemTax = item.applyTax ? basePrice * 0.07 : 0;
+    const finalPrice = basePrice + itemTax;
+    const profit = basePrice - item.cost;
+    
     div.innerHTML = `
-      <input class="flex-1 p-2 rounded bg-white/20 text-sm"
-        placeholder="Descripción del servicio"
-        value="${item.desc}"
-        oninput="updateItem(${index}, 'desc', this.value)">
-      <input type="number" step="0.01" class="w-24 p-2 rounded bg-white/20 text-sm text-right"
-        placeholder="0.00"
-        value="${item.price || ''}"
-        oninput="updateItem(${index}, 'price', this.value)">
-      <button onclick="removeItem(${index})" class="px-2 text-red-400 hover:text-red-300">
-        <i class="fas fa-trash"></i>
-      </button>
+      <div class="flex gap-2 items-start">
+        <div class="flex-1">
+          <input class="w-full bg-transparent border-b border-white/20 focus:border-blue-400 focus:outline-none py-1 text-sm font-medium"
+            placeholder="Descripción del item"
+            value="${item.desc}"
+            oninput="updateItem(${index}, 'desc', this.value)">
+        </div>
+        <button onclick="removeItem(${index})" class="w-8 h-8 rounded-lg text-red-400 hover:bg-red-400/10 flex items-center justify-center transition-all touch-manipulation">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div>
+          <label class="text-[9px] uppercase text-white/40 block mb-1">Costo B/. (Interno)</label>
+          <input type="number" step="0.01" 
+            class="w-full bg-white/10 rounded-lg px-2 py-1.5 text-xs text-right font-mono border border-white/10 focus:border-blue-400 focus:outline-none"
+            value="${item.cost || ''}"
+            oninput="updateItem(${index}, 'cost', this.value)">
+        </div>
+        
+        <div>
+          <label class="text-[9px] uppercase text-white/40 block mb-1">Margen % (Interno)</label>
+          <input type="number" step="1" min="0"
+            class="w-full bg-green-500/10 border border-green-500/30 text-green-300 rounded-lg px-2 py-1.5 text-xs text-right font-mono focus:border-green-400 focus:outline-none"
+            value="${item.margin}"
+            oninput="updateItem(${index}, 'margin', this.value)">
+        </div>
+        
+        <div>
+          <label class="text-[9px] uppercase text-white/40 block mb-1">Precio Base B/.</label>
+          <input type="number" step="0.01" 
+            class="w-full bg-blue-500/10 border border-blue-500/30 text-blue-300 rounded-lg px-2 py-1.5 text-xs text-right font-mono"
+            value="${basePrice.toFixed(2)}"
+            readonly>
+        </div>
+        
+        <div>
+          <label class="text-[9px] uppercase text-white/40 block mb-1">Precio Final B/.</label>
+          <input type="number" step="0.01" 
+            class="w-full bg-white/20 border border-white/30 rounded-lg px-2 py-1.5 text-xs text-right font-mono font-bold text-white"
+            value="${finalPrice.toFixed(2)}"
+            oninput="updateItem(${index}, 'finalPrice', this.value)">
+        </div>
+      </div>
+      
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" ${item.applyTax ? 'checked' : ''} onchange="updateItem(${index}, 'applyTax', this.checked)" class="sr-only peer">
+            <div class="w-9 h-5 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
+            <span class="ml-2 text-xs text-white/70">ITBMS 7%</span>
+          </label>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <span class="text-xs ${profit >= 0 ? 'profit-positive' : 'profit-negative'}">
+            Ganancia: B/. ${profit.toFixed(2)}
+          </span>
+          <div class="flex items-center gap-1">
+            <label class="text-[10px] text-white/50">Cant:</label>
+            <input type="number" min="1" value="${item.qty}" 
+              class="w-14 bg-white/10 rounded-lg px-2 py-1 text-center text-xs font-mono border border-white/10 focus:border-blue-400 focus:outline-none"
+              oninput="updateItem(${index}, 'qty', this.value)">
+          </div>
+        </div>
+      </div>
     `;
     container.appendChild(div);
   });
   
-  document.getElementById('itemCount').textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
+  document.getElementById('itemCount').textContent = items.length;
 }
 
 async function renderHistory() {
-  const quotes = await DB.getAll();
+  const quotes = await DB.getQuotes();
   const filter = document.getElementById('filterStatus').value;
   const search = document.getElementById('searchClient').value.toLowerCase();
   
@@ -392,38 +712,39 @@ async function renderHistory() {
   const container = document.getElementById('historyList');
   container.innerHTML = '';
   
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="text-center text-white/40 py-8 text-sm">No hay cotizaciones</div>';
+  }
+  
   filtered.forEach(quote => {
     const div = document.createElement('div');
-    div.className = 'bg-white/5 hover:bg-white/10 p-3 rounded-xl cursor-pointer transition-all border border-white/10';
-    div.onclick = () => loadQuote(quote.id);
+    div.className = 'bg-white/5 hover:bg-white/10 p-3 rounded-xl cursor-pointer transition-all border border-white/10 touch-manipulation';
+    div.onclick = () => { loadQuote(quote.id); toggleHistory(); };
     
     const statusColors = {
-      pendiente: 'status-pendiente',
-      facturado: 'status-facturado',
-      dgi: 'status-dgi',
-      anulado: 'status-anulado'
+      pendiente: 'bg-yellow-500/20 text-yellow-300',
+      facturado: 'bg-green-500/20 text-green-300',
+      dgi: 'bg-blue-500/20 text-blue-300',
+      anulado: 'bg-red-500/20 text-red-300'
     };
     
     div.innerHTML = `
       <div class="flex justify-between items-start mb-1">
         <span class="font-mono font-bold text-sm text-blue-300">${quote.number}</span>
-        <span class="${statusColors[quote.status] || 'status-pendiente'} status-badge">
+        <span class="text-[10px] px-2 py-0.5 rounded-full ${statusColors[quote.status]}">
           ${quote.status}
         </span>
       </div>
-      <p class="text-sm font-medium truncate">${quote.client || 'Sin cliente'}</p>
-      <div class="flex justify-between items-center mt-2 text-xs text-white/60">
+      <p class="text-sm font-medium truncate text-white/90">${quote.client || 'Sin cliente'}</p>
+      <div class="flex justify-between items-center mt-2 text-xs text-white/50">
         <span>${new Date(quote.date).toLocaleDateString('es-PA')}</span>
-        <span class="font-mono">B/. ${quote.total?.toFixed(2) || '0.00'}</span>
+        <span class="font-mono font-bold text-white/70">B/. ${quote.total?.toFixed(2) || '0.00'}</span>
       </div>
-      ${quote.invoiceNumber ? `<div class="mt-1 text-xs text-blue-300">Fact: ${quote.invoiceNumber}</div>` : ''}
+      ${quote.invoiceNumber ? `<div class="mt-1 text-[10px] text-blue-400 font-mono">Fact: ${quote.invoiceNumber}</div>` : ''}
     `;
     container.appendChild(div);
   });
   
-  document.getElementById('totalCount').textContent = filtered.length;
-  
-  // Stats
   const stats = quotes.reduce((acc, q) => {
     acc.total += q.total || 0;
     if (q.status === 'facturado' || q.status === 'dgi') acc.invoiced += q.total || 0;
@@ -435,43 +756,345 @@ async function renderHistory() {
 }
 
 // ============================================
+// CATÁLOGO Y CATEGORÍAS
+// ============================================
+
+function updateCategorySelects() {
+  const selects = ['catalogCategory', 'newProdCategory'];
+  selects.forEach(id => {
+    const select = document.getElementById(id);
+    const currentVal = select.value;
+    const isAll = id === 'catalogCategory';
+    
+    select.innerHTML = isAll ? '<option value="all">Todas las categorías</option>' : '<option value="">Seleccionar...</option>';
+    
+    categories.forEach(cat => {
+      select.innerHTML += `<option value="${cat}">${cat}</option>`;
+    });
+    
+    if (!isAll && categories.length > 0 && !currentVal) {
+      select.value = categories[0];
+    } else {
+      select.value = currentVal;
+    }
+  });
+}
+
+function openCatalog() {
+  document.getElementById('catalogModal').classList.remove('hidden');
+  document.getElementById('overlay').classList.remove('hidden');
+  setTimeout(() => document.getElementById('overlay').classList.remove('opacity-0'), 10);
+  renderCatalog();
+}
+
+function closeCatalog() {
+  document.getElementById('catalogModal').classList.add('hidden');
+  document.getElementById('overlay').classList.add('opacity-0');
+  setTimeout(() => document.getElementById('overlay').classList.add('hidden'), 300);
+}
+
+function openCategoryManager() {
+  document.getElementById('categoryModal').classList.remove('hidden');
+  renderCategoryList();
+}
+
+function closeCategoryManager() {
+  document.getElementById('categoryModal').classList.add('hidden');
+}
+
+function renderCategoryList() {
+  const container = document.getElementById('categoryList');
+  container.innerHTML = '';
+  
+  categories.forEach((cat, index) => {
+    const div = document.createElement('div');
+    div.className = 'flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/10';
+    div.innerHTML = `
+      <span class="text-sm">${cat}</span>
+      <button onclick="deleteCategory(${index})" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-400/10 flex items-center justify-center transition-all">
+        <i class="fas fa-trash text-xs"></i>
+      </button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+async function addCategory() {
+  const input = document.getElementById('newCategoryName');
+  const name = input.value.trim();
+  
+  if (!name) return;
+  if (categories.includes(name)) {
+    alert('Esta categoría ya existe');
+    return;
+  }
+  
+  categories.push(name);
+  await DB.saveCategories(categories);
+  input.value = '';
+  renderCategoryList();
+  updateCategorySelects();
+}
+
+async function deleteCategory(index) {
+  if (!confirm(`¿Eliminar la categoría "${categories[index]}"? Los productos en esta categoría pasarán a "General"`)) return;
+  
+  const removedCat = categories[index];
+  categories.splice(index, 1);
+  await DB.saveCategories(categories);
+  
+  // Update products with this category
+  catalog.forEach(async (product) => {
+    if (product.category === removedCat) {
+      product.category = 'General';
+      await DB.saveCatalogItem(product);
+    }
+  });
+  
+  renderCategoryList();
+  updateCategorySelects();
+  renderCatalog();
+}
+
+function renderCatalog() {
+  const search = document.getElementById('catalogSearch').value.toLowerCase();
+  const category = document.getElementById('catalogCategory').value;
+  
+  const filtered = catalog
+    .filter(p => !search || p.name.toLowerCase().includes(search))
+    .filter(p => category === 'all' || p.category === category)
+    .sort((a, b) => a.name.localeCompare(b.name));
+  
+  const container = document.getElementById('catalogList');
+  container.innerHTML = '';
+  
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="text-center text-white/40 py-8">No hay productos en el catálogo</div>';
+    return;
+  }
+  
+  const grouped = filtered.reduce((acc, item) => {
+    const cat = item.category || 'General';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(item);
+    return acc;
+  }, {});
+  
+  Object.entries(grouped).forEach(([cat, products]) => {
+    const catDiv = document.createElement('div');
+    catDiv.innerHTML = `<h4 class="text-xs uppercase font-bold text-white/50 mb-2 sticky top-0 bg-[#0B1220] py-2">${cat}</h4>`;
+    
+    const grid = document.createElement('div');
+    grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3';
+    
+    products.forEach(product => {
+      const price = calculateProductPrice(product);
+      const div = document.createElement('div');
+      div.className = 'bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all cursor-pointer touch-manipulation';
+      div.onclick = () => addItemFromCatalog(product);
+      
+      div.innerHTML = `
+        <div class="flex justify-between items-start mb-2">
+          <h5 class="font-bold text-sm text-white/90">${product.name}</h5>
+          ${product.applyTax ? '<span class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">ITBMS</span>' : ''}
+        </div>
+        <div class="space-y-1 text-xs text-white/60">
+          <div class="flex justify-between">
+            <span>Costo:</span>
+            <span class="font-mono">B/. ${product.cost.toFixed(2)}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Margen:</span>
+            <span class="font-mono">${product.margin}%</span>
+          </div>
+          <div class="flex justify-between text-white font-bold border-t border-white/10 pt-1 mt-1">
+            <span>Precio:</span>
+            <span class="font-mono text-blue-300">B/. ${price.toFixed(2)}</span>
+          </div>
+        </div>
+        <button class="w-full mt-3 py-2 rounded-lg bg-blue-500/20 text-blue-300 text-xs font-bold hover:bg-blue-500/30 transition-all">
+          <i class="fas fa-plus mr-1"></i>Agregar
+        </button>
+      `;
+      grid.appendChild(div);
+    });
+    
+    catDiv.appendChild(grid);
+    container.appendChild(catDiv);
+  });
+}
+
+function calculateProductPrice(product) {
+  const base = product.cost * (1 + product.margin / 100);
+  const tax = product.applyTax ? base * 0.07 : 0;
+  return base + tax;
+}
+
+function openNewProductForm() {
+  document.getElementById('productModal').classList.remove('hidden');
+  updateCategorySelects();
+}
+
+function closeProductModal() {
+  document.getElementById('productModal').classList.add('hidden');
+  document.getElementById('newProdName').value = '';
+  document.getElementById('newProdCost').value = '';
+  document.getElementById('newProdMargin').value = '30';
+  document.getElementById('newProdTax').checked = true;
+}
+
+async function saveNewProduct() {
+  const name = document.getElementById('newProdName').value;
+  const cost = parseFloat(document.getElementById('newProdCost').value) || 0;
+  const margin = parseFloat(document.getElementById('newProdMargin').value) || 30;
+  const applyTax = document.getElementById('newProdTax').checked;
+  const category = document.getElementById('newProdCategory').value || 'General';
+  
+  if (!name) {
+    alert('Ingrese el nombre del producto');
+    return;
+  }
+  
+  const product = {
+    id: crypto.randomUUID(),
+    name,
+    category,
+    cost,
+    margin,
+    applyTax,
+    createdAt: new Date().toISOString()
+  };
+  
+  await DB.saveCatalogItem(product);
+  catalog = await DB.getCatalog();
+  renderCatalog();
+  closeProductModal();
+}
+
+function addItemFromCatalog(product) {
+  const price = calculateProductPrice(product);
+  const basePrice = product.cost * (1 + product.margin / 100);
+  
+  items.push({
+    desc: product.name,
+    cost: product.cost,
+    margin: product.margin,
+    basePrice: basePrice,
+    applyTax: product.applyTax,
+    price: price,
+    qty: 1,
+    catalogId: product.id
+  });
+  
+  renderItems();
+  updatePreview();
+  closeCatalog();
+}
+
+// ============================================
 // ACCIONES
 // ============================================
 
+function toggleHistory() {
+  const sidebar = document.getElementById('historySidebar');
+  const overlay = document.getElementById('overlay');
+  
+  if (sidebar.classList.contains('open')) {
+    sidebar.classList.remove('open');
+    overlay.classList.add('opacity-0');
+    setTimeout(() => overlay.classList.add('hidden'), 300);
+    document.body.style.overflow = '';
+  } else {
+    closeAllModals();
+    sidebar.classList.add('open');
+    overlay.classList.remove('hidden');
+    setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeAllModals() {
+  document.getElementById('historySidebar').classList.remove('open');
+  document.getElementById('catalogModal').classList.add('hidden');
+  document.getElementById('productModal').classList.add('hidden');
+  document.getElementById('categoryModal').classList.add('hidden');
+  document.getElementById('overlay').classList.add('opacity-0');
+  setTimeout(() => document.getElementById('overlay').classList.add('hidden'), 300);
+  document.body.style.overflow = '';
+}
+
 function addItem() {
-  items.push({ desc: '', price: 0 });
+  const defaultMargin = parseInt(document.getElementById('defaultMargin').value) || 30;
+  items.push({
+    desc: '',
+    cost: 0,
+    margin: defaultMargin,
+    basePrice: 0,
+    applyTax: true,
+    price: 0,
+    qty: 1
+  });
   renderItems();
   updatePreview();
 }
 
 function removeItem(index) {
-  if (items.length > 1) {
-    items.splice(index, 1);
-    renderItems();
-    updatePreview();
-  }
+  items.splice(index, 1);
+  renderItems();
+  updatePreview();
 }
 
 function updateItem(index, field, value) {
-  items[index][field] = field === 'price' ? parseFloat(value) || 0 : value;
+  const item = items[index];
+  
+  if (field === 'cost' || field === 'margin' || field === 'qty') {
+    item[field] = parseFloat(value) || (field === 'qty' ? 1 : 0);
+    recalculateItem(item);
+  } else if (field === 'applyTax') {
+    item.applyTax = value;
+    recalculateItem(item);
+  } else if (field === 'finalPrice') {
+    const newFinalPrice = parseFloat(value) || 0;
+    const basePrice = item.applyTax ? newFinalPrice / 1.07 : newFinalPrice;
+    item.margin = item.cost > 0 ? ((basePrice - item.cost) / item.cost) * 100 : 0;
+    item.basePrice = basePrice;
+    item.price = newFinalPrice;
+  } else if (field === 'desc') {
+    item[field] = value;
+  }
+  
+  renderItems();
+  updatePreview();
+}
+
+function recalculateItem(item) {
+  item.basePrice = item.cost * (1 + item.margin / 100);
+  const tax = item.applyTax ? item.basePrice * 0.07 : 0;
+  item.price = item.basePrice + tax;
+}
+
+function updateAllMargins() {
+  const newMargin = parseInt(document.getElementById('defaultMargin').value) || 30;
+  items.forEach(item => {
+    item.margin = newMargin;
+    recalculateItem(item);
+  });
+  renderItems();
   updatePreview();
 }
 
 function updatePreview() {
-  // Actualizar estado
   currentQuote.client = document.getElementById('client').value;
   currentQuote.clientRuc = document.getElementById('clientRuc').value;
   currentQuote.date = document.getElementById('qDate').value;
-  currentQuote.applyTax = document.getElementById('applyTax').checked;
   currentQuote.status = document.getElementById('invoiceStatus').value;
   currentQuote.invoiceNumber = document.getElementById('invoiceNumber').value;
   currentQuote.invoiceDate = document.getElementById('invoiceDate').value;
   
-  // Mostrar/ocultar campos de factura
   const showInvoice = currentQuote.status !== 'pendiente' && currentQuote.status !== 'anulado';
-  document.getElementById('invoiceDetails').classList.toggle('hidden', !showInvoice);
+  document.getElementById('invoiceFields').classList.toggle('hidden', !showInvoice);
   
-  // Preview
+  // Preview Header
   document.getElementById('pvNumber').textContent = currentQuote.number;
   document.getElementById('pvDate').textContent = new Date(currentQuote.date).toLocaleDateString('es-PA', {
     year: 'numeric', month: 'long', day: 'numeric'
@@ -479,58 +1102,75 @@ function updatePreview() {
   document.getElementById('pvClient').textContent = currentQuote.client || "CLIENTE";
   document.getElementById('pvRuc').textContent = currentQuote.clientRuc || "";
   
-  // Status badge
-  const statusEl = document.getElementById('pvStatus');
-  const statusText = {
-    pendiente: '🟡 PENDIENTE',
-    facturado: '🟢 FACTURADO',
-    dgi: '🔵 FACTURA DGI',
-    anulado: '🔴 ANULADO'
+  const statusConfig = {
+    pendiente: { text: 'PENDIENTE', class: 'bg-yellow-100 text-yellow-700' },
+    facturado: { text: 'FACTURADO', class: 'bg-green-100 text-green-700' },
+    dgi: { text: 'FACTURA DGI', class: 'bg-blue-100 text-blue-700' },
+    anulado: { text: 'ANULADO', class: 'bg-red-100 text-red-700' }
   };
-  statusEl.textContent = statusText[currentQuote.status];
-  statusEl.className = `mt-2 inline-block px-3 py-1 rounded-full text-xs font-bold ${
-    currentQuote.status === 'anulado' ? 'bg-red-100 text-red-700' :
-    currentQuote.status === 'facturado' ? 'bg-green-100 text-green-700' :
-    currentQuote.status === 'dgi' ? 'bg-blue-100 text-blue-700' :
-    'bg-yellow-100 text-yellow-700'
-  }`;
+  const st = statusConfig[currentQuote.status];
+  const stEl = document.getElementById('pvStatus');
+  stEl.textContent = st.text;
+  stEl.className = `mt-2 inline-block px-3 py-1 rounded-full text-[10px] font-bold ${st.class}`;
   
-  // Watermark anulado
   document.getElementById('watermark').classList.toggle('hidden', currentQuote.status !== 'anulado');
   
-  // Tabla
-  let subtotal = 0;
+  // TABLA SIMPLIFICADA - SOLO DATOS CLIENTE
   const tbody = document.getElementById('pvTable');
   tbody.innerHTML = '';
+  let subtotal = 0;
+  let totalTax = 0;
   
   items.forEach((item, i) => {
-    subtotal += item.price;
-    if (item.desc || item.price) {
-      tbody.innerHTML += `
-        <tr class="border-b border-slate-100">
-          <td class="py-3 text-slate-400">${i + 1}</td>
-          <td class="py-3">${item.desc || ''}</td>
-          <td class="py-3 text-right font-mono">${item.price.toFixed(2)}</td>
-        </tr>`;
-    }
+    if (!item.desc) return;
+    
+    const lineTotal = item.price * item.qty;
+    const lineTax = item.applyTax ? (item.price - (item.price / 1.07)) * item.qty : 0;
+    const lineSubtotal = lineTotal - lineTax;
+    
+    subtotal += lineSubtotal;
+    totalTax += lineTax;
+    
+    // Solo mostrar: # | Descripción | Precio Unit | Cant | Total
+    tbody.innerHTML += `
+      <tr class="border-b border-slate-100">
+        <td class="py-3 text-slate-400 text-xs">${i + 1}</td>
+        <td class="py-3">
+          ${item.desc}
+          ${item.applyTax ? '<span class="text-[9px] text-blue-500 ml-1">*</span>' : ''}
+        </td>
+        <td class="py-3 text-right font-mono font-medium">B/. ${item.price.toFixed(2)}</td>
+        <td class="py-3 text-right font-mono text-slate-600">${item.qty}</td>
+        <td class="py-3 text-right font-mono font-bold">B/. ${lineTotal.toFixed(2)}</td>
+      </tr>
+    `;
   });
   
-  // Cálculos
-  const tax = currentQuote.applyTax ? subtotal * 0.07 : 0;
-  const total = subtotal + tax;
+  // Nota sobre ITBMS si aplica
+  if (totalTax > 0) {
+    tbody.innerHTML += `
+      <tr>
+        <td colspan="5" class="py-2 text-[10px] text-slate-400 italic">
+          * Precios incluyen ITBMS (7%)
+        </td>
+      </tr>
+    `;
+  }
   
-  document.getElementById('taxRow').style.display = currentQuote.applyTax ? 'flex' : 'none';
-  document.getElementById('sub').textContent = "B/. " + subtotal.toFixed(2);
-  document.getElementById('tax').textContent = "B/. " + tax.toFixed(2);
+  const total = subtotal + totalTax;
+  
+  // Resumen de totales
+  document.getElementById('pvSubtotal').textContent = "B/. " + subtotal.toFixed(2);
+  document.getElementById('pvTaxTotal').textContent = "B/. " + totalTax.toFixed(2);
+  document.getElementById('pvTaxRow').style.display = totalTax > 0 ? 'flex' : 'none';
   document.getElementById('total').textContent = "B/. " + total.toFixed(2);
   
-  // Guardar en objeto
   currentQuote.items = items;
   currentQuote.subtotal = subtotal;
-  currentQuote.tax = tax;
+  currentQuote.tax = totalTax;
   currentQuote.total = total;
   
-  // Info de factura en preview
+  // Info factura
   const invInfo = document.getElementById('pvInvoiceInfo');
   if (currentQuote.invoiceNumber && showInvoice) {
     invInfo.classList.remove('hidden');
@@ -544,31 +1184,45 @@ function updatePreview() {
 
 async function saveQuote() {
   if (!currentQuote.client) {
-    alert('Por favor ingrese el nombre del cliente');
+    alert('Ingrese el nombre del cliente');
+    document.getElementById('client').focus();
     return;
   }
   
-  if (items.every(i => !i.desc && !i.price)) {
-    alert('Agregue al menos un servicio');
+  if (items.length === 0 || items.every(i => !i.desc)) {
+    alert('Agregue al menos un item');
     return;
   }
   
-  await DB.save(currentQuote);
+  await DB.saveQuote(currentQuote);
+  
+  for (const item of items) {
+    if (item.catalogId) {
+      const catalogItem = catalog.find(p => p.id === item.catalogId);
+      if (catalogItem) {
+        catalogItem.cost = item.cost;
+        catalogItem.margin = item.margin;
+        catalogItem.applyTax = item.applyTax;
+        await DB.saveCatalogItem(catalogItem);
+      }
+    }
+  }
+  
   await renderHistory();
   
-  // Feedback visual
   const btn = document.getElementById('btnSave');
   const original = btn.innerHTML;
-  btn.innerHTML = '<i class="fas fa-check mr-2"></i>Guardado!';
-  btn.classList.add('bg-green-600');
+  btn.innerHTML = '<i class="fas fa-check"></i><span>GUARDADO</span>';
+  btn.classList.add('brightness-110');
   setTimeout(() => {
     btn.innerHTML = original;
-    btn.classList.remove('bg-green-600');
+    btn.classList.remove('brightness-110');
   }, 1500);
 }
 
 async function loadQuote(id) {
-  const quote = await DB.getById(id);
+  const quotes = await DB.getQuotes();
+  const quote = quotes.find(q => q.id === id);
   if (!quote) return;
   
   currentQuote = { ...quote };
@@ -586,12 +1240,8 @@ function printQuote() {
   window.print();
 }
 
-// ============================================
-// UTILIDADES PARA MIGRACIÓN
-// ============================================
-
-async function exportData() {
-  const json = await DB.exportToJSON();
+function exportData() {
+  const json = DB.exportToJSON();
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -603,7 +1253,6 @@ async function exportData() {
 // Iniciar
 init();
 
-// Exponer para debugging
 window.DB = DB;
 window.exportData = exportData;
 </script>

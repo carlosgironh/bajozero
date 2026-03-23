@@ -1,0 +1,2727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>A3 Solution | ERP Profesional</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: #0f172a; }
+
+@page { size: letter; margin: 0.5in; }
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; }
+  .sheet { width: 8.5in !important; height: 11in !important; box-shadow: none !important; margin: 0 !important; border-radius: 0 !important; }
+}
+
+/* Design System */
+.card { @apply bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-xl; }
+.input { @apply w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none transition-all; }
+.btn-primary { @apply px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all active:scale-95; }
+.btn-secondary { @apply px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl transition-all active:scale-95; }
+.btn-success { @apply px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all active:scale-95; }
+.btn-danger { @apply px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-xl transition-all active:scale-95; }
+
+/* Status badges */
+.status-pendiente { @apply bg-yellow-500/20 text-yellow-300 border border-yellow-500/30; }
+.status-emitido { @apply bg-blue-500/20 text-blue-300 border border-blue-500/30; }
+.status-pagado { @apply bg-emerald-500/20 text-emerald-300 border border-emerald-500/30; }
+.status-anulado { @apply bg-red-500/20 text-red-300 border border-red-500/30; }
+.status-borrador { @apply bg-slate-500/20 text-slate-300 border border-slate-500/30; }
+
+/* Animations */
+.fade-in { animation: fadeIn 0.3s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.slide-in { animation: slideIn 0.3s ease-out; }
+@keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+/* Tables */
+.data-table { @apply w-full text-left border-collapse; }
+.data-table th { @apply py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-700; }
+.data-table td { @apply py-3 px-4 text-sm border-b border-slate-700/50; }
+.data-table tr:hover { @apply bg-slate-700/30; }
+
+/* Mobile */
+.touch-manipulation { touch-action: manipulation; }
+.safe-bottom { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+
+/* Document preview */
+.sheet { @apply bg-white text-slate-900 shadow-2xl; }
+</style>
+</head>
+
+<body class="text-slate-100 min-h-screen">
+
+<!-- AUTH SCREEN -->
+<div id="authScreen" class="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
+  <div class="w-full max-w-md card p-8">
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center text-3xl font-black shadow-lg shadow-blue-500/30">A3</div>
+      <h1 class="text-2xl font-bold">A3 Solution</h1>
+      <p class="text-slate-400 text-sm">Sistema de Gestión Empresarial</p>
+    </div>
+    
+    <div id="loginForm" class="space-y-4">
+      <div>
+        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Usuario</label>
+        <input type="text" id="loginUser" class="input" placeholder="admin" value="admin">
+      </div>
+      <div>
+        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Contraseña</label>
+        <input type="password" id="loginPass" class="input" placeholder="••••••" value="admin123">
+      </div>
+      <button onclick="login()" class="w-full btn-primary">
+        <i class="fas fa-sign-in-alt mr-2"></i>Ingresar al Sistema
+      </button>
+      <p class="text-xs text-center text-slate-500 mt-4">Versión 2.0 PRO • Modo Offline</p>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP (Hidden until auth) -->
+<div id="mainApp" class="hidden">
+  
+  <!-- HEADER -->
+  <header class="fixed top-0 left-0 right-0 h-16 bg-slate-900/95 backdrop-blur-xl border-b border-slate-700/50 z-40 flex items-center justify-between px-4 lg:px-6">
+    <div class="flex items-center gap-4">
+      <button onclick="toggleSidebar()" class="lg:hidden w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center touch-manipulation">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center font-black shadow-lg shadow-blue-500/20">A3</div>
+        <div class="hidden sm:block">
+          <h1 class="font-bold leading-tight">A3 Solution</h1>
+          <p class="text-xs text-slate-400">ERP Profesional</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-2 text-sm text-slate-400 bg-slate-800/50 px-4 py-2 rounded-xl border border-slate-700/50">
+        <i class="fas fa-user-circle text-blue-400"></i>
+        <span id="currentUserName">Administrador</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">Admin</span>
+      </div>
+      <button onclick="logout()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center transition-all touch-manipulation">
+        <i class="fas fa-power-off"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="fixed left-0 top-16 bottom-0 w-64 bg-slate-900/95 backdrop-blur-xl border-r border-slate-700/50 z-30 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
+    <nav class="p-4 space-y-2">
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-4">Principal</div>
+      
+      <button onclick="showModule('dashboard')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left group active">
+        <i class="fas fa-chart-line w-5 text-center text-slate-400 group-hover:text-blue-400"></i>
+        <span>Dashboard</span>
+      </button>
+      
+      <button onclick="showModule('clients')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left group">
+        <i class="fas fa-users w-5 text-center text-slate-400 group-hover:text-blue-400"></i>
+        <span>Clientes</span>
+      </button>
+      
+      <button onclick="showModule('catalog')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left group">
+        <i class="fas fa-boxes w-5 text-center text-slate-400 group-hover:text-blue-400"></i>
+        <span>Catálogo</span>
+      </button>
+      
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-6 mb-2 px-4">Documentos</div>
+      
+      <button onclick="showModule('quotes')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left group">
+        <i class="fas fa-file-invoice-dollar w-5 text-center text-slate-400 group-hover:text-blue-400"></i>
+        <span>Cotizaciones</span>
+        <span id="badgeQuotes" class="ml-auto text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full hidden">0</span>
+      </button>
+      
+      <button onclick="showModule('invoices')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left group">
+        <i class="fas fa-file-invoice w-5 text-center text-slate-400 group-hover:text-blue-400"></i>
+        <span>Facturas</span>
+        <span id="badgeInvoices" class="ml-auto text-xs bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full hidden">0</span>
+      </button>
+      
+      <button onclick="showModule('payments')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left group">
+        <i class="fas fa-credit-card w-5 text-center text-slate-400 group-hover:text-blue-400"></i>
+        <span>Pagos</span>
+      </button>
+      
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-6 mb-2 px-4">Administración</div>
+      
+      <button onclick="showModule('reports')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left group">
+        <i class="fas fa-chart-pie w-5 text-center text-slate-400 group-hover:text-blue-400"></i>
+        <span>Reportes</span>
+      </button>
+      
+      <button onclick="showModule('settings')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left group">
+        <i class="fas fa-cog w-5 text-center text-slate-400 group-hover:text-blue-400"></i>
+        <span>Configuración</span>
+      </button>
+    </nav>
+    
+    <div class="p-4 mt-auto border-t border-slate-700/50">
+      <div class="text-xs text-slate-500">
+        <div class="flex justify-between mb-1">
+          <span>Base de datos:</span>
+          <span class="text-emerald-400">● Activa</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Versión:</span>
+          <span>2.0.1</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="lg:ml-64 pt-16 min-h-screen">
+    <div id="contentArea" class="p-4 lg:p-8 max-w-7xl mx-auto">
+      
+      <!-- DASHBOARD MODULE -->
+      <div id="module-dashboard" class="module fade-in space-y-6">
+        <div class="flex justify-between items-center">
+          <h2 class="text-2xl font-bold">Dashboard</h2>
+          <div class="text-sm text-slate-400" id="currentDate"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="card p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <p class="text-slate-400 text-sm">Cotizaciones Mes</p>
+                <p class="text-3xl font-bold text-blue-400" id="dashQuotesCount">0</p>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 text-xl">
+                <i class="fas fa-file-invoice-dollar"></i>
+              </div>
+            </div>
+            <p class="text-sm text-slate-500">Total: <span class="text-white font-mono" id="dashQuotesTotal">B/. 0.00</span></p>
+          </div>
+          
+          <div class="card p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <p class="text-slate-400 text-sm">Facturado</p>
+                <p class="text-3xl font-bold text-emerald-400" id="dashInvoicesCount">0</p>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl">
+                <i class="fas fa-file-invoice"></i>
+              </div>
+            </div>
+            <p class="text-sm text-slate-500">Total: <span class="text-white font-mono" id="dashInvoicesTotal">B/. 0.00</span></p>
+          </div>
+          
+          <div class="card p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <p class="text-slate-400 text-sm">Por Cobrar</p>
+                <p class="text-3xl font-bold text-yellow-400" id="dashPendingCount">0</p>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center text-yellow-400 text-xl">
+                <i class="fas fa-clock"></i>
+              </div>
+            </div>
+            <p class="text-sm text-slate-500">Monto: <span class="text-white font-mono" id="dashPendingTotal">B/. 0.00</span></p>
+          </div>
+          
+          <div class="card p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <p class="text-slate-400 text-sm">Clientes</p>
+                <p class="text-3xl font-bold text-purple-400" id="dashClientsCount">0</p>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 text-xl">
+                <i class="fas fa-users"></i>
+              </div>
+            </div>
+            <p class="text-sm text-slate-500">Activos este mes</p>
+          </div>
+        </div>
+        
+        <div class="grid lg:grid-cols-2 gap-6">
+          <div class="card p-6">
+            <h3 class="font-bold mb-4 flex items-center gap-2">
+              <i class="fas fa-clock-rotate-left text-blue-400"></i>
+              Actividad Reciente
+            </h3>
+            <div id="recentActivity" class="space-y-3 max-h-80 overflow-y-auto">
+              <p class="text-slate-500 text-sm text-center py-8">No hay actividad reciente</p>
+            </div>
+          </div>
+          
+          <div class="card p-6">
+            <h3 class="font-bold mb-4 flex items-center gap-2">
+              <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+              Acciones Pendientes
+            </h3>
+            <div id="pendingActions" class="space-y-3">
+              <p class="text-slate-500 text-sm text-center py-8">No hay acciones pendientes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLIENTS MODULE -->
+      <div id="module-clients" class="module hidden fade-in space-y-6">
+        <div class="flex justify-between items-center flex-wrap gap-4">
+          <h2 class="text-2xl font-bold">Gestión de Clientes</h2>
+          <button onclick="openClientModal()" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i>Nuevo Cliente
+          </button>
+        </div>
+        
+        <div class="card p-4">
+          <div class="flex gap-4 mb-4">
+            <div class="relative flex-1 max-w-md">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input type="text" id="clientSearch" placeholder="Buscar cliente..." oninput="renderClients()"
+                class="input pl-10">
+            </div>
+            <select id="clientFilter" onchange="renderClients()" class="input w-48">
+              <option value="all">Todos</option>
+              <option value="active">Activos</option>
+              <option value="inactive">Inactivos</option>
+            </select>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>RUC/Identificación</th>
+                  <th>Teléfono</th>
+                  <th>Email</th>
+                  <th>Estado</th>
+                  <th class="text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="clientsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATALOG MODULE -->
+      <div id="module-catalog" class="module hidden fade-in space-y-6">
+        <div class="flex justify-between items-center flex-wrap gap-4">
+          <h2 class="text-2xl font-bold">Catálogo de Productos</h2>
+          <div class="flex gap-2">
+            <button onclick="openCategoryManager()" class="btn-secondary">
+              <i class="fas fa-tags mr-2"></i>Categorías
+            </button>
+            <button onclick="openProductModal()" class="btn-primary">
+              <i class="fas fa-plus mr-2"></i>Nuevo Producto
+            </button>
+          </div>
+        </div>
+        
+        <div class="card p-4">
+          <div class="flex gap-4 mb-4 flex-wrap">
+            <div class="relative flex-1 min-w-[200px]">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input type="text" id="productSearch" placeholder="Buscar producto..." oninput="renderCatalog()"
+                class="input pl-10">
+            </div>
+            <select id="productCategoryFilter" onchange="renderCatalog()" class="input w-48">
+              <option value="all">Todas las categorías</option>
+            </select>
+            <select id="productStatusFilter" onchange="renderCatalog()" class="input w-40">
+              <option value="all">Todos</option>
+              <option value="active">Activos</option>
+              <option value="inactive">Inactivos</option>
+            </select>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Producto</th>
+                  <th>Categoría</th>
+                  <th class="text-right">Costo</th>
+                  <th class="text-right">Precio</th>
+                  <th class="text-center">ITBMS</th>
+                  <th>Estado</th>
+                  <th class="text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="catalogTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUOTES MODULE -->
+      <div id="module-quotes" class="module hidden fade-in space-y-6">
+        <div class="flex justify-between items-center flex-wrap gap-4">
+          <h2 class="text-2xl font-bold">Cotizaciones</h2>
+          <button onclick="openQuoteModal()" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i>Nueva Cotización
+          </button>
+        </div>
+        
+        <div class="card p-4">
+          <div class="flex gap-4 mb-4 flex-wrap">
+            <div class="relative flex-1 min-w-[200px]">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input type="text" id="quoteSearch" placeholder="Buscar # o cliente..." oninput="renderQuotes()"
+                class="input pl-10">
+            </div>
+            <select id="quoteStatusFilter" onchange="renderQuotes()" class="input w-40">
+              <option value="all">Todos</option>
+              <option value="borrador">Borrador</option>
+              <option value="emitido">Emitido</option>
+              <option value="facturado">Facturado</option>
+              <option value="anulado">Anulado</option>
+            </select>
+            <input type="date" id="quoteDateFrom" onchange="renderQuotes()" class="input w-40">
+            <input type="date" id="quoteDateTo" onchange="renderQuotes()" class="input w-40">
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Número</th>
+                  <th>Fecha</th>
+                  <th>Cliente</th>
+                  <th class="text-right">Total</th>
+                  <th>Estado</th>
+                  <th class="text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="quotesTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVOICES MODULE -->
+      <div id="module-invoices" class="module hidden fade-in space-y-6">
+        <div class="flex justify-between items-center flex-wrap gap-4">
+          <h2 class="text-2xl font-bold">Facturas</h2>
+          <button onclick="openInvoiceModal()" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i>Nueva Factura
+          </button>
+        </div>
+        
+        <div class="card p-4">
+          <div class="flex gap-4 mb-4 flex-wrap">
+            <div class="relative flex-1 min-w-[200px]">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input type="text" id="invoiceSearch" placeholder="Buscar # o cliente..." oninput="renderInvoices()"
+                class="input pl-10">
+            </div>
+            <select id="invoiceStatusFilter" onchange="renderInvoices()" class="input w-40">
+              <option value="all">Todos</option>
+              <option value="emitido">Emitido</option>
+              <option value="pagado">Pagado</option>
+              <option value="parcial">Pago Parcial</option>
+              <option value="anulado">Anulado</option>
+            </select>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Número</th>
+                  <th>Fecha</th>
+                  <th>Cliente</th>
+                  <th class="text-right">Total</th>
+                  <th class="text-right">Pagado</th>
+                  <th>Estado</th>
+                  <th class="text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="invoicesTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYMENTS MODULE -->
+      <div id="module-payments" class="module hidden fade-in space-y-6">
+        <div class="flex justify-between items-center flex-wrap gap-4">
+          <h2 class="text-2xl font-bold">Registro de Pagos</h2>
+          <button onclick="openPaymentModal()" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i>Registrar Pago
+          </button>
+        </div>
+        
+        <div class="card p-4">
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Factura</th>
+                  <th>Cliente</th>
+                  <th>Método</th>
+                  <th>Referencia</th>
+                  <th class="text-right">Monto</th>
+                  <th class="text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="paymentsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTS MODULE -->
+      <div id="module-reports" class="module hidden fade-in space-y-6">
+        <h2 class="text-2xl font-bold mb-6">Reportes Administrativos</h2>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <button onclick="generateReport('sales')" class="card p-6 text-left hover:bg-slate-700/50 transition-all group">
+            <div class="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400 text-2xl mb-4 group-hover:scale-110 transition-transform">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-1">Ventas</h3>
+            <p class="text-sm text-slate-400">Reporte de ventas por período</p>
+          </button>
+          
+          <button onclick="generateReport('receivables')" class="card p-6 text-left hover:bg-slate-700/50 transition-all group">
+            <div class="w-14 h-14 rounded-2xl bg-yellow-500/20 flex items-center justify-center text-yellow-400 text-2xl mb-4 group-hover:scale-110 transition-transform">
+              <i class="fas fa-hand-holding-dollar"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-1">Cuentas por Cobrar</h3>
+            <p class="text-sm text-slate-400">Facturas pendientes de pago</p>
+          </button>
+          
+          <button onclick="generateReport('tax')" class="card p-6 text-left hover:bg-slate-700/50 transition-all group">
+            <div class="w-14 h-14 rounded-2xl bg-purple-500/20 flex items-center justify-center text-purple-400 text-2xl mb-4 group-hover:scale-110 transition-transform">
+              <i class="fas fa-calculator"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-1">Impuestos</h3>
+            <p class="text-sm text-slate-400">Resumen de ITBMS</p>
+          </button>
+          
+          <button onclick="generateReport('products')" class="card p-6 text-left hover:bg-slate-700/50 transition-all group">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-2xl mb-4 group-hover:scale-110 transition-transform">
+              <i class="fas fa-boxes-stacked"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-1">Productos</h3>
+            <p class="text-sm text-slate-400">Movimiento de inventario</p>
+          </button>
+          
+          <button onclick="generateReport('clients')" class="card p-6 text-left hover:bg-slate-700/50 transition-all group">
+            <div class="w-14 h-14 rounded-2xl bg-pink-500/20 flex items-center justify-center text-pink-400 text-2xl mb-4 group-hover:scale-110 transition-transform">
+              <i class="fas fa-users"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-1">Clientes</h3>
+            <p class="text-sm text-slate-400">Estado de cuenta por cliente</p>
+          </button>
+          
+          <button onclick="exportFullBackup()" class="card p-6 text-left hover:bg-slate-700/50 transition-all group">
+            <div class="w-14 h-14 rounded-2xl bg-slate-500/20 flex items-center justify-center text-slate-400 text-2xl mb-4 group-hover:scale-110 transition-transform">
+              <i class="fas fa-database"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-1">Backup Completo</h3>
+            <p class="text-sm text-slate-400">Exportar toda la base de datos</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- SETTINGS MODULE -->
+      <div id="module-settings" class="module hidden fade-in space-y-6">
+        <h2 class="text-2xl font-bold">Configuración del Sistema</h2>
+        
+        <div class="grid lg:grid-cols-2 gap-6">
+          <div class="card p-6 space-y-4">
+            <h3 class="font-bold flex items-center gap-2">
+              <i class="fas fa-building text-blue-400"></i>
+              Datos de la Empresa
+            </h3>
+            <div class="space-y-3">
+              <div>
+                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Nombre Empresa</label>
+                <input type="text" id="companyName" class="input" value="A3 Solution">
+              </div>
+              <div>
+                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">RUC</label>
+                <input type="text" id="companyRUC" class="input" value="8-963-952 DV 35">
+              </div>
+              <div>
+                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Dirección</label>
+                <textarea id="companyAddress" class="input h-20 resize-none">Panamá</textarea>
+              </div>
+              <div>
+                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Teléfono</label>
+                <input type="text" id="companyPhone" class="input">
+              </div>
+              <button onclick="saveCompanySettings()" class="btn-primary w-full">Guardar Cambios</button>
+            </div>
+          </div>
+          
+          <div class="card p-6 space-y-4">
+            <h3 class="font-bold flex items-center gap-2">
+              <i class="fas fa-file-invoice text-blue-400"></i>
+              Numeración de Documentos
+            </h3>
+            <div class="space-y-3">
+              <div>
+                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Prefijo Cotizaciones</label>
+                <input type="text" id="prefixQuotes" class="input" value="COT-">
+              </div>
+              <div>
+                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Prefijo Facturas</label>
+                <input type="text" id="prefixInvoices" class="input" value="FAC-">
+              </div>
+              <div>
+                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Próxima Cotización #</label>
+                <input type="number" id="nextQuoteNum" class="input" value="1001">
+              </div>
+              <div>
+                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Próxima Factura #</label>
+                <input type="number" id="nextInvoiceNum" class="input" value="1001">
+              </div>
+              <button onclick="saveNumberingSettings()" class="btn-primary w-full">Guardar Configuración</button>
+            </div>
+          </div>
+          
+          <div class="card p-6 space-y-4">
+            <h3 class="font-bold flex items-center gap-2">
+              <i class="fas fa-shield-alt text-blue-400"></i>
+              Seguridad
+            </h3>
+            <div class="space-y-3">
+              <div>
+                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Usuario Admin</label>
+                <input type="text" id="adminUser" class="input" value="admin">
+              </div>
+              <div>
+                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Nueva Contraseña</label>
+                <input type="password" id="adminPass" class="input" placeholder="Dejar en blanco para no cambiar">
+              </div>
+              <button onclick="saveSecuritySettings()" class="btn-primary w-full">Actualizar Credenciales</button>
+            </div>
+          </div>
+          
+          <div class="card p-6 space-y-4">
+            <h3 class="font-bold flex items-center gap-2">
+              <i class="fas fa-database text-blue-400"></i>
+              Base de Datos
+            </h3>
+            <div class="space-y-3">
+              <button onclick="exportFullBackup()" class="btn-secondary w-full flex items-center justify-center gap-2">
+                <i class="fas fa-download"></i>
+                Exportar Backup JSON
+              </button>
+              <div class="relative">
+                <input type="file" id="importFile" accept=".json" onchange="importBackup(this)" class="hidden">
+                <button onclick="document.getElementById('importFile').click()" class="btn-secondary w-full flex items-center justify-center gap-2">
+                  <i class="fas fa-upload"></i>
+                  Importar Backup
+                </button>
+              </div>
+              <button onclick="clearAllData()" class="btn-danger w-full flex items-center justify-center gap-2 mt-4">
+                <i class="fas fa-trash"></i>
+                Limpiar Todos los Datos
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- MODALS -->
+
+<!-- Client Modal -->
+<div id="clientModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+  <div class="card w-full max-w-lg p-6 fade-in">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-bold" id="clientModalTitle">Nuevo Cliente</h3>
+      <button onclick="closeModal('clientModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <form id="clientForm" onsubmit="saveClient(event)" class="space-y-4">
+      <input type="hidden" id="clientId">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="col-span-2">
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Nombre / Razón Social *</label>
+          <input type="text" id="clientName" required class="input">
+        </div>
+        <div>
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">RUC / Identificación *</label>
+          <input type="text" id="clientRUC" required class="input">
+        </div>
+        <div>
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Teléfono</label>
+          <input type="tel" id="clientPhone" class="input">
+        </div>
+        <div class="col-span-2">
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Email</label>
+          <input type="email" id="clientEmail" class="input">
+        </div>
+        <div class="col-span-2">
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Dirección</label>
+          <textarea id="clientAddress" class="input h-20 resize-none"></textarea>
+        </div>
+      </div>
+      <div class="flex gap-3 pt-4">
+        <button type="button" onclick="closeModal('clientModal')" class="flex-1 btn-secondary">Cancelar</button>
+        <button type="submit" class="flex-1 btn-primary">Guardar Cliente</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Product Modal -->
+<div id="productModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+  <div class="card w-full max-w-lg p-6 fade-in max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-bold" id="productModalTitle">Nuevo Producto</h3>
+      <button onclick="closeModal('productModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <form id="productForm" onsubmit="saveProduct(event)" class="space-y-4">
+      <input type="hidden" id="productId">
+      <div>
+        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Código SKU *</label>
+        <input type="text" id="productSku" required class="input" placeholder="PROD-001">
+      </div>
+      <div>
+        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Nombre *</label>
+        <input type="text" id="productName" required class="input">
+      </div>
+      <div>
+        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Descripción</label>
+        <textarea id="productDesc" class="input h-20 resize-none"></textarea>
+      </div>
+      <div>
+        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Categoría</label>
+        <select id="productCategory" class="input"></select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Costo *</label>
+          <input type="number" step="0.01" id="productCost" required class="input" oninput="calculateProductPrice()">
+        </div>
+        <div>
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Margen % *</label>
+          <input type="number" step="0.01" id="productMargin" required class="input" value="30" oninput="calculateProductPrice()">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Precio Base</label>
+          <input type="number" step="0.01" id="productBasePrice" class="input bg-slate-800" readonly>
+        </div>
+        <div>
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Precio Final (con ITBMS)</label>
+          <input type="number" step="0.01" id="productFinalPrice" class="input bg-slate-800" readonly>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 p-3 bg-slate-700/30 rounded-xl">
+        <input type="checkbox" id="productTax" checked class="w-5 h-5 rounded accent-blue-500" onchange="calculateProductPrice()">
+        <label for="productTax" class="text-sm">Aplica ITBMS (7%)</label>
+      </div>
+      <div class="flex items-center gap-3 p-3 bg-slate-700/30 rounded-xl">
+        <input type="checkbox" id="productActive" checked class="w-5 h-5 rounded accent-blue-500">
+        <label for="productActive" class="text-sm">Producto Activo</label>
+      </div>
+      <div class="flex gap-3 pt-4">
+        <button type="button" onclick="closeModal('productModal')" class="flex-1 btn-secondary">Cancelar</button>
+        <button type="submit" class="flex-1 btn-primary">Guardar Producto</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Category Modal -->
+<div id="categoryModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+  <div class="card w-full max-w-md p-6 fade-in">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-bold">Gestionar Categorías</h3>
+      <button onclick="closeModal('categoryModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="space-y-3 mb-4">
+      <div class="flex gap-2">
+        <input type="text" id="newCategoryName" class="input" placeholder="Nueva categoría...">
+        <button onclick="addCategory()" class="btn-primary px-4">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+    <div id="categoryList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+    <button onclick="closeModal('categoryModal')" class="w-full btn-secondary mt-4">Cerrar</button>
+  </div>
+</div>
+
+<!-- Quote Modal -->
+<div id="quoteModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+  <div class="card w-full max-w-6xl p-6 fade-in my-8">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h3 class="text-xl font-bold" id="quoteModalTitle">Nueva Cotización</h3>
+        <p class="text-sm text-slate-400" id="quoteNumberDisplay"></p>
+      </div>
+      <button onclick="closeModal('quoteModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="grid lg:grid-cols-3 gap-6">
+      <!-- Form -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Cliente *</label>
+            <select id="quoteClient" class="input" required onchange="updateQuoteClient()">
+              <option value="">Seleccionar cliente...</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Fecha *</label>
+            <input type="date" id="quoteDate" required class="input">
+          </div>
+        </div>
+        
+        <div>
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Notas</label>
+          <textarea id="quoteNotes" class="input h-20 resize-none" placeholder="Términos y condiciones..."></textarea>
+        </div>
+        
+        <div class="flex justify-between items-center">
+          <h4 class="font-bold">Items</h4>
+          <button onclick="openProductSelector()" class="btn-secondary text-sm py-2">
+            <i class="fas fa-plus mr-2"></i>Agregar Producto
+          </button>
+        </div>
+        
+        <div id="quoteItems" class="space-y-3"></div>
+        
+        <div class="flex justify-between items-center pt-4 border-t border-slate-700">
+          <button type="button" onclick="saveQuote('borrador')" class="btn-secondary">
+            <i class="fas fa-save mr-2"></i>Guardar Borrador
+          </button>
+          <div class="flex gap-2">
+            <button type="button" onclick="saveQuote('emitido')" class="btn-primary">
+              <i class="fas fa-check mr-2"></i>Emitir Cotización
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Preview -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-4">
+          <div class="card p-4 space-y-3">
+            <h4 class="font-bold text-sm uppercase text-slate-400">Resumen</h4>
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">Subtotal:</span>
+              <span class="font-mono" id="quoteSubtotal">B/. 0.00</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">ITBMS:</span>
+              <span class="font-mono" id="quoteTax">B/. 0.00</span>
+            </div>
+            <div class="flex justify-between text-lg font-bold border-t border-slate-700 pt-2">
+              <span>Total:</span>
+              <span class="font-mono text-blue-400" id="quoteTotal">B/. 0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Product Selector Modal -->
+<div id="productSelectorModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+  <div class="card w-full max-w-4xl p-6 fade-in max-h-[90vh] flex flex-col">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold">Seleccionar Producto</h3>
+      <button onclick="closeModal('productSelectorModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="relative mb-4">
+      <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+      <input type="text" id="selectorSearch" class="input pl-10" placeholder="Buscar producto..." oninput="renderProductSelector()">
+    </div>
+    <div id="productSelectorList" class="flex-1 overflow-y-auto space-y-2"></div>
+  </div>
+</div>
+
+<!-- Invoice Modal -->
+<div id="invoiceModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+  <div class="card w-full max-w-6xl p-6 fade-in my-8">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h3 class="text-xl font-bold" id="invoiceModalTitle">Nueva Factura</h3>
+        <p class="text-sm text-slate-400" id="invoiceNumberDisplay"></p>
+      </div>
+      <button onclick="closeModal('invoiceModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="grid lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Cliente *</label>
+            <select id="invoiceClient" class="input" required>
+              <option value="">Seleccionar cliente...</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Fecha *</label>
+            <input type="date" id="invoiceDate" required class="input">
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Fecha Vencimiento</label>
+            <input type="date" id="invoiceDueDate" class="input">
+          </div>
+          <div>
+            <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Método de Pago</label>
+            <select id="invoicePaymentMethod" class="input">
+              <option value="contado">Contado</option>
+              <option value="credito">Crédito</option>
+              <option value="transferencia">Transferencia</option>
+              <option value="cheque">Cheque</option>
+            </select>
+          </div>
+        </div>
+        
+        <div>
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Notas</label>
+          <textarea id="invoiceNotes" class="input h-20 resize-none"></textarea>
+        </div>
+        
+        <div class="flex justify-between items-center">
+          <h4 class="font-bold">Items</h4>
+          <button onclick="openInvoiceProductSelector()" class="btn-secondary text-sm py-2">
+            <i class="fas fa-plus mr-2"></i>Agregar Producto
+          </button>
+        </div>
+        
+        <div id="invoiceItems" class="space-y-3"></div>
+        
+        <div class="flex justify-between items-center pt-4 border-t border-slate-700">
+          <button type="button" onclick="saveInvoice('borrador')" class="btn-secondary">
+            <i class="fas fa-save mr-2"></i>Guardar Borrador
+          </button>
+          <button type="button" onclick="saveInvoice('emitido')" class="btn-success">
+            <i class="fas fa-check mr-2"></i>Emitir Factura
+          </button>
+        </div>
+      </div>
+      
+      <div class="lg:col-span-1">
+        <div class="sticky top-4 space-y-4">
+          <div class="card p-4 space-y-3">
+            <h4 class="font-bold text-sm uppercase text-slate-400">Resumen</h4>
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">Subtotal:</span>
+              <span class="font-mono" id="invSubtotal">B/. 0.00</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">ITBMS:</span>
+              <span class="font-mono" id="invTax">B/. 0.00</span>
+            </div>
+            <div class="flex justify-between text-lg font-bold border-t border-slate-700 pt-2">
+              <span>Total:</span>
+              <span class="font-mono text-emerald-400" id="invTotal">B/. 0.00</span>
+            </div>
+          </div>
+          
+          <div class="card p-4">
+            <h4 class="font-bold text-sm uppercase text-slate-400 mb-3">Convertir desde Cotización</h4>
+            <select id="convertQuoteSelect" class="input mb-2">
+              <option value="">Seleccionar cotización...</option>
+            </select>
+            <button onclick="convertQuoteToInvoice()" class="btn-secondary w-full text-sm">
+              <i class="fas fa-exchange-alt mr-2"></i>Convertir
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+  <div class="card w-full max-w-lg p-6 fade-in">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-bold">Registrar Pago</h3>
+      <button onclick="closeModal('paymentModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <form id="paymentForm" onsubmit="savePayment(event)" class="space-y-4">
+      <div>
+        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Factura *</label>
+        <select id="paymentInvoice" required class="input" onchange="updatePaymentBalance()">
+          <option value="">Seleccionar factura...</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Fecha *</label>
+          <input type="date" id="paymentDate" required class="input">
+        </div>
+        <div>
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Monto *</label>
+          <input type="number" step="0.01" id="paymentAmount" required class="input">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Método *</label>
+          <select id="paymentMethod" required class="input">
+            <option value="efectivo">Efectivo</option>
+            <option value="transferencia">Transferencia</option>
+            <option value="cheque">Cheque</option>
+            <option value="tarjeta">Tarjeta</option>
+            <option value="yappy">Yappy</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Referencia</label>
+          <input type="text" id="paymentReference" class="input" placeholder="# transferencia, etc">
+        </div>
+      </div>
+      <div class="p-3 bg-slate-700/30 rounded-xl">
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-400">Saldo pendiente:</span>
+          <span class="font-mono font-bold" id="paymentBalance">B/. 0.00</span>
+        </div>
+      </div>
+      <div class="flex gap-3 pt-4">
+        <button type="button" onclick="closeModal('paymentModal')" class="flex-1 btn-secondary">Cancelar</button>
+        <button type="submit" class="flex-1 btn-success">Registrar Pago</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Document Preview Modal -->
+<div id="previewModal" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+  <div class="w-full max-w-4xl my-8">
+    <div class="flex justify-end gap-2 mb-4 no-print">
+      <button onclick="closeModal('previewModal')" class="btn-secondary">
+        <i class="fas fa-times mr-2"></i>Cerrar
+      </button>
+      <button onclick="printDocument()" class="btn-primary">
+        <i class="fas fa-print mr-2"></i>Imprimir
+      </button>
+      <button onclick="downloadPDF()" class="btn-success">
+        <i class="fas fa-file-pdf mr-2"></i>Descargar PDF
+      </button>
+    </div>
+    <div id="documentPreview" class="sheet rounded-2xl p-8 sm:p-12 min-h-[800px]">
+      <!-- Content injected dynamically -->
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// ARQUITECTURA DE BASE DE DATOS
+// ============================================
+
+const DB_SCHEMA = {
+  // Users & Auth
+  users: 'a3_users_v1',
+  
+  // Core Business
+  clients: 'a3_clients_v1',
+  categories: 'a3_categories_v1',
+  products: 'a3_products_v1',
+  
+  // Documents
+  quotes: 'a3_quotes_v1',
+  invoices: 'a3_invoices_v1',
+  invoice_items: 'a3_invoice_items_v1',
+  
+  // Financial
+  payments: 'a3_payments_v1',
+  taxes: 'a3_taxes_v1',
+  
+  // Audit & Config
+  audit_logs: 'a3_audit_v1',
+  settings: 'a3_settings_v1',
+  sequences: 'a3_sequences_v1'
+};
+
+const DB = {
+  // Generic CRUD
+  async getAll(store) {
+    const data = localStorage.getItem(DB_SCHEMA[store]);
+    return data ? JSON.parse(data) : [];
+  },
+  
+  async getById(store, id) {
+    const items = await this.getAll(store);
+    return items.find(i => i.id === id);
+  },
+  
+  async save(store, item) {
+    const items = await this.getAll(store);
+    const idx = items.findIndex(i => i.id === item.id);
+    const now = new Date().toISOString();
+    
+    if (idx >= 0) {
+      items[idx] = { ...items[idx], ...item, updated_at: now };
+    } else {
+      item.created_at = now;
+      items.push(item);
+    }
+    
+    localStorage.setItem(DB_SCHEMA[store], JSON.stringify(items));
+    
+    // Audit log
+    await this.logAudit(store, idx >= 0 ? 'UPDATE' : 'CREATE', item.id);
+    
+    return item;
+  },
+  
+  async delete(store, id) {
+    const items = await this.getAll(store);
+    const filtered = items.filter(i => i.id !== id);
+    localStorage.setItem(DB_SCHEMA[store], JSON.stringify(filtered));
+    await this.logAudit(store, 'DELETE', id);
+  },
+  
+  // Audit logging
+  async logAudit(table, action, recordId) {
+    const logs = await this.getAll('audit_logs');
+    logs.push({
+      id: crypto.randomUUID(),
+      table,
+      action,
+      record_id: recordId,
+      user_id: currentUser?.id || 'system',
+      user_name: currentUser?.name || 'System',
+      timestamp: new Date().toISOString(),
+      ip: 'localhost'
+    });
+    localStorage.setItem(DB_SCHEMA.audit_logs, JSON.stringify(logs.slice(-1000))); // Keep last 1000
+  },
+  
+  // Sequences for numbering
+  async getNextNumber(type) {
+    const sequences = await this.getAll('sequences');
+    let seq = sequences.find(s => s.type === type);
+    
+    if (!seq) {
+      seq = { id: crypto.randomUUID(), type, current: 1000, prefix: type === 'quote' ? 'COT-' : 'FAC-' };
+      sequences.push(seq);
+    }
+    
+    seq.current++;
+    localStorage.setItem(DB_SCHEMA.sequences, JSON.stringify(sequences));
+    
+    return `${seq.prefix}${String(seq.current).padStart(6, '0')}`;
+  },
+  
+  // Export/Import
+  exportAll() {
+    const data = {};
+    Object.values(DB_SCHEMA).forEach(key => {
+      data[key] = localStorage.getItem(key);
+    });
+    return JSON.stringify(data, null, 2);
+  },
+  
+  async importAll(json) {
+    const data = JSON.parse(json);
+    Object.entries(data).forEach(([key, value]) => {
+      if (value) localStorage.setItem(key, value);
+    });
+  }
+};
+
+// ============================================
+// ESTADO GLOBAL
+// ============================================
+
+let currentUser = null;
+let currentModule = 'dashboard';
+let tempQuoteItems = [];
+let tempInvoiceItems = [];
+let currentPreviewDoc = null;
+
+// ============================================
+// INICIALIZACIÓN
+// ============================================
+
+async function init() {
+  // Check auth
+  const session = localStorage.getItem('a3_session');
+  if (session) {
+    currentUser = JSON.parse(session);
+    showMainApp();
+  }
+  
+  // Set current date
+  document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-PA', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+  
+  // Init default data if empty
+  await initDefaultData();
+}
+
+async function initDefaultData() {
+  // Default categories
+  const cats = await DB.getAll('categories');
+  if (cats.length === 0) {
+    const defaults = ['General', 'Cables', 'Equipos de Red', 'Seguridad', 'Mano de Obra', 'Servicios'];
+    for (const name of defaults) {
+      await DB.save('categories', { id: crypto.randomUUID(), name, active: true });
+    }
+  }
+  
+  // Default admin user
+  const users = await DB.getAll('users');
+  if (users.length === 0) {
+    await DB.save('users', {
+      id: crypto.randomUUID(),
+      username: 'admin',
+      password: 'admin123', // In production, hash this!
+      name: 'Administrador',
+      role: 'admin',
+      active: true
+    });
+  }
+  
+  // Default settings
+  const settings = await DB.getAll('settings');
+  if (settings.length === 0) {
+    await DB.save('settings', {
+      id: crypto.randomUUID(),
+      company_name: 'A3 Solution',
+      company_ruc: '8-963-952 DV 35',
+      company_address: 'Panamá',
+      company_phone: '',
+      company_email: 'contacto@a3solution.com',
+      tax_rate: 7,
+      tax_name: 'ITBMS',
+      currency: 'B/.',
+      quote_prefix: 'COT-',
+      invoice_prefix: 'FAC-'
+    });
+  }
+}
+
+// ============================================
+// AUTENTICACIÓN
+// ============================================
+
+async function login() {
+  const username = document.getElementById('loginUser').value;
+  const password = document.getElementById('loginPass').value;
+  
+  const users = await DB.getAll('users');
+  const user = users.find(u => u.username === username && u.password === password && u.active);
+  
+  if (user) {
+    currentUser = { id: user.id, name: user.name, role: user.role };
+    localStorage.setItem('a3_session', JSON.stringify(currentUser));
+    showMainApp();
+    await DB.logAudit('users', 'LOGIN', user.id);
+  } else {
+    alert('Usuario o contraseña incorrectos');
+  }
+}
+
+function logout() {
+  localStorage.removeItem('a3_session');
+  currentUser = null;
+  location.reload();
+}
+
+function showMainApp() {
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  document.getElementById('currentUserName').textContent = currentUser.name;
+  updateDashboard();
+}
+
+// ============================================
+// NAVEGACIÓN
+// ============================================
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('-translate-x-full');
+}
+
+function showModule(module) {
+  currentModule = module;
+  
+  // Update nav active state
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.remove('bg-slate-800', 'text-blue-400');
+    el.querySelector('i').classList.remove('text-blue-400');
+  });
+  event?.target?.closest('.nav-item')?.classList.add('bg-slate-800', 'text-blue-400');
+  
+  // Hide all modules
+  document.querySelectorAll('.module').forEach(m => m.classList.add('hidden'));
+  
+  // Show selected
+  document.getElementById(`module-${module}`).classList.remove('hidden');
+  
+  // Load data
+  switch(module) {
+    case 'dashboard': updateDashboard(); break;
+    case 'clients': renderClients(); break;
+    case 'catalog': renderCatalog(); break;
+    case 'quotes': renderQuotes(); break;
+    case 'invoices': renderInvoices(); break;
+    case 'payments': renderPayments(); break;
+  }
+  
+  // Close mobile sidebar
+  if (window.innerWidth < 1024) {
+    document.getElementById('sidebar').classList.add('-translate-x-full');
+  }
+}
+
+// ============================================
+// DASHBOARD
+// ============================================
+
+async function updateDashboard() {
+  const quotes = await DB.getAll('quotes');
+  const invoices = await DB.getAll('invoices');
+  const clients = await DB.getAll('clients');
+  const payments = await DB.getAll('payments');
+  
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0,0,0,0);
+  
+  const monthQuotes = quotes.filter(q => new Date(q.date) >= monthStart);
+  const monthInvoices = invoices.filter(i => new Date(i.date) >= monthStart && i.status !== 'anulado');
+  
+  document.getElementById('dashQuotesCount').textContent = monthQuotes.length;
+  document.getElementById('dashQuotesTotal').textContent = `B/. ${monthQuotes.reduce((a,b) => a + (b.total || 0), 0).toFixed(2)}`;
+  
+  document.getElementById('dashInvoicesCount').textContent = monthInvoices.length;
+  document.getElementById('dashInvoicesTotal').textContent = `B/. ${monthInvoices.reduce((a,b) => a + (b.total || 0), 0).toFixed(2)}`;
+  
+  const pendingInvoices = invoices.filter(i => i.status === 'emitido' || i.status === 'parcial');
+  document.getElementById('dashPendingCount').textContent = pendingInvoices.length;
+  document.getElementById('dashPendingTotal').textContent = `B/. ${pendingInvoices.reduce((a,b) => a + ((b.total || 0) - (b.paid || 0)), 0).toFixed(2)}`;
+  
+  document.getElementById('dashClientsCount').textContent = clients.filter(c => c.active).length;
+  
+  // Recent activity
+  const logs = (await DB.getAll('audit_logs')).slice(-10).reverse();
+  const activityHtml = logs.map(log => `
+    <div class="flex items-center gap-3 text-sm p-2 rounded-lg hover:bg-slate-700/30">
+      <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs">
+        <i class="fas fa-${getActionIcon(log.action)}"></i>
+      </div>
+      <div class="flex-1">
+        <p class="text-slate-300">${log.user_name} ${log.action.toLowerCase()} ${log.table}</p>
+        <p class="text-xs text-slate-500">${new Date(log.timestamp).toLocaleString('es-PA')}</p>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('recentActivity').innerHTML = activityHtml || '<p class="text-slate-500 text-sm text-center py-8">No hay actividad reciente</p>';
+}
+
+function getActionIcon(action) {
+  const icons = { CREATE: 'plus', UPDATE: 'edit', DELETE: 'trash', LOGIN: 'sign-in-alt' };
+  return icons[action] || 'circle';
+}
+
+// ============================================
+// CLIENTES
+// ============================================
+
+async function renderClients() {
+  const clients = await DB.getAll('clients');
+  const search = document.getElementById('clientSearch')?.value?.toLowerCase() || '';
+  const filter = document.getElementById('clientFilter')?.value || 'all';
+  
+  const filtered = clients
+    .filter(c => !search || c.name.toLowerCase().includes(search) || c.ruc?.includes(search))
+    .filter(c => filter === 'all' || (filter === 'active' ? c.active : !c.active));
+  
+  const tbody = document.getElementById('clientsTable');
+  tbody.innerHTML = filtered.map(c => `
+    <tr>
+      <td>
+        <div class="font-medium">${c.name}</div>
+        <div class="text-xs text-slate-400">${c.address || ''}</div>
+      </td>
+      <td class="font-mono text-xs">${c.ruc || '-'}</td>
+      <td>${c.phone || '-'}</td>
+      <td class="text-xs">${c.email || '-'}</td>
+      <td>
+        <span class="px-2 py-1 rounded-full text-xs ${c.active ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-500/20 text-slate-400'}">
+          ${c.active ? 'Activo' : 'Inactivo'}
+        </span>
+      </td>
+      <td class="text-right">
+        <button onclick="editClient('${c.id}')" class="w-8 h-8 rounded-lg hover:bg-blue-500/20 text-blue-400 mr-1">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button onclick="deleteClient('${c.id}')" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openClientModal() {
+  document.getElementById('clientModalTitle').textContent = 'Nuevo Cliente';
+  document.getElementById('clientForm').reset();
+  document.getElementById('clientId').value = '';
+  document.getElementById('clientModal').classList.remove('hidden');
+}
+
+function editClient(id) {
+  DB.getById('clients', id).then(c => {
+    document.getElementById('clientModalTitle').textContent = 'Editar Cliente';
+    document.getElementById('clientId').value = c.id;
+    document.getElementById('clientName').value = c.name;
+    document.getElementById('clientRUC').value = c.ruc || '';
+    document.getElementById('clientPhone').value = c.phone || '';
+    document.getElementById('clientEmail').value = c.email || '';
+    document.getElementById('clientAddress').value = c.address || '';
+    document.getElementById('clientModal').classList.remove('hidden');
+  });
+}
+
+async function saveClient(e) {
+  e.preventDefault();
+  const id = document.getElementById('clientId').value || crypto.randomUUID();
+  const client = {
+    id,
+    name: document.getElementById('clientName').value,
+    ruc: document.getElementById('clientRUC').value,
+    phone: document.getElementById('clientPhone').value,
+    email: document.getElementById('clientEmail').value,
+    address: document.getElementById('clientAddress').value,
+    active: true
+  };
+  
+  await DB.save('clients', client);
+  closeModal('clientModal');
+  renderClients();
+}
+
+async function deleteClient(id) {
+  if (!confirm('¿Eliminar este cliente?')) return;
+  await DB.delete('clients', id);
+  renderClients();
+}
+
+// ============================================
+// CATÁLOGO
+// ============================================
+
+async function renderCatalog() {
+  const products = await DB.getAll('products');
+  const categories = await DB.getAll('categories');
+  const search = document.getElementById('productSearch')?.value?.toLowerCase() || '';
+  const catFilter = document.getElementById('productCategoryFilter')?.value || 'all';
+  const statusFilter = document.getElementById('productStatusFilter')?.value || 'all';
+  
+  // Update category filter
+  const catSelect = document.getElementById('productCategoryFilter');
+  if (catSelect && catSelect.options.length <= 1) {
+    categories.filter(c => c.active).forEach(c => {
+      catSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+    });
+  }
+  
+  const filtered = products
+    .filter(p => !search || p.name.toLowerCase().includes(search) || p.sku?.toLowerCase().includes(search))
+    .filter(p => catFilter === 'all' || p.category === catFilter)
+    .filter(p => statusFilter === 'all' || (statusFilter === 'active' ? p.active : !p.active));
+  
+  const tbody = document.getElementById('catalogTable');
+  tbody.innerHTML = filtered.map(p => {
+    const basePrice = p.cost * (1 + p.margin / 100);
+    const finalPrice = p.apply_tax ? basePrice * 1.07 : basePrice;
+    
+    return `
+    <tr>
+      <td class="font-mono text-xs">${p.sku || '-'}</td>
+      <td>
+        <div class="font-medium">${p.name}</div>
+        <div class="text-xs text-slate-400 truncate max-w-xs">${p.description || ''}</div>
+      </td>
+      <td>${p.category || 'General'}</td>
+      <td class="text-right font-mono text-xs">B/. ${p.cost?.toFixed(2)}</td>
+      <td class="text-right font-mono font-medium">B/. ${finalPrice.toFixed(2)}</td>
+      <td class="text-center">
+        ${p.apply_tax ? '<span class="text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">7%</span>' : '-'}
+      </td>
+      <td>
+        <span class="px-2 py-1 rounded-full text-xs ${p.active ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-500/20 text-slate-400'}">
+          ${p.active ? 'Activo' : 'Inactivo'}
+        </span>
+      </td>
+      <td class="text-right">
+        <button onclick="editProduct('${p.id}')" class="w-8 h-8 rounded-lg hover:bg-blue-500/20 text-blue-400 mr-1">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button onclick="deleteProduct('${p.id}')" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `}).join('');
+}
+
+function openProductModal() {
+  document.getElementById('productModalTitle').textContent = 'Nuevo Producto';
+  document.getElementById('productForm').reset();
+  document.getElementById('productId').value = '';
+  loadCategoriesSelect();
+  document.getElementById('productModal').classList.remove('hidden');
+}
+
+function editProduct(id) {
+  DB.getById('products', id).then(p => {
+    document.getElementById('productModalTitle').textContent = 'Editar Producto';
+    document.getElementById('productId').value = p.id;
+    document.getElementById('productSku').value = p.sku || '';
+    document.getElementById('productName').value = p.name;
+    document.getElementById('productDesc').value = p.description || '';
+    document.getElementById('productCost').value = p.cost;
+    document.getElementById('productMargin').value = p.margin;
+    document.getElementById('productTax').checked = p.apply_tax;
+    document.getElementById('productActive').checked = p.active;
+    loadCategoriesSelect(p.category);
+    calculateProductPrice();
+    document.getElementById('productModal').classList.remove('hidden');
+  });
+}
+
+async function loadCategoriesSelect(selected = '') {
+  const categories = await DB.getAll('categories');
+  const select = document.getElementById('productCategory');
+  select.innerHTML = categories.filter(c => c.active).map(c => 
+    `<option value="${c.name}" ${c.name === selected ? 'selected' : ''}>${c.name}</option>`
+  ).join('');
+}
+
+function calculateProductPrice() {
+  const cost = parseFloat(document.getElementById('productCost').value) || 0;
+  const margin = parseFloat(document.getElementById('productMargin').value) || 0;
+  const applyTax = document.getElementById('productTax').checked;
+  
+  const basePrice = cost * (1 + margin / 100);
+  const finalPrice = applyTax ? basePrice * 1.07 : basePrice;
+  
+  document.getElementById('productBasePrice').value = basePrice.toFixed(2);
+  document.getElementById('productFinalPrice').value = finalPrice.toFixed(2);
+}
+
+async function saveProduct(e) {
+  e.preventDefault();
+  const id = document.getElementById('productId').value || crypto.randomUUID();
+  
+  const product = {
+    id,
+    sku: document.getElementById('productSku').value,
+    name: document.getElementById('productName').value,
+    description: document.getElementById('productDesc').value,
+    category: document.getElementById('productCategory').value,
+    cost: parseFloat(document.getElementById('productCost').value) || 0,
+    margin: parseFloat(document.getElementById('productMargin').value) || 0,
+    apply_tax: document.getElementById('productTax').checked,
+    active: document.getElementById('productActive').checked
+  };
+  
+  // Save price history if price changed
+  const existing = await DB.getById('products', id);
+  if (existing) {
+    const oldPrice = existing.cost * (1 + existing.margin / 100) * (existing.apply_tax ? 1.07 : 1);
+    const newPrice = product.cost * (1 + product.margin / 100) * (product.apply_tax ? 1.07 : 1);
+    
+    if (Math.abs(oldPrice - newPrice) > 0.01) {
+      product.price_history = [...(existing.price_history || []), {
+        date: new Date().toISOString(),
+        cost: existing.cost,
+        margin: existing.margin,
+        apply_tax: existing.apply_tax,
+        price: oldPrice
+      }];
+    } else {
+      product.price_history = existing.price_history || [];
+    }
+  }
+  
+  await DB.save('products', product);
+  closeModal('productModal');
+  renderCatalog();
+}
+
+async function deleteProduct(id) {
+  if (!confirm('¿Eliminar este producto?')) return;
+  await DB.delete('products', id);
+  renderCatalog();
+}
+
+// Categorías
+async function openCategoryManager() {
+  document.getElementById('categoryModal').classList.remove('hidden');
+  renderCategoryList();
+}
+
+async function renderCategoryList() {
+  const categories = await DB.getAll('categories');
+  const container = document.getElementById('categoryList');
+  container.innerHTML = categories.map((c, idx) => `
+    <div class="flex justify-between items-center p-3 bg-slate-700/30 rounded-xl">
+      <span>${c.name}</span>
+      <button onclick="deleteCategory('${c.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-500/20">
+        <i class="fas fa-trash text-xs"></i>
+      </button>
+    </div>
+  `).join('');
+}
+
+async function addCategory() {
+  const name = document.getElementById('newCategoryName').value.trim();
+  if (!name) return;
+  
+  const categories = await DB.getAll('categories');
+  if (categories.find(c => c.name.toLowerCase() === name.toLowerCase())) {
+    alert('Esta categoría ya existe');
+    return;
+  }
+  
+  await DB.save('categories', {
+    id: crypto.randomUUID(),
+    name,
+    active: true
+  });
+  
+  document.getElementById('newCategoryName').value = '';
+  renderCategoryList();
+  renderCatalog();
+}
+
+async function deleteCategory(id) {
+  if (!confirm('¿Eliminar esta categoría? Los productos pasarán a "General"')) return;
+  
+  const cat = await DB.getById('categories', id);
+  const products = await DB.getAll('products');
+  
+  for (const p of products.filter(p => p.category === cat.name)) {
+    p.category = 'General';
+    await DB.save('products', p);
+  }
+  
+  await DB.delete('categories', id);
+  renderCategoryList();
+  renderCatalog();
+}
+
+// ============================================
+// COTIZACIONES
+// ============================================
+
+async function renderQuotes() {
+  const quotes = await DB.getAll('quotes');
+  const clients = await DB.getAll('clients');
+  const search = document.getElementById('quoteSearch')?.value?.toLowerCase() || '';
+  const statusFilter = document.getElementById('quoteStatusFilter')?.value || 'all';
+  const dateFrom = document.getElementById('quoteDateFrom')?.value;
+  const dateTo = document.getElementById('quoteDateTo')?.value;
+  
+  const filtered = quotes
+    .filter(q => !search || q.number?.toLowerCase().includes(search) || clients.find(c => c.id === q.client_id)?.name?.toLowerCase().includes(search))
+    .filter(q => statusFilter === 'all' || q.status === statusFilter)
+    .filter(q => !dateFrom || new Date(q.date) >= new Date(dateFrom))
+    .filter(q => !dateTo || new Date(q.date) <= new Date(dateTo))
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  
+  const tbody = document.getElementById('quotesTable');
+  tbody.innerHTML = filtered.map(q => {
+    const client = clients.find(c => c.id === q.client_id);
+    const statusClass = {
+      borrador: 'status-borrador',
+      emitido: 'status-emitido',
+      facturado: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
+      anulado: 'status-anulado'
+    }[q.status] || 'status-borrador';
+    
+    return `
+    <tr>
+      <td class="font-mono font-medium">${q.number}</td>
+      <td class="text-xs">${new Date(q.date).toLocaleDateString('es-PA')}</td>
+      <td>${client?.name || 'Cliente eliminado'}</td>
+      <td class="text-right font-mono">B/. ${q.total?.toFixed(2)}</td>
+      <td><span class="px-2 py-1 rounded-full text-xs ${statusClass}">${q.status}</span></td>
+      <td class="text-right">
+        <button onclick="viewQuote('${q.id}')" class="w-8 h-8 rounded-lg hover:bg-blue-500/20 text-blue-400 mr-1" title="Ver">
+          <i class="fas fa-eye"></i>
+        </button>
+        ${q.status === 'emitido' ? `
+        <button onclick="convertQuote('${q.id}')" class="w-8 h-8 rounded-lg hover:bg-emerald-500/20 text-emerald-400 mr-1" title="Convertir a Factura">
+          <i class="fas fa-exchange-alt"></i>
+        </button>
+        ` : ''}
+        <button onclick="deleteQuote('${q.id}')" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400" title="Eliminar">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `}).join('');
+}
+
+async function openQuoteModal() {
+  const number = await DB.getNextNumber('quote');
+  document.getElementById('quoteModalTitle').textContent = 'Nueva Cotización';
+  document.getElementById('quoteNumberDisplay').textContent = number;
+  document.getElementById('quoteDate').value = new Date().toISOString().split('T')[0];
+  
+  // Load clients
+  const clients = await DB.getAll('clients');
+  const select = document.getElementById('quoteClient');
+  select.innerHTML = '<option value="">Seleccionar cliente...</option>' + 
+    clients.filter(c => c.active).map(c => `<option value="${c.id}">${c.name} - ${c.ruc}</option>`).join('');
+  
+  tempQuoteItems = [];
+  renderQuoteItems();
+  updateQuoteTotals();
+  
+  document.getElementById('quoteModal').classList.remove('hidden');
+}
+
+function openProductSelector() {
+  document.getElementById('productSelectorModal').classList.remove('hidden');
+  renderProductSelector();
+}
+
+async function renderProductSelector() {
+  const products = await DB.getAll('products');
+  const search = document.getElementById('selectorSearch')?.value?.toLowerCase() || '';
+  
+  const filtered = products.filter(p => p.active && (!search || p.name.toLowerCase().includes(search)));
+  
+  const container = document.getElementById('productSelectorList');
+  container.innerHTML = filtered.map(p => {
+    const price = calculatePrice(p);
+    return `
+    <div class="flex justify-between items-center p-3 bg-slate-700/30 rounded-xl hover:bg-slate-700/50 cursor-pointer" onclick="addProductToQuote('${p.id}')">
+      <div>
+        <div class="font-medium">${p.name}</div>
+        <div class="text-xs text-slate-400">${p.category} | SKU: ${p.sku || '-'}</div>
+      </div>
+      <div class="text-right">
+        <div class="font-mono font-medium">B/. ${price.toFixed(2)}</div>
+        ${p.apply_tax ? '<span class="text-xs text-blue-400">+ITBMS</span>' : ''}
+      </div>
+    </div>
+  `}).join('');
+}
+
+function calculatePrice(product) {
+  const base = product.cost * (1 + product.margin / 100);
+  return product.apply_tax ? base * 1.07 : base;
+}
+
+function addProductToQuote(productId) {
+  DB.getById('products', productId).then(p => {
+    tempQuoteItems.push({
+      id: crypto.randomUUID(),
+      product_id: p.id,
+      name: p.name,
+      description: p.description,
+      cost: p.cost,
+      margin: p.margin,
+      apply_tax: p.apply_tax,
+      price: calculatePrice(p),
+      quantity: 1
+    });
+    renderQuoteItems();
+    updateQuoteTotals();
+    closeModal('productSelectorModal');
+  });
+}
+
+function renderQuoteItems() {
+  const container = document.getElementById('quoteItems');
+  if (tempQuoteItems.length === 0) {
+    container.innerHTML = '<p class="text-slate-500 text-center py-8">Agrega productos desde el catálogo</p>';
+    return;
+  }
+  
+  container.innerHTML = tempQuoteItems.map((item, idx) => `
+    <div class="item-card rounded-xl p-4 space-y-3">
+      <div class="flex justify-between items-start">
+        <div class="flex-1">
+          <input type="text" value="${item.name}" onchange="updateQuoteItem(${idx}, 'name', this.value)" 
+            class="w-full bg-transparent border-b border-slate-600 focus:border-blue-500 focus:outline-none font-medium">
+        </div>
+        <button onclick="removeQuoteItem(${idx})" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400 ml-2">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="grid grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="text-xs text-slate-500 block mb-1">Cantidad</label>
+          <input type="number" min="1" value="${item.quantity}" onchange="updateQuoteItem(${idx}, 'quantity', this.value)"
+            class="w-full bg-slate-700/50 rounded-lg px-2 py-1 text-center font-mono">
+        </div>
+        <div>
+          <label class="text-xs text-slate-500 block mb-1">Precio Unit.</label>
+          <input type="number" step="0.01" value="${item.price.toFixed(2)}" onchange="updateQuoteItem(${idx}, 'price', this.value)"
+            class="w-full bg-slate-700/50 rounded-lg px-2 py-1 text-right font-mono">
+        </div>
+        <div class="col-span-2 flex items-end justify-end">
+          <div class="text-right">
+            <div class="text-xs text-slate-500">Total línea</div>
+            <div class="font-mono font-bold">B/. ${(item.price * item.quantity).toFixed(2)}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateQuoteItem(idx, field, value) {
+  const item = tempQuoteItems[idx];
+  if (field === 'quantity') item.quantity = parseInt(value) || 1;
+  else if (field === 'price') item.price = parseFloat(value) || 0;
+  else if (field === 'name') item.name = value;
+  
+  renderQuoteItems();
+  updateQuoteTotals();
+}
+
+function removeQuoteItem(idx) {
+  tempQuoteItems.splice(idx, 1);
+  renderQuoteItems();
+  updateQuoteTotals();
+}
+
+function updateQuoteTotals() {
+  let subtotal = 0;
+  let tax = 0;
+  
+  tempQuoteItems.forEach(item => {
+    const basePrice = item.apply_tax ? item.price / 1.07 : item.price;
+    const itemTax = item.apply_tax ? basePrice * 0.07 * item.quantity : 0;
+    const itemSubtotal = basePrice * item.quantity;
+    
+    subtotal += itemSubtotal;
+    tax += itemTax;
+  });
+  
+  document.getElementById('quoteSubtotal').textContent = `B/. ${subtotal.toFixed(2)}`;
+  document.getElementById('quoteTax').textContent = `B/. ${tax.toFixed(2)}`;
+  document.getElementById('quoteTotal').textContent = `B/. ${(subtotal + tax).toFixed(2)}`;
+}
+
+async function saveQuote(status) {
+  const clientId = document.getElementById('quoteClient').value;
+  if (!clientId) {
+    alert('Seleccione un cliente');
+    return;
+  }
+  
+  if (tempQuoteItems.length === 0) {
+    alert('Agregue al menos un item');
+    return;
+  }
+  
+  const number = document.getElementById('quoteNumberDisplay').textContent;
+  let subtotal = 0, tax = 0;
+  
+  const items = tempQuoteItems.map(item => {
+    const basePrice = item.apply_tax ? item.price / 1.07 : item.price;
+    const itemTax = item.apply_tax ? basePrice * 0.07 * item.quantity : 0;
+    const itemSubtotal = basePrice * item.quantity;
+    
+    subtotal += itemSubtotal;
+    tax += itemTax;
+    
+    return {
+      ...item,
+      base_price: basePrice,
+      tax_amount: itemTax / item.quantity,
+      total: item.price * item.quantity
+    };
+  });
+  
+  const quote = {
+    id: crypto.randomUUID(),
+    number,
+    client_id: clientId,
+    date: document.getElementById('quoteDate').value,
+    notes: document.getElementById('quoteNotes').value,
+    status,
+    items,
+    subtotal,
+    tax,
+    total: subtotal + tax,
+    created_by: currentUser.id
+  };
+  
+  await DB.save('quotes', quote);
+  closeModal('quoteModal');
+  renderQuotes();
+  updateDashboard();
+}
+
+async function viewQuote(id) {
+  const quote = await DB.getById('quotes', id);
+  const client = await DB.getById('clients', quote.client_id);
+  const settings = (await DB.getAll('settings'))[0];
+  
+  currentPreviewDoc = { type: 'quote', data: quote };
+  
+  const html = `
+    <div class="max-w-3xl mx-auto">
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-slate-800">${settings.company_name}</h1>
+          <p class="text-slate-600">RUC: ${settings.company_ruc}</p>
+          <p class="text-slate-600">${settings.company_address}</p>
+        </div>
+        <div class="text-right">
+          <h2 class="text-2xl font-bold text-slate-300">COTIZACIÓN</h2>
+          <p class="text-xl font-mono font-bold text-slate-800">${quote.number}</p>
+          <p class="text-slate-600">${new Date(quote.date).toLocaleDateString('es-PA')}</p>
+        </div>
+      </div>
+      
+      <div class="bg-slate-50 p-4 rounded-lg mb-8">
+        <h3 class="text-xs uppercase text-slate-500 font-bold mb-1">Cliente</h3>
+        <p class="text-lg font-bold text-slate-800">${client?.name || 'N/A'}</p>
+        <p class="text-slate-600">RUC: ${client?.ruc || 'N/A'}</p>
+      </div>
+      
+      <table class="w-full mb-8">
+        <thead>
+          <tr class="border-b-2 border-slate-800">
+            <th class="text-left py-2 text-sm">Descripción</th>
+            <th class="text-right py-2 text-sm w-24">Precio</th>
+            <th class="text-right py-2 text-sm w-20">Cant.</th>
+            <th class="text-right py-2 text-sm w-24">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${quote.items.map((item, i) => `
+            <tr class="border-b border-slate-200">
+              <td class="py-3">${item.name}</td>
+              <td class="text-right font-mono">B/. ${item.price.toFixed(2)}</td>
+              <td class="text-right font-mono">${item.quantity}</td>
+              <td class="text-right font-mono font-bold">B/. ${(item.price * item.quantity).toFixed(2)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      
+      <div class="flex justify-end">
+        <div class="w-64 space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-600">Subtotal:</span>
+            <span class="font-mono">B/. ${quote.subtotal.toFixed(2)}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-600">ITBMS (7%):</span>
+            <span class="font-mono">B/. ${quote.tax.toFixed(2)}</span>
+          </div>
+          <div class="flex justify-between text-xl font-bold border-t border-slate-300 pt-2">
+            <span>Total:</span>
+            <span class="font-mono text-blue-600">B/. ${quote.total.toFixed(2)}</span>
+          </div>
+        </div>
+      </div>
+      
+      ${quote.notes ? `
+        <div class="mt-8 pt-4 border-t border-slate-200">
+          <h4 class="text-xs uppercase text-slate-500 font-bold mb-2">Notas</h4>
+          <p class="text-sm text-slate-600">${quote.notes}</p>
+        </div>
+      ` : ''}
+    </div>
+  `;
+  
+  document.getElementById('documentPreview').innerHTML = html;
+  document.getElementById('previewModal').classList.remove('hidden');
+}
+
+async function convertQuote(id) {
+  const quote = await DB.getById('quotes', id);
+  
+  // Open invoice modal with quote data
+  const number = await DB.getNextNumber('invoice');
+  document.getElementById('invoiceModalTitle').textContent = 'Nueva Factura (desde Cotización)';
+  document.getElementById('invoiceNumberDisplay').textContent = number;
+  document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
+  
+  // Set client
+  const clients = await DB.getAll('clients');
+  const select = document.getElementById('invoiceClient');
+  select.innerHTML = '<option value="">Seleccionar cliente...</option>' + 
+    clients.filter(c => c.active).map(c => `<option value="${c.id}" ${c.id === quote.client_id ? 'selected' : ''}>${c.name} - ${c.ruc}</option>`).join('');
+  
+  // Copy items
+  tempInvoiceItems = quote.items.map(item => ({
+    ...item,
+    id: crypto.randomUUID()
+  }));
+  
+  renderInvoiceItems();
+  updateInvoiceTotals();
+  
+  // Store reference to quote
+  document.getElementById('convertQuoteSelect').value = id;
+  
+  document.getElementById('invoiceModal').classList.remove('hidden');
+}
+
+async function deleteQuote(id) {
+  if (!confirm('¿Eliminar esta cotización?')) return;
+  await DB.delete('quotes', id);
+  renderQuotes();
+}
+
+// ============================================
+// FACTURAS
+// ============================================
+
+async function renderInvoices() {
+  const invoices = await DB.getAll('invoices');
+  const clients = await DB.getAll('clients');
+  const search = document.getElementById('invoiceSearch')?.value?.toLowerCase() || '';
+  const statusFilter = document.getElementById('invoiceStatusFilter')?.value || 'all';
+  
+  const filtered = invoices
+    .filter(inv => !search || inv.number?.toLowerCase().includes(search) || clients.find(c => c.id === inv.client_id)?.name?.toLowerCase().includes(search))
+    .filter(inv => statusFilter === 'all' || inv.status === statusFilter)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  
+  const tbody = document.getElementById('invoicesTable');
+  tbody.innerHTML = filtered.map(inv => {
+    const client = clients.find(c => c.id === inv.client_id);
+    const balance = (inv.total || 0) - (inv.paid || 0);
+    
+    const statusClass = {
+      emitido: 'status-emitido',
+      pagado: 'status-pagado',
+      parcial: 'status-pendiente',
+      anulado: 'status-anulado'
+    }[inv.status] || 'status-emitido';
+    
+    return `
+    <tr>
+      <td class="font-mono font-medium">${inv.number}</td>
+      <td class="text-xs">${new Date(inv.date).toLocaleDateString('es-PA')}</td>
+      <td>${client?.name || 'Cliente eliminado'}</td>
+      <td class="text-right font-mono">B/. ${inv.total?.toFixed(2)}</td>
+      <td class="text-right font-mono ${balance > 0 ? 'text-yellow-400' : 'text-emerald-400'}">B/. ${inv.paid?.toFixed(2) || '0.00'}</td>
+      <td><span class="px-2 py-1 rounded-full text-xs ${statusClass}">${inv.status}</span></td>
+      <td class="text-right">
+        <button onclick="viewInvoice('${inv.id}')" class="w-8 h-8 rounded-lg hover:bg-blue-500/20 text-blue-400 mr-1">
+          <i class="fas fa-eye"></i>
+        </button>
+        ${inv.status !== 'pagado' && inv.status !== 'anulado' ? `
+        <button onclick="registerPayment('${inv.id}')" class="w-8 h-8 rounded-lg hover:bg-emerald-500/20 text-emerald-400 mr-1">
+          <i class="fas fa-dollar-sign"></i>
+        </button>
+        ` : ''}
+      </td>
+    </tr>
+  `}).join('');
+}
+
+async function openInvoiceModal() {
+  const number = await DB.getNextNumber('invoice');
+  document.getElementById('invoiceModalTitle').textContent = 'Nueva Factura';
+  document.getElementById('invoiceNumberDisplay').textContent = number;
+  document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
+  
+  // Due date default +30 days
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + 30);
+  document.getElementById('invoiceDueDate').value = dueDate.toISOString().split('T')[0];
+  
+  // Load clients
+  const clients = await DB.getAll('clients');
+  const select = document.getElementById('invoiceClient');
+  select.innerHTML = '<option value="">Seleccionar cliente...</option>' + 
+    clients.filter(c => c.active).map(c => `<option value="${c.id}">${c.name} - ${c.ruc}</option>`).join('');
+  
+  // Load quotes for conversion
+  const quotes = await DB.getAll('quotes');
+  const quoteSelect = document.getElementById('convertQuoteSelect');
+  quoteSelect.innerHTML = '<option value="">Seleccionar cotización...</option>' +
+    quotes.filter(q => q.status === 'emitido').map(q => {
+      const client = clients.find(c => c.id === q.client_id);
+      return `<option value="${q.id}">${q.number} - ${client?.name || 'N/A'} (B/. ${q.total?.toFixed(2)})</option>`;
+    }).join('');
+  
+  tempInvoiceItems = [];
+  renderInvoiceItems();
+  updateInvoiceTotals();
+  
+  document.getElementById('invoiceModal').classList.remove('hidden');
+}
+
+function openInvoiceProductSelector() {
+  document.getElementById('productSelectorModal').classList.remove('hidden');
+  // Reuse quote selector but add to invoice
+  const originalRender = renderProductSelector;
+  renderProductSelector = async function() {
+    const products = await DB.getAll('products');
+    const search = document.getElementById('selectorSearch')?.value?.toLowerCase() || '';
+    const filtered = products.filter(p => p.active && (!search || p.name.toLowerCase().includes(search)));
+    
+    const container = document.getElementById('productSelectorList');
+    container.innerHTML = filtered.map(p => {
+      const price = calculatePrice(p);
+      return `
+      <div class="flex justify-between items-center p-3 bg-slate-700/30 rounded-xl hover:bg-slate-700/50 cursor-pointer" onclick="addProductToInvoice('${p.id}')">
+        <div>
+          <div class="font-medium">${p.name}</div>
+          <div class="text-xs text-slate-400">${p.category} | SKU: ${p.sku || '-'}</div>
+        </div>
+        <div class="text-right">
+          <div class="font-mono font-medium">B/. ${price.toFixed(2)}</div>
+          ${p.apply_tax ? '<span class="text-xs text-blue-400">+ITBMS</span>' : ''}
+        </div>
+      </div>
+    `}).join('');
+  };
+  renderProductSelector();
+}
+
+function addProductToInvoice(productId) {
+  DB.getById('products', productId).then(p => {
+    tempInvoiceItems.push({
+      id: crypto.randomUUID(),
+      product_id: p.id,
+      name: p.name,
+      description: p.description,
+      cost: p.cost,
+      margin: p.margin,
+      apply_tax: p.apply_tax,
+      price: calculatePrice(p),
+      quantity: 1
+    });
+    renderInvoiceItems();
+    updateInvoiceTotals();
+    closeModal('productSelectorModal');
+  });
+}
+
+function renderInvoiceItems() {
+  const container = document.getElementById('invoiceItems');
+  if (tempInvoiceItems.length === 0) {
+    container.innerHTML = '<p class="text-slate-500 text-center py-8">Agrega productos desde el catálogo</p>';
+    return;
+  }
+  
+  container.innerHTML = tempInvoiceItems.map((item, idx) => `
+    <div class="item-card rounded-xl p-4 space-y-3">
+      <div class="flex justify-between items-start">
+        <div class="flex-1">
+          <input type="text" value="${item.name}" onchange="updateInvoiceItem(${idx}, 'name', this.value)" 
+            class="w-full bg-transparent border-b border-slate-600 focus:border-blue-500 focus:outline-none font-medium">
+        </div>
+        <button onclick="removeInvoiceItem(${idx})" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400 ml-2">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="grid grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="text-xs text-slate-500 block mb-1">Cantidad</label>
+          <input type="number" min="1" value="${item.quantity}" onchange="updateInvoiceItem(${idx}, 'quantity', this.value)"
+            class="w-full bg-slate-700/50 rounded-lg px-2 py-1 text-center font-mono">
+        </div>
+        <div>
+          <label class="text-xs text-slate-500 block mb-1">Precio Unit.</label>
+          <input type="number" step="0.01" value="${item.price.toFixed(2)}" onchange="updateInvoiceItem(${idx}, 'price', this.value)"
+            class="w-full bg-slate-700/50 rounded-lg px-2 py-1 text-right font-mono">
+        </div>
+        <div class="col-span-2 flex items-end justify-end">
+          <div class="text-right">
+            <div class="text-xs text-slate-500">Total línea</div>
+            <div class="font-mono font-bold">B/. ${(item.price * item.quantity).toFixed(2)}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateInvoiceItem(idx, field, value) {
+  const item = tempInvoiceItems[idx];
+  if (field === 'quantity') item.quantity = parseInt(value) || 1;
+  else if (field === 'price') item.price = parseFloat(value) || 0;
+  else if (field === 'name') item.name = value;
+  
+  renderInvoiceItems();
+  updateInvoiceTotals();
+}
+
+function removeInvoiceItem(idx) {
+  tempInvoiceItems.splice(idx, 1);
+  renderInvoiceItems();
+  updateInvoiceTotals();
+}
+
+function updateInvoiceTotals() {
+  let subtotal = 0;
+  let tax = 0;
+  
+  tempInvoiceItems.forEach(item => {
+    const basePrice = item.apply_tax ? item.price / 1.07 : item.price;
+    const itemTax = item.apply_tax ? basePrice * 0.07 * item.quantity : 0;
+    const itemSubtotal = basePrice * item.quantity;
+    
+    subtotal += itemSubtotal;
+    tax += itemTax;
+  });
+  
+  document.getElementById('invSubtotal').textContent = `B/. ${subtotal.toFixed(2)}`;
+  document.getElementById('invTax').textContent = `B/. ${tax.toFixed(2)}`;
+  document.getElementById('invTotal').textContent = `B/. ${(subtotal + tax).toFixed(2)}`;
+}
+
+async function convertQuoteToInvoice() {
+  const quoteId = document.getElementById('convertQuoteSelect').value;
+  if (!quoteId) return;
+  
+  const quote = await DB.getById('quotes', id);
+  if (!quote) return;
+  
+  // Update quote status
+  quote.status = 'facturado';
+  await DB.save('quotes', quote);
+  
+  // Items already loaded in openInvoiceModal via convertQuote
+}
+
+async function saveInvoice(status) {
+  const clientId = document.getElementById('invoiceClient').value;
+  if (!clientId) {
+    alert('Seleccione un cliente');
+    return;
+  }
+  
+  if (tempInvoiceItems.length === 0) {
+    alert('Agregue al menos un item');
+    return;
+  }
+  
+  const number = document.getElementById('invoiceNumberDisplay').textContent;
+  let subtotal = 0, tax = 0;
+  
+  const items = tempInvoiceItems.map(item => {
+    const basePrice = item.apply_tax ? item.price / 1.07 : item.price;
+    const itemTax = item.apply_tax ? basePrice * 0.07 * item.quantity : 0;
+    const itemSubtotal = basePrice * item.quantity;
+    
+    subtotal += itemSubtotal;
+    tax += itemTax;
+    
+    return {
+      ...item,
+      base_price: basePrice,
+      tax_amount: itemTax / item.quantity,
+      total: item.price * item.quantity
+    };
+  });
+  
+  const invoice = {
+    id: crypto.randomUUID(),
+    number,
+    client_id: clientId,
+    date: document.getElementById('invoiceDate').value,
+    due_date: document.getElementById('invoiceDueDate').value,
+    payment_method: document.getElementById('invoicePaymentMethod').value,
+    notes: document.getElementById('invoiceNotes').value,
+    status,
+    items,
+    subtotal,
+    tax,
+    total: subtotal + tax,
+    paid: 0,
+    created_by: currentUser.id
+  };
+  
+  await DB.save('invoices', invoice);
+  
+  // If converted from quote, update quote
+  const quoteId = document.getElementById('convertQuoteSelect')?.value;
+  if (quoteId) {
+    const quote = await DB.getById('quotes', quoteId);
+    if (quote) {
+      quote.status = 'facturado';
+      quote.invoice_id = invoice.id;
+      await DB.save('quotes', quote);
+    }
+  }
+  
+  closeModal('invoiceModal');
+  renderInvoices();
+  renderQuotes();
+  updateDashboard();
+}
+
+async function viewInvoice(id) {
+  const invoice = await DB.getById('invoices', id);
+  const client = await DB.getById('clients', invoice.client_id);
+  const settings = (await DB.getAll('settings'))[0];
+  
+  currentPreviewDoc = { type: 'invoice', data: invoice };
+  
+  const balance = invoice.total - (invoice.paid || 0);
+  
+  const html = `
+    <div class="max-w-3xl mx-auto">
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-slate-800">${settings.company_name}</h1>
+          <p class="text-slate-600">RUC: ${settings.company_ruc}</p>
+          <p class="text-slate-600">${settings.company_address}</p>
+        </div>
+        <div class="text-right">
+          <h2 class="text-2xl font-bold text-emerald-600">FACTURA</h2>
+          <p class="text-xl font-mono font-bold text-slate-800">${invoice.number}</p>
+          <p class="text-slate-600">${new Date(invoice.date).toLocaleDateString('es-PA')}</p>
+        </div>
+      </div>
+      
+      <div class="bg-slate-50 p-4 rounded-lg mb-8">
+        <h3 class="text-xs uppercase text-slate-500 font-bold mb-1">Cliente</h3>
+        <p class="text-lg font-bold text-slate-800">${client?.name || 'N/A'}</p>
+        <p class="text-slate-600">RUC: ${client?.ruc || 'N/A'}</p>
+        <p class="text-slate-600">${client?.address || ''}</p>
+      </div>
+      
+      <table class="w-full mb-8">
+        <thead>
+          <tr class="border-b-2 border-slate-800">
+            <th class="text-left py-2 text-sm">Descripción</th>
+            <th class="text-right py-2 text-sm w-24">Precio</th>
+            <th class="text-right py-2 text-sm w-20">Cant.</th>
+            <th class="text-right py-2 text-sm w-24">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${invoice.items.map((item, i) => `
+            <tr class="border-b border-slate-200">
+              <td class="py-3">${item.name}</td>
+              <td class="text-right font-mono">B/. ${item.price.toFixed(2)}</td>
+              <td class="text-right font-mono">${item.quantity}</td>
+              <td class="text-right font-mono font-bold">B/. ${(item.price * item.quantity).toFixed(2)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      
+      <div class="flex justify-between items-start">
+        <div class="text-sm text-slate-600">
+          <p><strong>Método de pago:</strong> ${invoice.payment_method}</p>
+          <p><strong>Vencimiento:</strong> ${new Date(invoice.due_date).toLocaleDateString('es-PA')}</p>
+          ${invoice.notes ? `<p class="mt-2"><strong>Notas:</strong> ${invoice.notes}</p>` : ''}
+        </div>
+        
+        <div class="w-64 space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-600">Subtotal:</span>
+            <span class="font-mono">B/. ${invoice.subtotal.toFixed(2)}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-600">ITBMS (7%):</span>
+            <span class="font-mono">B/. ${invoice.tax.toFixed(2)}</span>
+          </div>
+          <div class="flex justify-between text-lg font-bold border-t border-slate-300 pt-2">
+            <span>Total:</span>
+            <span class="font-mono text-emerald-600">B/. ${invoice.total.toFixed(2)}</span>
+          </div>
+          ${invoice.paid > 0 ? `
+            <div class="flex justify-between text-sm text-emerald-600">
+              <span>Pagado:</span>
+              <span class="font-mono">B/. ${invoice.paid.toFixed(2)}</span>
+            </div>
+            <div class="flex justify-between text-sm font-bold ${balance > 0 ? 'text-red-600' : 'text-emerald-600'}">
+              <span>Saldo:</span>
+              <span class="font-mono">B/. ${balance.toFixed(2)}</span>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('documentPreview').innerHTML = html;
+  document.getElementById('previewModal').classList.remove('hidden');
+}
+
+async function registerPayment(invoiceId) {
+  const invoice = await DB.getById('invoices', invoiceId);
+  const balance = invoice.total - (invoice.paid || 0);
+  
+  document.getElementById('paymentBalance').textContent = `B/. ${balance.toFixed(2)}`;
+  document.getElementById('paymentAmount').value = balance.toFixed(2);
+  document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+  
+  // Load invoice select
+  const invoices = await DB.getAll('invoices');
+  const clients = await DB.getAll('clients');
+  const select = document.getElementById('paymentInvoice');
+  select.innerHTML = '<option value="">Seleccionar factura...</option>' +
+    invoices.filter(i => i.status !== 'anulado' && i.status !== 'pagado').map(i => {
+      const client = clients.find(c => c.id === i.client_id);
+      const bal = i.total - (i.paid || 0);
+      return `<option value="${i.id}" ${i.id === invoiceId ? 'selected' : ''}>${i.number} - ${client?.name || 'N/A'} (Saldo: B/. ${bal.toFixed(2)})</option>`;
+    }).join('');
+  
+  document.getElementById('paymentModal').classList.remove('hidden');
+}
+
+async function updatePaymentBalance() {
+  const invoiceId = document.getElementById('paymentInvoice').value;
+  if (!invoiceId) return;
+  
+  const invoice = await DB.getById('invoices', invoiceId);
+  const balance = invoice.total - (invoice.paid || 0);
+  document.getElementById('paymentBalance').textContent = `B/. ${balance.toFixed(2)}`;
+  document.getElementById('paymentAmount').value = balance.toFixed(2);
+}
+
+async function savePayment(e) {
+  e.preventDefault();
+  
+  const invoiceId = document.getElementById('paymentInvoice').value;
+  const amount = parseFloat(document.getElementById('paymentAmount').value) || 0;
+  
+  const invoice = await DB.getById('invoices', invoiceId);
+  const balance = invoice.total - (invoice.paid || 0);
+  
+  if (amount > balance) {
+    alert('El monto excede el saldo pendiente');
+    return;
+  }
+  
+  const payment = {
+    id: crypto.randomUUID(),
+    invoice_id: invoiceId,
+    date: document.getElementById('paymentDate').value,
+    amount,
+    method: document.getElementById('paymentMethod').value,
+    reference: document.getElementById('paymentReference').value,
+    created_by: currentUser.id
+  };
+  
+  await DB.save('payments', payment);
+  
+  // Update invoice
+  invoice.paid = (invoice.paid || 0) + amount;
+  if (invoice.paid >= invoice.total) {
+    invoice.status = 'pagado';
+  } else {
+    invoice.status = 'parcial';
+  }
+  await DB.save('invoices', invoice);
+  
+  closeModal('paymentModal');
+  renderInvoices();
+  renderPayments();
+  updateDashboard();
+}
+
+// ============================================
+// PAGOS
+// ============================================
+
+async function renderPayments() {
+  const payments = await DB.getAll('payments');
+  const invoices = await DB.getAll('invoices');
+  const clients = await DB.getAll('clients');
+  
+  const sorted = payments.sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  const tbody = document.getElementById('paymentsTable');
+  tbody.innerHTML = sorted.map(p => {
+    const invoice = invoices.find(i => i.id === p.invoice_id);
+    const client = clients.find(c => c.id === invoice?.client_id);
+    
+    return `
+    <tr>
+      <td class="text-xs">${new Date(p.date).toLocaleDateString('es-PA')}</td>
+      <td class="font-mono text-xs">${invoice?.number || 'N/A'}</td>
+      <td>${client?.name || 'N/A'}</td>
+      <td class="capitalize">${p.method}</td>
+      <td class="text-xs">${p.reference || '-'}</td>
+      <td class="text-right font-mono font-bold text-emerald-400">B/. ${p.amount.toFixed(2)}</td>
+      <td class="text-right">
+        <button onclick="deletePayment('${p.id}')" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `}).join('');
+}
+
+async function deletePayment(id) {
+  if (!confirm('¿Eliminar este pago?')) return;
+  
+  const payment = await DB.getById('payments', id);
+  const invoice = await DB.getById('invoices', payment.invoice_id);
+  
+  // Revert invoice payment
+  invoice.paid = Math.max(0, (invoice.paid || 0) - payment.amount);
+  if (invoice.paid <= 0) invoice.status = 'emitido';
+  else if (invoice.paid < invoice.total) invoice.status = 'parcial';
+  
+  await DB.save('invoices', invoice);
+  await DB.delete('payments', id);
+  
+  renderPayments();
+  renderInvoices();
+  updateDashboard();
+}
+
+// ============================================
+// REPORTES
+// ============================================
+
+async function generateReport(type) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  switch(type) {
+    case 'sales': {
+      const invoices = await DB.getAll('invoices');
+      const monthInvoices = invoices.filter(i => {
+        const d = new Date(i.date);
+        const now = new Date();
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && i.status !== 'anulado';
+      });
+      
+      doc.text('Reporte de Ventas - ' + new Date().toLocaleDateString('es-PA', {month: 'long', year: 'numeric'}), 14, 20);
+      
+      const data = monthInvoices.map(i => [
+        i.number,
+        new Date(i.date).toLocaleDateString('es-PA'),
+        i.total.toFixed(2),
+        i.status
+      ]);
+      
+      doc.autoTable({
+        head: [['Factura', 'Fecha', 'Total', 'Estado']],
+        body: data,
+        startY: 30
+      });
+      
+      const total = monthInvoices.reduce((a, b) => a + b.total, 0);
+      doc.text(`Total del mes: B/. ${total.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10);
+      break;
+    }
+    
+    case 'receivables': {
+      const invoices = await DB.getAll('invoices');
+      const pending = invoices.filter(i => i.status === 'emitido' || i.status === 'parcial');
+      const clients = await DB.getAll('clients');
+      
+      doc.text('Cuentas por Cobrar', 14, 20);
+      
+      const data = pending.map(i => {
+        const client = clients.find(c => c.id === i.client_id);
+        const balance = i.total - (i.paid || 0);
+        return [
+          i.number,
+          client?.name || 'N/A',
+          new Date(i.due_date).toLocaleDateString('es-PA'),
+          balance.toFixed(2)
+        ];
+      });
+      
+      doc.autoTable({
+        head: [['Factura', 'Cliente', 'Vencimiento', 'Saldo']],
+        body: data,
+        startY: 30
+      });
+      
+      const total = pending.reduce((a, b) => a + (b.total - (b.paid || 0)), 0);
+      doc.text(`Total por cobrar: B/. ${total.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10);
+      break;
+    }
+    
+    case 'tax': {
+      const invoices = await DB.getAll('invoices');
+      const monthInvoices = invoices.filter(i => {
+        const d = new Date(i.date);
+        const now = new Date();
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && i.status !== 'anulado';
+      });
+      
+      const totalTax = monthInvoices.reduce((a, b) => a + (b.tax || 0), 0);
+      
+      doc.text('Reporte de ITBMS', 14, 20);
+      doc.text(`Período: ${new Date().toLocaleDateString('es-PA', {month: 'long', year: 'numeric'})}`, 14, 30);
+      doc.text(`Total ITBMS generado: B/. ${totalTax.toFixed(2)}`, 14, 50);
+      doc.text(`Base imponible: B/. ${monthInvoices.reduce((a, b) => a + b.subtotal, 0).toFixed(2)}`, 14, 60);
+      break;
+    }
+  }
+  
+  doc.save(`reporte_${type}_${new Date().toISOString().split('T')[0]}.pdf`);
+}
+
+// ============================================
+// UTILIDADES
+// ============================================
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.add('hidden');
+}
+
+function printDocument() {
+  window.print();
+}
+
+async function downloadPDF() {
+  if (!currentPreviewDoc) return;
+  
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  // Simple PDF generation from preview HTML
+  const element = document.getElementById('documentPreview');
+  
+  doc.html(element, {
+    callback: function(doc) {
+      doc.save(`${currentPreviewDoc.type}_${currentPreviewDoc.data.number}.pdf`);
+    },
+    x: 10,
+    y: 10,
+    width: 190,
+    windowWidth: 800
+  });
+}
+
+function exportFullBackup() {
+  const data = DB.exportAll();
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `a3_backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+}
+
+async function importBackup(input) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  const text = await file.text();
+  try {
+    await DB.importAll(text);
+    alert('Backup importado exitosamente');
+    location.reload();
+  } catch(e) {
+    alert('Error al importar: ' + e.message);
+  }
+}
+
+function clearAllData() {
+  if (!confirm('¿ESTÁ SEGURO? Esta acción eliminará TODOS los datos permanentemente.')) return;
+  if (!confirm('CONFIRME: ¿Realmente desea borrar todo?')) return;
+  
+  Object.values(DB_SCHEMA).forEach(key => {
+    localStorage.removeItem(key);
+  });
+  
+  alert('Todos los datos han sido eliminados');
+  location.reload();
+}
+
+// Settings
+async function saveCompanySettings() {
+  const settings = (await DB.getAll('settings'))[0] || { id: crypto.randomUUID() };
+  settings.company_name = document.getElementById('companyName').value;
+  settings.company_ruc = document.getElementById('companyRUC').value;
+  settings.company_address = document.getElementById('companyAddress').value;
+  settings.company_phone = document.getElementById('companyPhone').value;
+  
+  await DB.save('settings', settings);
+  alert('Configuración guardada');
+}
+
+async function saveNumberingSettings() {
+  const sequences = await DB.getAll('sequences');
+  
+  let quoteSeq = sequences.find(s => s.type === 'quote');
+  if (!quoteSeq) {
+    quoteSeq = { id: crypto.randomUUID(), type: 'quote', current: parseInt(document.getElementById('nextQuoteNum').value) - 1 };
+    sequences.push(quoteSeq);
+  }
+  quoteSeq.prefix = document.getElementById('prefixQuotes').value;
+  
+  let invSeq = sequences.find(s => s.type === 'invoice');
+  if (!invSeq) {
+    invSeq = { id: crypto.randomUUID(), type: 'invoice', current: parseInt(document.getElementById('nextInvoiceNum').value) - 1 };
+    sequences.push(invSeq);
+  }
+  invSeq.prefix = document.getElementById('prefixInvoices').value;
+  
+  localStorage.setItem(DB_SCHEMA.sequences, JSON.stringify(sequences));
+  alert('Numeración actualizada');
+}
+
+async function saveSecuritySettings() {
+  const users = await DB.getAll('users');
+  const admin = users.find(u => u.username === 'admin') || users[0];
+  
+  admin.username = document.getElementById('adminUser').value;
+  const newPass = document.getElementById('adminPass').value;
+  if (newPass) admin.password = newPass;
+  
+  await DB.save('users', admin);
+  alert('Credenciales actualizadas');
+}
+
+// Init
+init();
+</script>
+
+</body>
+</html>

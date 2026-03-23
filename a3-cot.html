@@ -20,39 +20,48 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
 @page { size: letter; margin: 0.5in; }
 @media print {
   .no-print { display: none !important; }
-  body { background: white !important; }
+  body { background: white !important; color: black !important; }
   .sheet { width: 8.5in !important; height: 11in !important; box-shadow: none !important; margin: 0 !important; border-radius: 0 !important; }
 }
 
 /* Design System */
 .card { @apply bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-xl; }
 
-/* MEJORADOS: Campos de texto con mejor visibilidad */
+/* CORREGIDO: Inputs con texto visible */
 .input {
-  @apply w-full bg-slate-800 border-2 border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all;
+  @apply w-full rounded-xl px-4 py-3 text-sm transition-all;
+  background-color: #1e293b; /* slate-800 */
+  border: 2px solid #475569; /* slate-600 */
+  color: #f1f5f9; /* slate-100 - texto claro visible */
   box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* Estados especiales para inputs */
+.input::placeholder {
+  color: #94a3b8 !important; /* slate-400 */
+  opacity: 1;
+}
+
 .input:focus {
-  background-color: #1e293b;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+  background-color: #0f172a; /* slate-900 */
+  border-color: #3b82f6; /* blue-500 */
+  color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+  outline: none;
 }
 
 .input:hover:not(:focus) {
-  border-color: #64748b;
-  background-color: #1e293b;
+  border-color: #64748b; /* slate-500 */
+  background-color: #334155; /* slate-700 */
 }
 
-/* Input con icono (search) */
+/* Input con icono */
 .input-with-icon {
-  @apply pl-10;
+  padding-left: 2.5rem;
 }
 
-/* Selects mejorados */
+/* Selects */
 select.input {
-  @apply cursor-pointer;
+  cursor: pointer;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 0.75rem center;
   background-repeat: no-repeat;
@@ -62,52 +71,70 @@ select.input {
   appearance: none;
 }
 
-/* Textarea mejorada */
+/* Textarea */
 textarea.input {
-  @apply resize-none;
+  resize: none;
   min-height: 80px;
 }
 
-/* Checkbox mejorado */
+/* Checkbox */
 input[type="checkbox"] {
-  @apply w-5 h-5 rounded border-2 border-slate-500 bg-slate-800 text-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-0 focus:ring-offset-slate-800 cursor-pointer;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.25rem;
+  border: 2px solid #64748b;
+  background-color: #1e293b;
+  color: #3b82f6;
+  cursor: pointer;
 }
 
-/* Login inputs específicos - más contrastados */
+input[type="checkbox"]:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Login específico */
 #authScreen .input {
-  @apply bg-slate-800/80 border-slate-500 text-white text-base;
-  font-size: 16px; /* Previene zoom en iOS */
+  background-color: rgba(30, 41, 59, 0.9);
+  border-color: #64748b;
+  color: #ffffff;
+  font-size: 16px;
 }
 
 #authScreen .input:focus {
-  @apply bg-slate-800 border-blue-400;
+  background-color: #0f172a;
+  border-color: #60a5fa;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 2px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* Labels mejorados */
+/* Labels */
 label {
-  @apply text-xs uppercase text-slate-300 font-bold block mb-2 tracking-wide;
-}
-
-/* Placeholder más visible */
-::placeholder {
-  color: #64748b !important;
-  opacity: 1;
-}
-
-:-ms-input-placeholder {
-  color: #64748b !important;
-}
-
-::-ms-input-placeholder {
-  color: #64748b !important;
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #cbd5e1; /* slate-300 */
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.025em;
 }
 
 /* Botones */
-.btn-primary { @apply px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all active:scale-95 shadow-lg shadow-blue-600/20; }
-.btn-secondary { @apply px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl transition-all active:scale-95 border border-slate-600; }
-.btn-success { @apply px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-600/20; }
-.btn-danger { @apply px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-xl transition-all active:scale-95 shadow-lg shadow-red-600/20; }
+.btn-primary { 
+  @apply px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all active:scale-95;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
+}
+.btn-secondary { 
+  @apply px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl transition-all active:scale-95;
+  border: 1px solid #475569;
+}
+.btn-success { 
+  @apply px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all active:scale-95;
+  box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.2);
+}
+.btn-danger { 
+  @apply px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-xl transition-all active:scale-95;
+  box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.2);
+}
 
 /* Status badges */
 .status-pendiente { @apply bg-yellow-500/20 text-yellow-300 border border-yellow-500/30; }
@@ -119,8 +146,6 @@ label {
 /* Animations */
 .fade-in { animation: fadeIn 0.3s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.slide-in { animation: slideIn 0.3s ease-out; }
-@keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -135,43 +160,45 @@ label {
 
 /* Mobile */
 .touch-manipulation { touch-action: manipulation; }
-.safe-bottom { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
 
 /* Document preview */
 .sheet { @apply bg-white text-slate-900 shadow-2xl; }
 
-/* Mejoras para items de cotización/factura */
+/* Item cards */
 .item-card {
-  @apply bg-slate-800/50 border-2 border-slate-700/50 rounded-xl p-4 space-y-3 transition-all;
-}
-
-.item-card:hover {
-  @apply border-slate-600 bg-slate-800;
+  background-color: rgba(30, 41, 59, 0.5);
+  border: 2px solid rgba(71, 85, 105, 0.5);
+  border-radius: 0.75rem;
+  padding: 1rem;
 }
 
 .item-card input {
-  @apply bg-slate-900/50 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 focus:outline-none transition-all;
+  background-color: rgba(15, 23, 42, 0.5);
+  border: 1px solid #475569;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  color: #ffffff;
+  font-size: 0.875rem;
 }
 
-/* Inputs de solo lectura */
+.item-card input:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+/* Readonly inputs */
 input[readonly], input:disabled {
-  @apply bg-slate-900/80 text-slate-400 cursor-not-allowed border-slate-700;
+  background-color: rgba(15, 23, 42, 0.8) !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed;
+  border-color: #334155 !important;
 }
 
-/* Focus visible para accesibilidad */
-*:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* Mejoras para modales en móvil */
+/* Responsive */
 @media (max-width: 640px) {
   .input {
-    @apply text-base py-3 px-4; /* Más grande en móvil para mejor touch */
-  }
-  
-  label {
-    @apply text-sm mb-2;
+    font-size: 16px;
+    padding: 0.75rem 1rem;
   }
 }
 </style>
@@ -190,11 +217,11 @@ input[readonly], input:disabled {
     
     <div id="loginForm" class="space-y-5">
       <div>
-        <label class="text-slate-300">Usuario</label>
+        <label>Usuario</label>
         <input type="text" id="loginUser" class="input" placeholder="Ingrese usuario" value="admin">
       </div>
       <div>
-        <label class="text-slate-300">Contraseña</label>
+        <label>Contraseña</label>
         <input type="password" id="loginPass" class="input" placeholder="Ingrese contraseña" value="admin123">
       </div>
       <button onclick="login()" class="w-full btn-primary mt-6">
@@ -205,7 +232,7 @@ input[readonly], input:disabled {
   </div>
 </div>
 
-<!-- MAIN APP (Hidden until auth) -->
+<!-- MAIN APP -->
 <div id="mainApp" class="hidden">
   
   <!-- HEADER -->
@@ -260,13 +287,11 @@ input[readonly], input:disabled {
       <button onclick="showModule('quotes')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left group">
         <i class="fas fa-file-invoice-dollar w-5 text-center text-slate-400 group-hover:text-blue-400"></i>
         <span>Cotizaciones</span>
-        <span id="badgeQuotes" class="ml-auto text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full hidden">0</span>
       </button>
       
       <button onclick="showModule('invoices')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left group">
         <i class="fas fa-file-invoice w-5 text-center text-slate-400 group-hover:text-blue-400"></i>
         <span>Facturas</span>
-        <span id="badgeInvoices" class="ml-auto text-xs bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full hidden">0</span>
       </button>
       
       <button onclick="showModule('payments')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left group">
@@ -286,26 +311,13 @@ input[readonly], input:disabled {
         <span>Configuración</span>
       </button>
     </nav>
-    
-    <div class="p-4 mt-auto border-t border-slate-700/50">
-      <div class="text-xs text-slate-500">
-        <div class="flex justify-between mb-1">
-          <span>Base de datos:</span>
-          <span class="text-emerald-400">● Activa</span>
-        </div>
-        <div class="flex justify-between">
-          <span>Versión:</span>
-          <span>2.0.1</span>
-        </div>
-      </div>
-    </div>
   </aside>
 
   <!-- MAIN CONTENT -->
   <main class="lg:ml-64 pt-16 min-h-screen">
     <div id="contentArea" class="p-4 lg:p-8 max-w-7xl mx-auto">
       
-      <!-- DASHBOARD MODULE -->
+      <!-- DASHBOARD -->
       <div id="module-dashboard" class="module fade-in space-y-6">
         <div class="flex justify-between items-center">
           <h2 class="text-2xl font-bold">Dashboard</h2>
@@ -389,7 +401,7 @@ input[readonly], input:disabled {
         </div>
       </div>
 
-      <!-- CLIENTS MODULE -->
+      <!-- CLIENTS -->
       <div id="module-clients" class="module hidden fade-in space-y-6">
         <div class="flex justify-between items-center flex-wrap gap-4">
           <h2 class="text-2xl font-bold">Gestión de Clientes</h2>
@@ -430,7 +442,7 @@ input[readonly], input:disabled {
         </div>
       </div>
 
-      <!-- CATALOG MODULE -->
+      <!-- CATALOG -->
       <div id="module-catalog" class="module hidden fade-in space-y-6">
         <div class="flex justify-between items-center flex-wrap gap-4">
           <h2 class="text-2xl font-bold">Catálogo de Productos</h2>
@@ -481,7 +493,7 @@ input[readonly], input:disabled {
         </div>
       </div>
 
-      <!-- QUOTES MODULE -->
+      <!-- QUOTES -->
       <div id="module-quotes" class="module hidden fade-in space-y-6">
         <div class="flex justify-between items-center flex-wrap gap-4">
           <h2 class="text-2xl font-bold">Cotizaciones</h2>
@@ -526,7 +538,7 @@ input[readonly], input:disabled {
         </div>
       </div>
 
-      <!-- INVOICES MODULE -->
+      <!-- INVOICES -->
       <div id="module-invoices" class="module hidden fade-in space-y-6">
         <div class="flex justify-between items-center flex-wrap gap-4">
           <h2 class="text-2xl font-bold">Facturas</h2>
@@ -570,7 +582,7 @@ input[readonly], input:disabled {
         </div>
       </div>
 
-      <!-- PAYMENTS MODULE -->
+      <!-- PAYMENTS -->
       <div id="module-payments" class="module hidden fade-in space-y-6">
         <div class="flex justify-between items-center flex-wrap gap-4">
           <h2 class="text-2xl font-bold">Registro de Pagos</h2>
@@ -599,7 +611,7 @@ input[readonly], input:disabled {
         </div>
       </div>
 
-      <!-- REPORTS MODULE -->
+      <!-- REPORTS -->
       <div id="module-reports" class="module hidden fade-in space-y-6">
         <h2 class="text-2xl font-bold mb-6">Reportes Administrativos</h2>
         
@@ -654,7 +666,7 @@ input[readonly], input:disabled {
         </div>
       </div>
 
-      <!-- SETTINGS MODULE -->
+      <!-- SETTINGS -->
       <div id="module-settings" class="module hidden fade-in space-y-6">
         <h2 class="text-2xl font-bold">Configuración del Sistema</h2>
         
@@ -842,11 +854,11 @@ input[readonly], input:disabled {
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label>Precio Base</label>
-          <input type="number" step="0.01" id="productBasePrice" class="input bg-slate-900/60" readonly>
+          <input type="number" step="0.01" id="productBasePrice" class="input" readonly style="background-color: #0f172a; color: #94a3b8;">
         </div>
         <div>
           <label>Precio Final (con ITBMS)</label>
-          <input type="number" step="0.01" id="productFinalPrice" class="input bg-slate-900/60" readonly>
+          <input type="number" step="0.01" id="productFinalPrice" class="input" readonly style="background-color: #0f172a; color: #94a3b8;">
         </div>
       </div>
       <div class="flex items-center gap-3 p-3 bg-slate-700/30 rounded-xl border border-slate-600/30">
@@ -901,7 +913,6 @@ input[readonly], input:disabled {
     </div>
     
     <div class="grid lg:grid-cols-3 gap-6">
-      <!-- Form -->
       <div class="lg:col-span-2 space-y-4">
         <div class="grid grid-cols-2 gap-4">
           <div>
@@ -942,7 +953,6 @@ input[readonly], input:disabled {
         </div>
       </div>
       
-      <!-- Preview -->
       <div class="lg:col-span-1">
         <div class="sticky top-4">
           <div class="card p-4 space-y-3 bg-slate-800/80 border-2 border-slate-600/30">
@@ -1163,35 +1173,23 @@ input[readonly], input:disabled {
 
 <script>
 // ============================================
-// ARQUITECTURA DE BASE DE DATOS
+// BASE DE DATOS
 // ============================================
 
 const DB_SCHEMA = {
-  // Users & Auth
   users: 'a3_users_v1',
-  
-  // Core Business
   clients: 'a3_clients_v1',
   categories: 'a3_categories_v1',
   products: 'a3_products_v1',
-  
-  // Documents
   quotes: 'a3_quotes_v1',
   invoices: 'a3_invoices_v1',
-  invoice_items: 'a3_invoice_items_v1',
-  
-  // Financial
   payments: 'a3_payments_v1',
-  taxes: 'a3_taxes_v1',
-  
-  // Audit & Config
   audit_logs: 'a3_audit_v1',
   settings: 'a3_settings_v1',
   sequences: 'a3_sequences_v1'
 };
 
 const DB = {
-  // Generic CRUD
   async getAll(store) {
     const data = localStorage.getItem(DB_SCHEMA[store]);
     return data ? JSON.parse(data) : [];
@@ -1215,10 +1213,7 @@ const DB = {
     }
     
     localStorage.setItem(DB_SCHEMA[store], JSON.stringify(items));
-    
-    // Audit log
     await this.logAudit(store, idx >= 0 ? 'UPDATE' : 'CREATE', item.id);
-    
     return item;
   },
   
@@ -1229,7 +1224,6 @@ const DB = {
     await this.logAudit(store, 'DELETE', id);
   },
   
-  // Audit logging
   async logAudit(table, action, recordId) {
     const logs = await this.getAll('audit_logs');
     logs.push({
@@ -1242,10 +1236,9 @@ const DB = {
       timestamp: new Date().toISOString(),
       ip: 'localhost'
     });
-    localStorage.setItem(DB_SCHEMA.audit_logs, JSON.stringify(logs.slice(-1000))); // Keep last 1000
+    localStorage.setItem(DB_SCHEMA.audit_logs, JSON.stringify(logs.slice(-1000)));
   },
   
-  // Sequences for numbering
   async getNextNumber(type) {
     const sequences = await this.getAll('sequences');
     let seq = sequences.find(s => s.type === type);
@@ -1257,11 +1250,9 @@ const DB = {
     
     seq.current++;
     localStorage.setItem(DB_SCHEMA.sequences, JSON.stringify(sequences));
-    
     return `${seq.prefix}${String(seq.current).padStart(6, '0')}`;
   },
   
-  // Export/Import
   exportAll() {
     const data = {};
     Object.values(DB_SCHEMA).forEach(key => {
@@ -1293,24 +1284,20 @@ let currentPreviewDoc = null;
 // ============================================
 
 async function init() {
-  // Check auth
   const session = localStorage.getItem('a3_session');
   if (session) {
     currentUser = JSON.parse(session);
     showMainApp();
   }
   
-  // Set current date
   document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-PA', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
   
-  // Init default data if empty
   await initDefaultData();
 }
 
 async function initDefaultData() {
-  // Default categories
   const cats = await DB.getAll('categories');
   if (cats.length === 0) {
     const defaults = ['General', 'Cables', 'Equipos de Red', 'Seguridad', 'Mano de Obra', 'Servicios'];
@@ -1319,20 +1306,18 @@ async function initDefaultData() {
     }
   }
   
-  // Default admin user
   const users = await DB.getAll('users');
   if (users.length === 0) {
     await DB.save('users', {
       id: crypto.randomUUID(),
       username: 'admin',
-      password: 'admin123', // In production, hash this!
+      password: 'admin123',
       name: 'Administrador',
       role: 'admin',
       active: true
     });
   }
   
-  // Default settings
   const settings = await DB.getAll('settings');
   if (settings.length === 0) {
     await DB.save('settings', {
@@ -1396,20 +1381,15 @@ function toggleSidebar() {
 function showModule(module) {
   currentModule = module;
   
-  // Update nav active state
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.remove('bg-slate-800', 'text-blue-400');
     el.querySelector('i').classList.remove('text-blue-400');
   });
   event?.target?.closest('.nav-item')?.classList.add('bg-slate-800', 'text-blue-400');
   
-  // Hide all modules
   document.querySelectorAll('.module').forEach(m => m.classList.add('hidden'));
-  
-  // Show selected
   document.getElementById(`module-${module}`).classList.remove('hidden');
   
-  // Load data
   switch(module) {
     case 'dashboard': updateDashboard(); break;
     case 'clients': renderClients(); break;
@@ -1419,7 +1399,6 @@ function showModule(module) {
     case 'payments': renderPayments(); break;
   }
   
-  // Close mobile sidebar
   if (window.innerWidth < 1024) {
     document.getElementById('sidebar').classList.add('-translate-x-full');
   }
@@ -1433,7 +1412,6 @@ async function updateDashboard() {
   const quotes = await DB.getAll('quotes');
   const invoices = await DB.getAll('invoices');
   const clients = await DB.getAll('clients');
-  const payments = await DB.getAll('payments');
   
   const monthStart = new Date();
   monthStart.setDate(1);
@@ -1454,7 +1432,6 @@ async function updateDashboard() {
   
   document.getElementById('dashClientsCount').textContent = clients.filter(c => c.active).length;
   
-  // Recent activity
   const logs = (await DB.getAll('audit_logs')).slice(-10).reverse();
   const activityHtml = logs.map(log => `
     <div class="flex items-center gap-3 text-sm p-2 rounded-lg hover:bg-slate-700/30">
@@ -1570,9 +1547,9 @@ async function renderCatalog() {
   const catFilter = document.getElementById('productCategoryFilter')?.value || 'all';
   const statusFilter = document.getElementById('productStatusFilter')?.value || 'all';
   
-  // Update category filter
   const catSelect = document.getElementById('productCategoryFilter');
   if (catSelect && catSelect.options.length <= 1) {
+    catSelect.innerHTML = '<option value="all">Todas las categorías</option>';
     categories.filter(c => c.active).forEach(c => {
       catSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`;
     });
@@ -1679,25 +1656,6 @@ async function saveProduct(e) {
     active: document.getElementById('productActive').checked
   };
   
-  // Save price history if price changed
-  const existing = await DB.getById('products', id);
-  if (existing) {
-    const oldPrice = existing.cost * (1 + existing.margin / 100) * (existing.apply_tax ? 1.07 : 1);
-    const newPrice = product.cost * (1 + product.margin / 100) * (product.apply_tax ? 1.07 : 1);
-    
-    if (Math.abs(oldPrice - newPrice) > 0.01) {
-      product.price_history = [...(existing.price_history || []), {
-        date: new Date().toISOString(),
-        cost: existing.cost,
-        margin: existing.margin,
-        apply_tax: existing.apply_tax,
-        price: oldPrice
-      }];
-    } else {
-      product.price_history = existing.price_history || [];
-    }
-  }
-  
   await DB.save('products', product);
   closeModal('productModal');
   renderCatalog();
@@ -1709,7 +1667,6 @@ async function deleteProduct(id) {
   renderCatalog();
 }
 
-// Categorías
 async function openCategoryManager() {
   document.getElementById('categoryModal').classList.remove('hidden');
   renderCategoryList();
@@ -1718,7 +1675,7 @@ async function openCategoryManager() {
 async function renderCategoryList() {
   const categories = await DB.getAll('categories');
   const container = document.getElementById('categoryList');
-  container.innerHTML = categories.map((c, idx) => `
+  container.innerHTML = categories.map(c => `
     <div class="flex justify-between items-center p-3 bg-slate-800/50 border border-slate-700/50 rounded-xl">
       <span class="font-medium">${c.name}</span>
       <button onclick="deleteCategory('${c.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-500/20 transition-colors">
@@ -1738,12 +1695,7 @@ async function addCategory() {
     return;
   }
   
-  await DB.save('categories', {
-    id: crypto.randomUUID(),
-    name,
-    active: true
-  });
-  
+  await DB.save('categories', { id: crypto.randomUUID(), name, active: true });
   document.getElementById('newCategoryName').value = '';
   renderCategoryList();
   renderCatalog();
@@ -1794,6 +1746,9 @@ async function renderQuotes() {
       anulado: 'status-anulado'
     }[q.status] || 'status-borrador';
     
+    // CORREGIDO: Mostrar botón convertir para borradores y emitidos
+    const canConvert = (q.status === 'emitido' || q.status === 'borrador');
+    
     return `
     <tr>
       <td class="font-mono font-medium">${q.number}</td>
@@ -1805,8 +1760,8 @@ async function renderQuotes() {
         <button onclick="viewQuote('${q.id}')" class="w-8 h-8 rounded-lg hover:bg-blue-500/20 text-blue-400 mr-1" title="Ver">
           <i class="fas fa-eye"></i>
         </button>
-        ${q.status === 'emitido' ? `
-        <button onclick="convertQuote('${q.id}')" class="w-8 h-8 rounded-lg hover:bg-emerald-500/20 text-emerald-400 mr-1" title="Convertir a Factura">
+        ${canConvert ? `
+        <button onclick="convertQuoteToInvoice('${q.id}')" class="w-8 h-8 rounded-lg hover:bg-emerald-500/20 text-emerald-400 mr-1" title="Convertir a Factura">
           <i class="fas fa-exchange-alt"></i>
         </button>
         ` : ''}
@@ -1824,7 +1779,6 @@ async function openQuoteModal() {
   document.getElementById('quoteNumberDisplay').textContent = number;
   document.getElementById('quoteDate').value = new Date().toISOString().split('T')[0];
   
-  // Load clients
   const clients = await DB.getAll('clients');
   const select = document.getElementById('quoteClient');
   select.innerHTML = '<option value="">Seleccionar cliente...</option>' + 
@@ -1901,23 +1855,24 @@ function renderQuoteItems() {
       <div class="flex justify-between items-start">
         <div class="flex-1">
           <input type="text" value="${item.name}" onchange="updateQuoteItem(${idx}, 'name', this.value)" 
-            class="w-full bg-transparent border-b-2 border-slate-600 focus:border-blue-500 focus:outline-none font-medium text-white pb-1">
+            style="width: 100%; background: transparent; border-bottom: 2px solid #475569; color: white; font-weight: 500; padding-bottom: 0.25rem;"
+            onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#475569'">
         </div>
         <button onclick="removeQuoteItem(${idx})" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400 ml-2 transition-colors">
           <i class="fas fa-times"></i>
         </button>
       </div>
       
-      <div class="grid grid-cols-4 gap-3 text-sm">
+      <div class="grid grid-cols-4 gap-3 text-sm mt-3">
         <div>
           <label class="text-xs text-slate-500 block mb-1">Cantidad</label>
           <input type="number" min="1" value="${item.quantity}" onchange="updateQuoteItem(${idx}, 'quantity', this.value)"
-            class="w-full bg-slate-900/50 border border-slate-600 rounded-lg px-2 py-1 text-center font-mono text-white focus:border-blue-500 focus:outline-none">
+            style="width: 100%; background: rgba(15, 23, 42, 0.5); border: 1px solid #475569; border-radius: 0.5rem; padding: 0.25rem 0.5rem; color: white; text-align: center; font-family: monospace;">
         </div>
         <div>
           <label class="text-xs text-slate-500 block mb-1">Precio Unit.</label>
           <input type="number" step="0.01" value="${item.price.toFixed(2)}" onchange="updateQuoteItem(${idx}, 'price', this.value)"
-            class="w-full bg-slate-900/50 border border-slate-600 rounded-lg px-2 py-1 text-right font-mono text-white focus:border-blue-500 focus:outline-none">
+            style="width: 100%; background: rgba(15, 23, 42, 0.5); border: 1px solid #475569; border-radius: 0.5rem; padding: 0.25rem 0.5rem; color: white; text-align: right; font-family: monospace;">
         </div>
         <div class="col-span-2 flex items-end justify-end">
           <div class="text-right">
@@ -2023,68 +1978,68 @@ async function viewQuote(id) {
   currentPreviewDoc = { type: 'quote', data: quote };
   
   const html = `
-    <div class="max-w-3xl mx-auto">
-      <div class="flex justify-between items-start mb-8">
+    <div style="max-width: 48rem; margin: 0 auto; font-family: system-ui, sans-serif; color: #1e293b;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
         <div>
-          <h1 class="text-3xl font-bold text-slate-800">${settings.company_name}</h1>
-          <p class="text-slate-600">RUC: ${settings.company_ruc}</p>
-          <p class="text-slate-600">${settings.company_address}</p>
+          <h1 style="font-size: 1.875rem; font-weight: 700; color: #0f172a;">${settings.company_name}</h1>
+          <p style="color: #475569;">RUC: ${settings.company_ruc}</p>
+          <p style="color: #475569;">${settings.company_address}</p>
         </div>
-        <div class="text-right">
-          <h2 class="text-2xl font-bold text-slate-300">COTIZACIÓN</h2>
-          <p class="text-xl font-mono font-bold text-slate-800">${quote.number}</p>
-          <p class="text-slate-600">${new Date(quote.date).toLocaleDateString('es-PA')}</p>
+        <div style="text-align: right;">
+          <h2 style="font-size: 1.5rem; font-weight: 700; color: #cbd5e1;">COTIZACIÓN</h2>
+          <p style="font-size: 1.25rem; font-family: monospace; font-weight: 700; color: #0f172a;">${quote.number}</p>
+          <p style="color: #475569;">${new Date(quote.date).toLocaleDateString('es-PA')}</p>
         </div>
       </div>
       
-      <div class="bg-slate-50 p-4 rounded-lg mb-8">
-        <h3 class="text-xs uppercase text-slate-500 font-bold mb-1">Cliente</h3>
-        <p class="text-lg font-bold text-slate-800">${client?.name || 'N/A'}</p>
-        <p class="text-slate-600">RUC: ${client?.ruc || 'N/A'}</p>
+      <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+        <h3 style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 0.25rem;">Cliente</h3>
+        <p style="font-size: 1.125rem; font-weight: 700; color: #0f172a;">${client?.name || 'N/A'}</p>
+        <p style="color: #475569;">RUC: ${client?.ruc || 'N/A'}</p>
       </div>
       
-      <table class="w-full mb-8">
+      <table style="width: 100%; margin-bottom: 2rem; border-collapse: collapse;">
         <thead>
-          <tr class="border-b-2 border-slate-800">
-            <th class="text-left py-2 text-sm">Descripción</th>
-            <th class="text-right py-2 text-sm w-24">Precio</th>
-            <th class="text-right py-2 text-sm w-20">Cant.</th>
-            <th class="text-right py-2 text-sm w-24">Total</th>
+          <tr style="border-bottom: 2px solid #0f172a;">
+            <th style="text-align: left; padding: 0.5rem 0; font-size: 0.875rem;">Descripción</th>
+            <th style="text-align: right; padding: 0.5rem 0; font-size: 0.875rem; width: 6rem;">Precio</th>
+            <th style="text-align: right; padding: 0.5rem 0; font-size: 0.875rem; width: 5rem;">Cant.</th>
+            <th style="text-align: right; padding: 0.5rem 0; font-size: 0.875rem; width: 6rem;">Total</th>
           </tr>
         </thead>
         <tbody>
-          ${quote.items.map((item, i) => `
-            <tr class="border-b border-slate-200">
-              <td class="py-3">${item.name}</td>
-              <td class="text-right font-mono">B/. ${item.price.toFixed(2)}</td>
-              <td class="text-right font-mono">${item.quantity}</td>
-              <td class="text-right font-mono font-bold">B/. ${(item.price * item.quantity).toFixed(2)}</td>
+          ${quote.items.map((item) => `
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+              <td style="padding: 0.75rem 0;">${item.name}</td>
+              <td style="text-align: right; font-family: monospace;">B/. ${item.price.toFixed(2)}</td>
+              <td style="text-align: right; font-family: monospace;">${item.quantity}</td>
+              <td style="text-align: right; font-family: monospace; font-weight: 700;">B/. ${(item.price * item.quantity).toFixed(2)}</td>
             </tr>
           `).join('')}
         </tbody>
       </table>
       
-      <div class="flex justify-end">
-        <div class="w-64 space-y-2">
-          <div class="flex justify-between text-sm">
-            <span class="text-slate-600">Subtotal:</span>
-            <span class="font-mono">B/. ${quote.subtotal.toFixed(2)}</span>
+      <div style="display: flex; justify-content: flex-end;">
+        <div style="width: 16rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.5rem;">
+            <span style="color: #475569;">Subtotal:</span>
+            <span style="font-family: monospace;">B/. ${quote.subtotal.toFixed(2)}</span>
           </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-slate-600">ITBMS (7%):</span>
-            <span class="font-mono">B/. ${quote.tax.toFixed(2)}</span>
+          <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.5rem;">
+            <span style="color: #475569;">ITBMS (7%):</span>
+            <span style="font-family: monospace;">B/. ${quote.tax.toFixed(2)}</span>
           </div>
-          <div class="flex justify-between text-xl font-bold border-t border-slate-300 pt-2">
+          <div style="display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 700; border-top: 1px solid #cbd5e1; padding-top: 0.5rem;">
             <span>Total:</span>
-            <span class="font-mono text-blue-600">B/. ${quote.total.toFixed(2)}</span>
+            <span style="font-family: monospace; color: #2563eb;">B/. ${quote.total.toFixed(2)}</span>
           </div>
         </div>
       </div>
       
       ${quote.notes ? `
-        <div class="mt-8 pt-4 border-t border-slate-200">
-          <h4 class="text-xs uppercase text-slate-500 font-bold mb-2">Notas</h4>
-          <p class="text-sm text-slate-600">${quote.notes}</p>
+        <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;">
+          <h4 style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 0.5rem;">Notas</h4>
+          <p style="font-size: 0.875rem; color: #475569;">${quote.notes}</p>
         </div>
       ` : ''}
     </div>
@@ -2094,22 +2049,43 @@ async function viewQuote(id) {
   document.getElementById('previewModal').classList.remove('hidden');
 }
 
-async function convertQuote(id) {
-  const quote = await DB.getById('quotes', id);
+// CORREGIDO: Función para convertir cotización a factura
+async function convertQuoteToInvoice(quoteId) {
+  if (!quoteId) {
+    quoteId = document.getElementById('convertQuoteSelect')?.value;
+  }
   
-  // Open invoice modal with quote data
+  if (!quoteId) {
+    alert('Seleccione una cotización');
+    return;
+  }
+  
+  const quote = await DB.getById('quotes', quoteId);
+  if (!quote) {
+    alert('Cotización no encontrada');
+    return;
+  }
+  
+  // Abrir modal de factura con datos de la cotización
   const number = await DB.getNextNumber('invoice');
   document.getElementById('invoiceModalTitle').textContent = 'Nueva Factura (desde Cotización)';
   document.getElementById('invoiceNumberDisplay').textContent = number;
   document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
   
-  // Set client
+  // Fecha vencimiento +30 días
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + 30);
+  document.getElementById('invoiceDueDate').value = dueDate.toISOString().split('T')[0];
+  
+  // Cargar clientes y seleccionar el de la cotización
   const clients = await DB.getAll('clients');
   const select = document.getElementById('invoiceClient');
   select.innerHTML = '<option value="">Seleccionar cliente...</option>' + 
-    clients.filter(c => c.active).map(c => `<option value="${c.id}" ${c.id === quote.client_id ? 'selected' : ''}>${c.name} - ${c.ruc}</option>`).join('');
+    clients.filter(c => c.active).map(c => 
+      `<option value="${c.id}" ${c.id === quote.client_id ? 'selected' : ''}>${c.name} - ${c.ruc}</option>`
+    ).join('');
   
-  // Copy items
+  // Copiar items de la cotización
   tempInvoiceItems = quote.items.map(item => ({
     ...item,
     id: crypto.randomUUID()
@@ -2118,9 +2094,16 @@ async function convertQuote(id) {
   renderInvoiceItems();
   updateInvoiceTotals();
   
-  // Store reference to quote
-  document.getElementById('convertQuoteSelect').value = id;
+  // Guardar referencia a la cotización
+  const quoteSelect = document.getElementById('convertQuoteSelect');
+  if (quoteSelect) {
+    quoteSelect.value = quoteId;
+  }
   
+  // Actualizar estado de la cotización a "facturado" al guardar
+  window.currentConvertingQuote = quoteId;
+  
+  closeModal('quoteModal');
   document.getElementById('invoiceModal').classList.remove('hidden');
 }
 
@@ -2185,22 +2168,19 @@ async function openInvoiceModal() {
   document.getElementById('invoiceNumberDisplay').textContent = number;
   document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
   
-  // Due date default +30 days
   const dueDate = new Date();
   dueDate.setDate(dueDate.getDate() + 30);
   document.getElementById('invoiceDueDate').value = dueDate.toISOString().split('T')[0];
   
-  // Load clients
   const clients = await DB.getAll('clients');
   const select = document.getElementById('invoiceClient');
   select.innerHTML = '<option value="">Seleccionar cliente...</option>' + 
     clients.filter(c => c.active).map(c => `<option value="${c.id}">${c.name} - ${c.ruc}</option>`).join('');
   
-  // Load quotes for conversion
   const quotes = await DB.getAll('quotes');
   const quoteSelect = document.getElementById('convertQuoteSelect');
   quoteSelect.innerHTML = '<option value="">Seleccionar cotización...</option>' +
-    quotes.filter(q => q.status === 'emitido').map(q => {
+    quotes.filter(q => q.status === 'emitido' || q.status === 'borrador').map(q => {
       const client = clients.find(c => c.id === q.client_id);
       return `<option value="${q.id}">${q.number} - ${client?.name || 'N/A'} (B/. ${q.total?.toFixed(2)})</option>`;
     }).join('');
@@ -2209,35 +2189,36 @@ async function openInvoiceModal() {
   renderInvoiceItems();
   updateInvoiceTotals();
   
+  window.currentConvertingQuote = null;
+  
   document.getElementById('invoiceModal').classList.remove('hidden');
 }
 
 function openInvoiceProductSelector() {
   document.getElementById('productSelectorModal').classList.remove('hidden');
-  // Reuse quote selector but add to invoice
-  const originalRender = renderProductSelector;
-  renderProductSelector = async function() {
-    const products = await DB.getAll('products');
-    const search = document.getElementById('selectorSearch')?.value?.toLowerCase() || '';
-    const filtered = products.filter(p => p.active && (!search || p.name.toLowerCase().includes(search)));
-    
-    const container = document.getElementById('productSelectorList');
-    container.innerHTML = filtered.map(p => {
-      const price = calculatePrice(p);
-      return `
-      <div class="flex justify-between items-center p-3 bg-slate-800/50 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 cursor-pointer transition-colors" onclick="addProductToInvoice('${p.id}')">
-        <div>
-          <div class="font-medium">${p.name}</div>
-          <div class="text-xs text-slate-400">${p.category} | SKU: ${p.sku || '-'}</div>
-        </div>
-        <div class="text-right">
-          <div class="font-mono font-medium">B/. ${price.toFixed(2)}</div>
-          ${p.apply_tax ? '<span class="text-xs text-blue-400">+ITBMS</span>' : ''}
-        </div>
+  renderProductSelectorForInvoice();
+}
+
+async function renderProductSelectorForInvoice() {
+  const products = await DB.getAll('products');
+  const search = document.getElementById('selectorSearch')?.value?.toLowerCase() || '';
+  const filtered = products.filter(p => p.active && (!search || p.name.toLowerCase().includes(search)));
+  
+  const container = document.getElementById('productSelectorList');
+  container.innerHTML = filtered.map(p => {
+    const price = calculatePrice(p);
+    return `
+    <div class="flex justify-between items-center p-3 bg-slate-800/50 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 cursor-pointer transition-colors" onclick="addProductToInvoice('${p.id}')">
+      <div>
+        <div class="font-medium">${p.name}</div>
+        <div class="text-xs text-slate-400">${p.category} | SKU: ${p.sku || '-'}</div>
       </div>
-    `}).join('');
-  };
-  renderProductSelector();
+      <div class="text-right">
+        <div class="font-mono font-medium">B/. ${price.toFixed(2)}</div>
+        ${p.apply_tax ? '<span class="text-xs text-blue-400">+ITBMS</span>' : ''}
+      </div>
+    </div>
+  `}).join('');
 }
 
 function addProductToInvoice(productId) {
@@ -2271,23 +2252,24 @@ function renderInvoiceItems() {
       <div class="flex justify-between items-start">
         <div class="flex-1">
           <input type="text" value="${item.name}" onchange="updateInvoiceItem(${idx}, 'name', this.value)" 
-            class="w-full bg-transparent border-b-2 border-slate-600 focus:border-blue-500 focus:outline-none font-medium text-white pb-1">
+            style="width: 100%; background: transparent; border-bottom: 2px solid #475569; color: white; font-weight: 500; padding-bottom: 0.25rem;"
+            onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#475569'">
         </div>
         <button onclick="removeInvoiceItem(${idx})" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400 ml-2 transition-colors">
           <i class="fas fa-times"></i>
         </button>
       </div>
       
-      <div class="grid grid-cols-4 gap-3 text-sm">
+      <div class="grid grid-cols-4 gap-3 text-sm mt-3">
         <div>
           <label class="text-xs text-slate-500 block mb-1">Cantidad</label>
           <input type="number" min="1" value="${item.quantity}" onchange="updateInvoiceItem(${idx}, 'quantity', this.value)"
-            class="w-full bg-slate-900/50 border border-slate-600 rounded-lg px-2 py-1 text-center font-mono text-white focus:border-blue-500 focus:outline-none">
+            style="width: 100%; background: rgba(15, 23, 42, 0.5); border: 1px solid #475569; border-radius: 0.5rem; padding: 0.25rem 0.5rem; color: white; text-align: center; font-family: monospace;">
         </div>
         <div>
           <label class="text-xs text-slate-500 block mb-1">Precio Unit.</label>
           <input type="number" step="0.01" value="${item.price.toFixed(2)}" onchange="updateInvoiceItem(${idx}, 'price', this.value)"
-            class="w-full bg-slate-900/50 border border-slate-600 rounded-lg px-2 py-1 text-right font-mono text-white focus:border-blue-500 focus:outline-none">
+            style="width: 100%; background: rgba(15, 23, 42, 0.5); border: 1px solid #475569; border-radius: 0.5rem; padding: 0.25rem 0.5rem; color: white; text-align: right; font-family: monospace;">
         </div>
         <div class="col-span-2 flex items-end justify-end">
           <div class="text-right">
@@ -2332,20 +2314,6 @@ function updateInvoiceTotals() {
   document.getElementById('invSubtotal').textContent = `B/. ${subtotal.toFixed(2)}`;
   document.getElementById('invTax').textContent = `B/. ${tax.toFixed(2)}`;
   document.getElementById('invTotal').textContent = `B/. ${(subtotal + tax).toFixed(2)}`;
-}
-
-async function convertQuoteToInvoice() {
-  const quoteId = document.getElementById('convertQuoteSelect').value;
-  if (!quoteId) return;
-  
-  const quote = await DB.getById('quotes', quoteId);
-  if (!quote) return;
-  
-  // Update quote status
-  quote.status = 'facturado';
-  await DB.save('quotes', quote);
-  
-  // Items already loaded in openInvoiceModal via convertQuote
 }
 
 async function saveInvoice(status) {
@@ -2398,15 +2366,15 @@ async function saveInvoice(status) {
   
   await DB.save('invoices', invoice);
   
-  // If converted from quote, update quote
-  const quoteId = document.getElementById('convertQuoteSelect')?.value;
-  if (quoteId) {
-    const quote = await DB.getById('quotes', quoteId);
+  // Si viene de una cotización, actualizar su estado
+  if (window.currentConvertingQuote) {
+    const quote = await DB.getById('quotes', window.currentConvertingQuote);
     if (quote) {
       quote.status = 'facturado';
       quote.invoice_id = invoice.id;
       await DB.save('quotes', quote);
     }
+    window.currentConvertingQuote = null;
   }
   
   closeModal('invoiceModal');
@@ -2425,76 +2393,76 @@ async function viewInvoice(id) {
   const balance = invoice.total - (invoice.paid || 0);
   
   const html = `
-    <div class="max-w-3xl mx-auto">
-      <div class="flex justify-between items-start mb-8">
+    <div style="max-width: 48rem; margin: 0 auto; font-family: system-ui, sans-serif; color: #1e293b;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
         <div>
-          <h1 class="text-3xl font-bold text-slate-800">${settings.company_name}</h1>
-          <p class="text-slate-600">RUC: ${settings.company_ruc}</p>
-          <p class="text-slate-600">${settings.company_address}</p>
+          <h1 style="font-size: 1.875rem; font-weight: 700; color: #0f172a;">${settings.company_name}</h1>
+          <p style="color: #475569;">RUC: ${settings.company_ruc}</p>
+          <p style="color: #475569;">${settings.company_address}</p>
         </div>
-        <div class="text-right">
-          <h2 class="text-2xl font-bold text-emerald-600">FACTURA</h2>
-          <p class="text-xl font-mono font-bold text-slate-800">${invoice.number}</p>
-          <p class="text-slate-600">${new Date(invoice.date).toLocaleDateString('es-PA')}</p>
+        <div style="text-align: right;">
+          <h2 style="font-size: 1.5rem; font-weight: 700; color: #059669;">FACTURA</h2>
+          <p style="font-size: 1.25rem; font-family: monospace; font-weight: 700; color: #0f172a;">${invoice.number}</p>
+          <p style="color: #475569;">${new Date(invoice.date).toLocaleDateString('es-PA')}</p>
         </div>
       </div>
       
-      <div class="bg-slate-50 p-4 rounded-lg mb-8">
-        <h3 class="text-xs uppercase text-slate-500 font-bold mb-1">Cliente</h3>
-        <p class="text-lg font-bold text-slate-800">${client?.name || 'N/A'}</p>
-        <p class="text-slate-600">RUC: ${client?.ruc || 'N/A'}</p>
-        <p class="text-slate-600">${client?.address || ''}</p>
+      <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+        <h3 style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 0.25rem;">Cliente</h3>
+        <p style="font-size: 1.125rem; font-weight: 700; color: #0f172a;">${client?.name || 'N/A'}</p>
+        <p style="color: #475569;">RUC: ${client?.ruc || 'N/A'}</p>
+        <p style="color: #475569;">${client?.address || ''}</p>
       </div>
       
-      <table class="w-full mb-8">
+      <table style="width: 100%; margin-bottom: 2rem; border-collapse: collapse;">
         <thead>
-          <tr class="border-b-2 border-slate-800">
-            <th class="text-left py-2 text-sm">Descripción</th>
-            <th class="text-right py-2 text-sm w-24">Precio</th>
-            <th class="text-right py-2 text-sm w-20">Cant.</th>
-            <th class="text-right py-2 text-sm w-24">Total</th>
+          <tr style="border-bottom: 2px solid #0f172a;">
+            <th style="text-align: left; padding: 0.5rem 0; font-size: 0.875rem;">Descripción</th>
+            <th style="text-align: right; padding: 0.5rem 0; font-size: 0.875rem; width: 6rem;">Precio</th>
+            <th style="text-align: right; padding: 0.5rem 0; font-size: 0.875rem; width: 5rem;">Cant.</th>
+            <th style="text-align: right; padding: 0.5rem 0; font-size: 0.875rem; width: 6rem;">Total</th>
           </tr>
         </thead>
         <tbody>
-          ${invoice.items.map((item, i) => `
-            <tr class="border-b border-slate-200">
-              <td class="py-3">${item.name}</td>
-              <td class="text-right font-mono">B/. ${item.price.toFixed(2)}</td>
-              <td class="text-right font-mono">${item.quantity}</td>
-              <td class="text-right font-mono font-bold">B/. ${(item.price * item.quantity).toFixed(2)}</td>
+          ${invoice.items.map((item) => `
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+              <td style="padding: 0.75rem 0;">${item.name}</td>
+              <td style="text-align: right; font-family: monospace;">B/. ${item.price.toFixed(2)}</td>
+              <td style="text-align: right; font-family: monospace;">${item.quantity}</td>
+              <td style="text-align: right; font-family: monospace; font-weight: 700;">B/. ${(item.price * item.quantity).toFixed(2)}</td>
             </tr>
           `).join('')}
         </tbody>
       </table>
       
-      <div class="flex justify-between items-start">
-        <div class="text-sm text-slate-600">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div style="font-size: 0.875rem; color: #475569;">
           <p><strong>Método de pago:</strong> ${invoice.payment_method}</p>
           <p><strong>Vencimiento:</strong> ${new Date(invoice.due_date).toLocaleDateString('es-PA')}</p>
-          ${invoice.notes ? `<p class="mt-2"><strong>Notas:</strong> ${invoice.notes}</p>` : ''}
+          ${invoice.notes ? `<p style="margin-top: 0.5rem;"><strong>Notas:</strong> ${invoice.notes}</p>` : ''}
         </div>
         
-        <div class="w-64 space-y-2">
-          <div class="flex justify-between text-sm">
-            <span class="text-slate-600">Subtotal:</span>
-            <span class="font-mono">B/. ${invoice.subtotal.toFixed(2)}</span>
+        <div style="width: 16rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.5rem;">
+            <span style="color: #475569;">Subtotal:</span>
+            <span style="font-family: monospace;">B/. ${invoice.subtotal.toFixed(2)}</span>
           </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-slate-600">ITBMS (7%):</span>
-            <span class="font-mono">B/. ${invoice.tax.toFixed(2)}</span>
+          <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.5rem;">
+            <span style="color: #475569;">ITBMS (7%):</span>
+            <span style="font-family: monospace;">B/. ${invoice.tax.toFixed(2)}</span>
           </div>
-          <div class="flex justify-between text-lg font-bold border-t border-slate-300 pt-2">
+          <div style="display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 700; border-top: 1px solid #cbd5e1; padding-top: 0.5rem;">
             <span>Total:</span>
-            <span class="font-mono text-emerald-600">B/. ${invoice.total.toFixed(2)}</span>
+            <span style="font-family: monospace; color: #059669;">B/. ${invoice.total.toFixed(2)}</span>
           </div>
           ${invoice.paid > 0 ? `
-            <div class="flex justify-between text-sm text-emerald-600">
+            <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: #059669; margin-top: 0.5rem;">
               <span>Pagado:</span>
-              <span class="font-mono">B/. ${invoice.paid.toFixed(2)}</span>
+              <span style="font-family: monospace;">B/. ${invoice.paid.toFixed(2)}</span>
             </div>
-            <div class="flex justify-between text-sm font-bold ${balance > 0 ? 'text-red-600' : 'text-emerald-600'}">
+            <div style="display: flex; justify-content: space-between; font-size: 0.875rem; font-weight: 700; ${balance > 0 ? 'color: #dc2626;' : 'color: #059669;'} margin-top: 0.25rem;">
               <span>Saldo:</span>
-              <span class="font-mono">B/. ${balance.toFixed(2)}</span>
+              <span style="font-family: monospace;">B/. ${balance.toFixed(2)}</span>
             </div>
           ` : ''}
         </div>
@@ -2514,7 +2482,6 @@ async function registerPayment(invoiceId) {
   document.getElementById('paymentAmount').value = balance.toFixed(2);
   document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
   
-  // Load invoice select
   const invoices = await DB.getAll('invoices');
   const clients = await DB.getAll('clients');
   const select = document.getElementById('paymentInvoice');
@@ -2564,7 +2531,6 @@ async function savePayment(e) {
   
   await DB.save('payments', payment);
   
-  // Update invoice
   invoice.paid = (invoice.paid || 0) + amount;
   if (invoice.paid >= invoice.total) {
     invoice.status = 'pagado';
@@ -2618,7 +2584,6 @@ async function deletePayment(id) {
   const payment = await DB.getById('payments', id);
   const invoice = await DB.getById('invoices', payment.invoice_id);
   
-  // Revert invoice payment
   invoice.paid = Math.max(0, (invoice.paid || 0) - payment.amount);
   if (invoice.paid <= 0) invoice.status = 'emitido';
   else if (invoice.paid < invoice.total) invoice.status = 'parcial';
@@ -2648,23 +2613,28 @@ async function generateReport(type) {
         return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && i.status !== 'anulado';
       });
       
-      doc.text('Reporte de Ventas - ' + new Date().toLocaleDateString('es-PA', {month: 'long', year: 'numeric'}), 14, 20);
+      doc.setFontSize(16);
+      doc.text('Reporte de Ventas', 14, 20);
+      doc.setFontSize(12);
+      doc.text(new Date().toLocaleDateString('es-PA', {month: 'long', year: 'numeric'}), 14, 30);
       
       const data = monthInvoices.map(i => [
         i.number,
         new Date(i.date).toLocaleDateString('es-PA'),
-        i.total.toFixed(2),
+        `B/. ${i.total.toFixed(2)}`,
         i.status
       ]);
       
       doc.autoTable({
         head: [['Factura', 'Fecha', 'Total', 'Estado']],
         body: data,
-        startY: 30
+        startY: 40,
+        theme: 'grid',
+        headStyles: { fillColor: [37, 99, 235] }
       });
       
       const total = monthInvoices.reduce((a, b) => a + b.total, 0);
-      doc.text(`Total del mes: B/. ${total.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10);
+      doc.text(`Total del mes: B/. ${total.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 15);
       break;
     }
     
@@ -2673,6 +2643,7 @@ async function generateReport(type) {
       const pending = invoices.filter(i => i.status === 'emitido' || i.status === 'parcial');
       const clients = await DB.getAll('clients');
       
+      doc.setFontSize(16);
       doc.text('Cuentas por Cobrar', 14, 20);
       
       const data = pending.map(i => {
@@ -2682,18 +2653,20 @@ async function generateReport(type) {
           i.number,
           client?.name || 'N/A',
           new Date(i.due_date).toLocaleDateString('es-PA'),
-          balance.toFixed(2)
+          `B/. ${balance.toFixed(2)}`
         ];
       });
       
       doc.autoTable({
         head: [['Factura', 'Cliente', 'Vencimiento', 'Saldo']],
         body: data,
-        startY: 30
+        startY: 30,
+        theme: 'grid',
+        headStyles: { fillColor: [234, 179, 8] }
       });
       
       const total = pending.reduce((a, b) => a + (b.total - (b.paid || 0)), 0);
-      doc.text(`Total por cobrar: B/. ${total.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10);
+      doc.text(`Total por cobrar: B/. ${total.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 15);
       break;
     }
     
@@ -2707,10 +2680,12 @@ async function generateReport(type) {
       
       const totalTax = monthInvoices.reduce((a, b) => a + (b.tax || 0), 0);
       
+      doc.setFontSize(16);
       doc.text('Reporte de ITBMS', 14, 20);
-      doc.text(`Período: ${new Date().toLocaleDateString('es-PA', {month: 'long', year: 'numeric'})}`, 14, 30);
+      doc.setFontSize(12);
+      doc.text(`Período: ${new Date().toLocaleDateString('es-PA', {month: 'long', year: 'numeric'})}`, 14, 35);
       doc.text(`Total ITBMS generado: B/. ${totalTax.toFixed(2)}`, 14, 50);
-      doc.text(`Base imponible: B/. ${monthInvoices.reduce((a, b) => a + b.subtotal, 0).toFixed(2)}`, 14, 60);
+      doc.text(`Base imponible: B/. ${monthInvoices.reduce((a, b) => a + b.subtotal, 0).toFixed(2)}`, 14, 65);
       break;
     }
   }
@@ -2736,18 +2711,34 @@ async function downloadPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   
-  // Simple PDF generation from preview HTML
+  // Usar html2canvas para mejor renderizado
   const element = document.getElementById('documentPreview');
   
-  doc.html(element, {
-    callback: function(doc) {
-      doc.save(`${currentPreviewDoc.type}_${currentPreviewDoc.data.number}.pdf`);
-    },
-    x: 10,
-    y: 10,
-    width: 190,
-    windowWidth: 800
+  // Crear un canvas temporal
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    logging: false
   });
+  
+  const imgData = canvas.toDataURL('image/png');
+  const imgWidth = 190;
+  const pageHeight = 280;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  let heightLeft = imgHeight;
+  let position = 10;
+  
+  doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+  heightLeft -= pageHeight;
+  
+  while (heightLeft >= 0) {
+    position = heightLeft - imgHeight + 10;
+    doc.addPage();
+    doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+  
+  doc.save(`${currentPreviewDoc.type}_${currentPreviewDoc.data.number}.pdf`);
 }
 
 function exportFullBackup() {
@@ -2786,7 +2777,6 @@ function clearAllData() {
   location.reload();
 }
 
-// Settings
 async function saveCompanySettings() {
   const settings = (await DB.getAll('settings'))[0] || { id: crypto.randomUUID() };
   settings.company_name = document.getElementById('companyName').value;
@@ -2830,6 +2820,11 @@ async function saveSecuritySettings() {
   await DB.save('users', admin);
   alert('Credenciales actualizadas');
 }
+
+// Agregar html2canvas para PDF
+const script = document.createElement('script');
+script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+document.head.appendChild(script);
 
 // Init
 init();

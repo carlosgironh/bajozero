@@ -26,11 +26,88 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
 
 /* Design System */
 .card { @apply bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-xl; }
-.input { @apply w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none transition-all; }
-.btn-primary { @apply px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all active:scale-95; }
-.btn-secondary { @apply px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl transition-all active:scale-95; }
-.btn-success { @apply px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all active:scale-95; }
-.btn-danger { @apply px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-xl transition-all active:scale-95; }
+
+/* MEJORADOS: Campos de texto con mejor visibilidad */
+.input {
+  @apply w-full bg-slate-800 border-2 border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all;
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Estados especiales para inputs */
+.input:focus {
+  background-color: #1e293b;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.input:hover:not(:focus) {
+  border-color: #64748b;
+  background-color: #1e293b;
+}
+
+/* Input con icono (search) */
+.input-with-icon {
+  @apply pl-10;
+}
+
+/* Selects mejorados */
+select.input {
+  @apply cursor-pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Textarea mejorada */
+textarea.input {
+  @apply resize-none;
+  min-height: 80px;
+}
+
+/* Checkbox mejorado */
+input[type="checkbox"] {
+  @apply w-5 h-5 rounded border-2 border-slate-500 bg-slate-800 text-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-0 focus:ring-offset-slate-800 cursor-pointer;
+}
+
+/* Login inputs específicos - más contrastados */
+#authScreen .input {
+  @apply bg-slate-800/80 border-slate-500 text-white text-base;
+  font-size: 16px; /* Previene zoom en iOS */
+}
+
+#authScreen .input:focus {
+  @apply bg-slate-800 border-blue-400;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Labels mejorados */
+label {
+  @apply text-xs uppercase text-slate-300 font-bold block mb-2 tracking-wide;
+}
+
+/* Placeholder más visible */
+::placeholder {
+  color: #64748b !important;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: #64748b !important;
+}
+
+::-ms-input-placeholder {
+  color: #64748b !important;
+}
+
+/* Botones */
+.btn-primary { @apply px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all active:scale-95 shadow-lg shadow-blue-600/20; }
+.btn-secondary { @apply px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl transition-all active:scale-95 border border-slate-600; }
+.btn-success { @apply px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-600/20; }
+.btn-danger { @apply px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-xl transition-all active:scale-95 shadow-lg shadow-red-600/20; }
 
 /* Status badges */
 .status-pendiente { @apply bg-yellow-500/20 text-yellow-300 border border-yellow-500/30; }
@@ -62,6 +139,41 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
 
 /* Document preview */
 .sheet { @apply bg-white text-slate-900 shadow-2xl; }
+
+/* Mejoras para items de cotización/factura */
+.item-card {
+  @apply bg-slate-800/50 border-2 border-slate-700/50 rounded-xl p-4 space-y-3 transition-all;
+}
+
+.item-card:hover {
+  @apply border-slate-600 bg-slate-800;
+}
+
+.item-card input {
+  @apply bg-slate-900/50 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 focus:outline-none transition-all;
+}
+
+/* Inputs de solo lectura */
+input[readonly], input:disabled {
+  @apply bg-slate-900/80 text-slate-400 cursor-not-allowed border-slate-700;
+}
+
+/* Focus visible para accesibilidad */
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Mejoras para modales en móvil */
+@media (max-width: 640px) {
+  .input {
+    @apply text-base py-3 px-4; /* Más grande en móvil para mejor touch */
+  }
+  
+  label {
+    @apply text-sm mb-2;
+  }
+}
 </style>
 </head>
 
@@ -69,23 +181,23 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
 
 <!-- AUTH SCREEN -->
 <div id="authScreen" class="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
-  <div class="w-full max-w-md card p-8">
+  <div class="w-full max-w-md card p-8 border-2 border-slate-700/50 shadow-2xl">
     <div class="text-center mb-8">
       <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center text-3xl font-black shadow-lg shadow-blue-500/30">A3</div>
-      <h1 class="text-2xl font-bold">A3 Solution</h1>
+      <h1 class="text-2xl font-bold text-white">A3 Solution</h1>
       <p class="text-slate-400 text-sm">Sistema de Gestión Empresarial</p>
     </div>
     
-    <div id="loginForm" class="space-y-4">
+    <div id="loginForm" class="space-y-5">
       <div>
-        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Usuario</label>
-        <input type="text" id="loginUser" class="input" placeholder="admin" value="admin">
+        <label class="text-slate-300">Usuario</label>
+        <input type="text" id="loginUser" class="input" placeholder="Ingrese usuario" value="admin">
       </div>
       <div>
-        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Contraseña</label>
-        <input type="password" id="loginPass" class="input" placeholder="••••••" value="admin123">
+        <label class="text-slate-300">Contraseña</label>
+        <input type="password" id="loginPass" class="input" placeholder="Ingrese contraseña" value="admin123">
       </div>
-      <button onclick="login()" class="w-full btn-primary">
+      <button onclick="login()" class="w-full btn-primary mt-6">
         <i class="fas fa-sign-in-alt mr-2"></i>Ingresar al Sistema
       </button>
       <p class="text-xs text-center text-slate-500 mt-4">Versión 2.0 PRO • Modo Offline</p>
@@ -99,7 +211,7 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
   <!-- HEADER -->
   <header class="fixed top-0 left-0 right-0 h-16 bg-slate-900/95 backdrop-blur-xl border-b border-slate-700/50 z-40 flex items-center justify-between px-4 lg:px-6">
     <div class="flex items-center gap-4">
-      <button onclick="toggleSidebar()" class="lg:hidden w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center touch-manipulation">
+      <button onclick="toggleSidebar()" class="lg:hidden w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center touch-manipulation border border-slate-700">
         <i class="fas fa-bars"></i>
       </button>
       <div class="flex items-center gap-3">
@@ -117,7 +229,7 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
         <span id="currentUserName">Administrador</span>
         <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">Admin</span>
       </div>
-      <button onclick="logout()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center transition-all touch-manipulation">
+      <button onclick="logout()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center transition-all touch-manipulation border border-slate-700">
         <i class="fas fa-power-off"></i>
       </button>
     </div>
@@ -287,11 +399,11 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
         </div>
         
         <div class="card p-4">
-          <div class="flex gap-4 mb-4">
-            <div class="relative flex-1 max-w-md">
+          <div class="flex gap-4 mb-4 flex-wrap">
+            <div class="relative flex-1 max-w-md min-w-[250px]">
               <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
               <input type="text" id="clientSearch" placeholder="Buscar cliente..." oninput="renderClients()"
-                class="input pl-10">
+                class="input input-with-icon">
             </div>
             <select id="clientFilter" onchange="renderClients()" class="input w-48">
               <option value="all">Todos</option>
@@ -337,7 +449,7 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
             <div class="relative flex-1 min-w-[200px]">
               <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
               <input type="text" id="productSearch" placeholder="Buscar producto..." oninput="renderCatalog()"
-                class="input pl-10">
+                class="input input-with-icon">
             </div>
             <select id="productCategoryFilter" onchange="renderCatalog()" class="input w-48">
               <option value="all">Todas las categorías</option>
@@ -383,7 +495,7 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
             <div class="relative flex-1 min-w-[200px]">
               <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
               <input type="text" id="quoteSearch" placeholder="Buscar # o cliente..." oninput="renderQuotes()"
-                class="input pl-10">
+                class="input input-with-icon">
             </div>
             <select id="quoteStatusFilter" onchange="renderQuotes()" class="input w-40">
               <option value="all">Todos</option>
@@ -428,7 +540,7 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
             <div class="relative flex-1 min-w-[200px]">
               <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
               <input type="text" id="invoiceSearch" placeholder="Buscar # o cliente..." oninput="renderInvoices()"
-                class="input pl-10">
+                class="input input-with-icon">
             </div>
             <select id="invoiceStatusFilter" onchange="renderInvoices()" class="input w-40">
               <option value="all">Todos</option>
@@ -552,21 +664,21 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
               <i class="fas fa-building text-blue-400"></i>
               Datos de la Empresa
             </h3>
-            <div class="space-y-3">
+            <div class="space-y-4">
               <div>
-                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Nombre Empresa</label>
+                <label>Nombre Empresa</label>
                 <input type="text" id="companyName" class="input" value="A3 Solution">
               </div>
               <div>
-                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">RUC</label>
+                <label>RUC</label>
                 <input type="text" id="companyRUC" class="input" value="8-963-952 DV 35">
               </div>
               <div>
-                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Dirección</label>
-                <textarea id="companyAddress" class="input h-20 resize-none">Panamá</textarea>
+                <label>Dirección</label>
+                <textarea id="companyAddress" class="input h-20">Panamá</textarea>
               </div>
               <div>
-                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Teléfono</label>
+                <label>Teléfono</label>
                 <input type="text" id="companyPhone" class="input">
               </div>
               <button onclick="saveCompanySettings()" class="btn-primary w-full">Guardar Cambios</button>
@@ -578,21 +690,21 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
               <i class="fas fa-file-invoice text-blue-400"></i>
               Numeración de Documentos
             </h3>
-            <div class="space-y-3">
+            <div class="space-y-4">
               <div>
-                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Prefijo Cotizaciones</label>
+                <label>Prefijo Cotizaciones</label>
                 <input type="text" id="prefixQuotes" class="input" value="COT-">
               </div>
               <div>
-                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Prefijo Facturas</label>
+                <label>Prefijo Facturas</label>
                 <input type="text" id="prefixInvoices" class="input" value="FAC-">
               </div>
               <div>
-                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Próxima Cotización #</label>
+                <label>Próxima Cotización #</label>
                 <input type="number" id="nextQuoteNum" class="input" value="1001">
               </div>
               <div>
-                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Próxima Factura #</label>
+                <label>Próxima Factura #</label>
                 <input type="number" id="nextInvoiceNum" class="input" value="1001">
               </div>
               <button onclick="saveNumberingSettings()" class="btn-primary w-full">Guardar Configuración</button>
@@ -604,13 +716,13 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
               <i class="fas fa-shield-alt text-blue-400"></i>
               Seguridad
             </h3>
-            <div class="space-y-3">
+            <div class="space-y-4">
               <div>
-                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Usuario Admin</label>
+                <label>Usuario Admin</label>
                 <input type="text" id="adminUser" class="input" value="admin">
               </div>
               <div>
-                <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Nueva Contraseña</label>
+                <label>Nueva Contraseña</label>
                 <input type="password" id="adminPass" class="input" placeholder="Dejar en blanco para no cambiar">
               </div>
               <button onclick="saveSecuritySettings()" class="btn-primary w-full">Actualizar Credenciales</button>
@@ -650,11 +762,11 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
 <!-- MODALS -->
 
 <!-- Client Modal -->
-<div id="clientModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-  <div class="card w-full max-w-lg p-6 fade-in">
+<div id="clientModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="card w-full max-w-lg p-6 fade-in border-2 border-slate-600/50 shadow-2xl">
     <div class="flex justify-between items-center mb-6">
       <h3 class="text-xl font-bold" id="clientModalTitle">Nuevo Cliente</h3>
-      <button onclick="closeModal('clientModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+      <button onclick="closeModal('clientModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center transition-colors">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -662,24 +774,24 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
       <input type="hidden" id="clientId">
       <div class="grid grid-cols-2 gap-4">
         <div class="col-span-2">
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Nombre / Razón Social *</label>
+          <label>Nombre / Razón Social *</label>
           <input type="text" id="clientName" required class="input">
         </div>
         <div>
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">RUC / Identificación *</label>
+          <label>RUC / Identificación *</label>
           <input type="text" id="clientRUC" required class="input">
         </div>
         <div>
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Teléfono</label>
+          <label>Teléfono</label>
           <input type="tel" id="clientPhone" class="input">
         </div>
         <div class="col-span-2">
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Email</label>
+          <label>Email</label>
           <input type="email" id="clientEmail" class="input">
         </div>
         <div class="col-span-2">
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Dirección</label>
-          <textarea id="clientAddress" class="input h-20 resize-none"></textarea>
+          <label>Dirección</label>
+          <textarea id="clientAddress" class="input h-20"></textarea>
         </div>
       </div>
       <div class="flex gap-3 pt-4">
@@ -691,59 +803,59 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
 </div>
 
 <!-- Product Modal -->
-<div id="productModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-  <div class="card w-full max-w-lg p-6 fade-in max-h-[90vh] overflow-y-auto">
+<div id="productModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="card w-full max-w-lg p-6 fade-in max-h-[90vh] overflow-y-auto border-2 border-slate-600/50 shadow-2xl">
     <div class="flex justify-between items-center mb-6">
       <h3 class="text-xl font-bold" id="productModalTitle">Nuevo Producto</h3>
-      <button onclick="closeModal('productModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+      <button onclick="closeModal('productModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center transition-colors">
         <i class="fas fa-times"></i>
       </button>
     </div>
     <form id="productForm" onsubmit="saveProduct(event)" class="space-y-4">
       <input type="hidden" id="productId">
       <div>
-        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Código SKU *</label>
+        <label>Código SKU *</label>
         <input type="text" id="productSku" required class="input" placeholder="PROD-001">
       </div>
       <div>
-        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Nombre *</label>
+        <label>Nombre *</label>
         <input type="text" id="productName" required class="input">
       </div>
       <div>
-        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Descripción</label>
-        <textarea id="productDesc" class="input h-20 resize-none"></textarea>
+        <label>Descripción</label>
+        <textarea id="productDesc" class="input h-20"></textarea>
       </div>
       <div>
-        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Categoría</label>
+        <label>Categoría</label>
         <select id="productCategory" class="input"></select>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Costo *</label>
+          <label>Costo *</label>
           <input type="number" step="0.01" id="productCost" required class="input" oninput="calculateProductPrice()">
         </div>
         <div>
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Margen % *</label>
+          <label>Margen % *</label>
           <input type="number" step="0.01" id="productMargin" required class="input" value="30" oninput="calculateProductPrice()">
         </div>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Precio Base</label>
-          <input type="number" step="0.01" id="productBasePrice" class="input bg-slate-800" readonly>
+          <label>Precio Base</label>
+          <input type="number" step="0.01" id="productBasePrice" class="input bg-slate-900/60" readonly>
         </div>
         <div>
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Precio Final (con ITBMS)</label>
-          <input type="number" step="0.01" id="productFinalPrice" class="input bg-slate-800" readonly>
+          <label>Precio Final (con ITBMS)</label>
+          <input type="number" step="0.01" id="productFinalPrice" class="input bg-slate-900/60" readonly>
         </div>
       </div>
-      <div class="flex items-center gap-3 p-3 bg-slate-700/30 rounded-xl">
-        <input type="checkbox" id="productTax" checked class="w-5 h-5 rounded accent-blue-500" onchange="calculateProductPrice()">
-        <label for="productTax" class="text-sm">Aplica ITBMS (7%)</label>
+      <div class="flex items-center gap-3 p-3 bg-slate-700/30 rounded-xl border border-slate-600/30">
+        <input type="checkbox" id="productTax" checked onchange="calculateProductPrice()">
+        <label for="productTax" class="mb-0 cursor-pointer select-none">Aplica ITBMS (7%)</label>
       </div>
-      <div class="flex items-center gap-3 p-3 bg-slate-700/30 rounded-xl">
-        <input type="checkbox" id="productActive" checked class="w-5 h-5 rounded accent-blue-500">
-        <label for="productActive" class="text-sm">Producto Activo</label>
+      <div class="flex items-center gap-3 p-3 bg-slate-700/30 rounded-xl border border-slate-600/30">
+        <input type="checkbox" id="productActive" checked>
+        <label for="productActive" class="mb-0 cursor-pointer select-none">Producto Activo</label>
       </div>
       <div class="flex gap-3 pt-4">
         <button type="button" onclick="closeModal('productModal')" class="flex-1 btn-secondary">Cancelar</button>
@@ -754,11 +866,11 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
 </div>
 
 <!-- Category Modal -->
-<div id="categoryModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-  <div class="card w-full max-w-md p-6 fade-in">
+<div id="categoryModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="card w-full max-w-md p-6 fade-in border-2 border-slate-600/50 shadow-2xl">
     <div class="flex justify-between items-center mb-6">
       <h3 class="text-xl font-bold">Gestionar Categorías</h3>
-      <button onclick="closeModal('categoryModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+      <button onclick="closeModal('categoryModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center transition-colors">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -776,14 +888,14 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
 </div>
 
 <!-- Quote Modal -->
-<div id="quoteModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-  <div class="card w-full max-w-6xl p-6 fade-in my-8">
+<div id="quoteModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
+  <div class="card w-full max-w-6xl p-6 fade-in my-8 border-2 border-slate-600/50 shadow-2xl">
     <div class="flex justify-between items-center mb-6">
       <div>
         <h3 class="text-xl font-bold" id="quoteModalTitle">Nueva Cotización</h3>
-        <p class="text-sm text-slate-400" id="quoteNumberDisplay"></p>
+        <p class="text-sm text-slate-400 font-mono mt-1" id="quoteNumberDisplay"></p>
       </div>
-      <button onclick="closeModal('quoteModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+      <button onclick="closeModal('quoteModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center transition-colors">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -793,24 +905,24 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
       <div class="lg:col-span-2 space-y-4">
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Cliente *</label>
+            <label>Cliente *</label>
             <select id="quoteClient" class="input" required onchange="updateQuoteClient()">
               <option value="">Seleccionar cliente...</option>
             </select>
           </div>
           <div>
-            <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Fecha *</label>
+            <label>Fecha *</label>
             <input type="date" id="quoteDate" required class="input">
           </div>
         </div>
         
         <div>
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Notas</label>
-          <textarea id="quoteNotes" class="input h-20 resize-none" placeholder="Términos y condiciones..."></textarea>
+          <label>Notas</label>
+          <textarea id="quoteNotes" class="input h-20" placeholder="Términos y condiciones..."></textarea>
         </div>
         
-        <div class="flex justify-between items-center">
-          <h4 class="font-bold">Items</h4>
+        <div class="flex justify-between items-center pt-2">
+          <h4 class="font-bold text-lg">Items</h4>
           <button onclick="openProductSelector()" class="btn-secondary text-sm py-2">
             <i class="fas fa-plus mr-2"></i>Agregar Producto
           </button>
@@ -833,7 +945,7 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
       <!-- Preview -->
       <div class="lg:col-span-1">
         <div class="sticky top-4">
-          <div class="card p-4 space-y-3">
+          <div class="card p-4 space-y-3 bg-slate-800/80 border-2 border-slate-600/30">
             <h4 class="font-bold text-sm uppercase text-slate-400">Resumen</h4>
             <div class="flex justify-between text-sm">
               <span class="text-slate-400">Subtotal:</span>
@@ -856,30 +968,30 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
 
 <!-- Product Selector Modal -->
 <div id="productSelectorModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-  <div class="card w-full max-w-4xl p-6 fade-in max-h-[90vh] flex flex-col">
+  <div class="card w-full max-w-4xl p-6 fade-in max-h-[90vh] flex flex-col border-2 border-slate-600/50 shadow-2xl">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-bold">Seleccionar Producto</h3>
-      <button onclick="closeModal('productSelectorModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+      <button onclick="closeModal('productSelectorModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center transition-colors">
         <i class="fas fa-times"></i>
       </button>
     </div>
     <div class="relative mb-4">
       <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-      <input type="text" id="selectorSearch" class="input pl-10" placeholder="Buscar producto..." oninput="renderProductSelector()">
+      <input type="text" id="selectorSearch" class="input input-with-icon" placeholder="Buscar producto..." oninput="renderProductSelector()">
     </div>
     <div id="productSelectorList" class="flex-1 overflow-y-auto space-y-2"></div>
   </div>
 </div>
 
 <!-- Invoice Modal -->
-<div id="invoiceModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-  <div class="card w-full max-w-6xl p-6 fade-in my-8">
+<div id="invoiceModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
+  <div class="card w-full max-w-6xl p-6 fade-in my-8 border-2 border-slate-600/50 shadow-2xl">
     <div class="flex justify-between items-center mb-6">
       <div>
         <h3 class="text-xl font-bold" id="invoiceModalTitle">Nueva Factura</h3>
-        <p class="text-sm text-slate-400" id="invoiceNumberDisplay"></p>
+        <p class="text-sm text-slate-400 font-mono mt-1" id="invoiceNumberDisplay"></p>
       </div>
-      <button onclick="closeModal('invoiceModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+      <button onclick="closeModal('invoiceModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center transition-colors">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -888,24 +1000,24 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
       <div class="lg:col-span-2 space-y-4">
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Cliente *</label>
+            <label>Cliente *</label>
             <select id="invoiceClient" class="input" required>
               <option value="">Seleccionar cliente...</option>
             </select>
           </div>
           <div>
-            <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Fecha *</label>
+            <label>Fecha *</label>
             <input type="date" id="invoiceDate" required class="input">
           </div>
         </div>
         
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Fecha Vencimiento</label>
+            <label>Fecha Vencimiento</label>
             <input type="date" id="invoiceDueDate" class="input">
           </div>
           <div>
-            <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Método de Pago</label>
+            <label>Método de Pago</label>
             <select id="invoicePaymentMethod" class="input">
               <option value="contado">Contado</option>
               <option value="credito">Crédito</option>
@@ -916,12 +1028,12 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
         </div>
         
         <div>
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Notas</label>
-          <textarea id="invoiceNotes" class="input h-20 resize-none"></textarea>
+          <label>Notas</label>
+          <textarea id="invoiceNotes" class="input h-20"></textarea>
         </div>
         
-        <div class="flex justify-between items-center">
-          <h4 class="font-bold">Items</h4>
+        <div class="flex justify-between items-center pt-2">
+          <h4 class="font-bold text-lg">Items</h4>
           <button onclick="openInvoiceProductSelector()" class="btn-secondary text-sm py-2">
             <i class="fas fa-plus mr-2"></i>Agregar Producto
           </button>
@@ -941,7 +1053,7 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
       
       <div class="lg:col-span-1">
         <div class="sticky top-4 space-y-4">
-          <div class="card p-4 space-y-3">
+          <div class="card p-4 space-y-3 bg-slate-800/80 border-2 border-slate-600/30">
             <h4 class="font-bold text-sm uppercase text-slate-400">Resumen</h4>
             <div class="flex justify-between text-sm">
               <span class="text-slate-400">Subtotal:</span>
@@ -957,7 +1069,7 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
             </div>
           </div>
           
-          <div class="card p-4">
+          <div class="card p-4 bg-slate-800/80 border-2 border-slate-600/30">
             <h4 class="font-bold text-sm uppercase text-slate-400 mb-3">Convertir desde Cotización</h4>
             <select id="convertQuoteSelect" class="input mb-2">
               <option value="">Seleccionar cotización...</option>
@@ -973,34 +1085,34 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
 </div>
 
 <!-- Payment Modal -->
-<div id="paymentModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-  <div class="card w-full max-w-lg p-6 fade-in">
+<div id="paymentModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="card w-full max-w-lg p-6 fade-in border-2 border-slate-600/50 shadow-2xl">
     <div class="flex justify-between items-center mb-6">
       <h3 class="text-xl font-bold">Registrar Pago</h3>
-      <button onclick="closeModal('paymentModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center">
+      <button onclick="closeModal('paymentModal')" class="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center transition-colors">
         <i class="fas fa-times"></i>
       </button>
     </div>
     <form id="paymentForm" onsubmit="savePayment(event)" class="space-y-4">
       <div>
-        <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Factura *</label>
+        <label>Factura *</label>
         <select id="paymentInvoice" required class="input" onchange="updatePaymentBalance()">
           <option value="">Seleccionar factura...</option>
         </select>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Fecha *</label>
+          <label>Fecha *</label>
           <input type="date" id="paymentDate" required class="input">
         </div>
         <div>
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Monto *</label>
+          <label>Monto *</label>
           <input type="number" step="0.01" id="paymentAmount" required class="input">
         </div>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Método *</label>
+          <label>Método *</label>
           <select id="paymentMethod" required class="input">
             <option value="efectivo">Efectivo</option>
             <option value="transferencia">Transferencia</option>
@@ -1011,14 +1123,14 @@ body { font-family: 'Inter', sans-serif; overscroll-behavior: none; background: 
           </select>
         </div>
         <div>
-          <label class="text-xs uppercase text-slate-400 font-bold block mb-2">Referencia</label>
+          <label>Referencia</label>
           <input type="text" id="paymentReference" class="input" placeholder="# transferencia, etc">
         </div>
       </div>
-      <div class="p-3 bg-slate-700/30 rounded-xl">
+      <div class="p-4 bg-slate-700/30 rounded-xl border border-slate-600/30">
         <div class="flex justify-between text-sm">
           <span class="text-slate-400">Saldo pendiente:</span>
-          <span class="font-mono font-bold" id="paymentBalance">B/. 0.00</span>
+          <span class="font-mono font-bold text-yellow-400 text-lg" id="paymentBalance">B/. 0.00</span>
         </div>
       </div>
       <div class="flex gap-3 pt-4">
@@ -1607,9 +1719,9 @@ async function renderCategoryList() {
   const categories = await DB.getAll('categories');
   const container = document.getElementById('categoryList');
   container.innerHTML = categories.map((c, idx) => `
-    <div class="flex justify-between items-center p-3 bg-slate-700/30 rounded-xl">
-      <span>${c.name}</span>
-      <button onclick="deleteCategory('${c.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-500/20">
+    <div class="flex justify-between items-center p-3 bg-slate-800/50 border border-slate-700/50 rounded-xl">
+      <span class="font-medium">${c.name}</span>
+      <button onclick="deleteCategory('${c.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-500/20 transition-colors">
         <i class="fas fa-trash text-xs"></i>
       </button>
     </div>
@@ -1740,7 +1852,7 @@ async function renderProductSelector() {
   container.innerHTML = filtered.map(p => {
     const price = calculatePrice(p);
     return `
-    <div class="flex justify-between items-center p-3 bg-slate-700/30 rounded-xl hover:bg-slate-700/50 cursor-pointer" onclick="addProductToQuote('${p.id}')">
+    <div class="flex justify-between items-center p-3 bg-slate-800/50 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 cursor-pointer transition-colors" onclick="addProductToQuote('${p.id}')">
       <div>
         <div class="font-medium">${p.name}</div>
         <div class="text-xs text-slate-400">${p.category} | SKU: ${p.sku || '-'}</div>
@@ -1780,18 +1892,18 @@ function addProductToQuote(productId) {
 function renderQuoteItems() {
   const container = document.getElementById('quoteItems');
   if (tempQuoteItems.length === 0) {
-    container.innerHTML = '<p class="text-slate-500 text-center py-8">Agrega productos desde el catálogo</p>';
+    container.innerHTML = '<p class="text-slate-500 text-center py-8 border-2 border-dashed border-slate-700 rounded-xl">Agrega productos desde el catálogo</p>';
     return;
   }
   
   container.innerHTML = tempQuoteItems.map((item, idx) => `
-    <div class="item-card rounded-xl p-4 space-y-3">
+    <div class="item-card">
       <div class="flex justify-between items-start">
         <div class="flex-1">
           <input type="text" value="${item.name}" onchange="updateQuoteItem(${idx}, 'name', this.value)" 
-            class="w-full bg-transparent border-b border-slate-600 focus:border-blue-500 focus:outline-none font-medium">
+            class="w-full bg-transparent border-b-2 border-slate-600 focus:border-blue-500 focus:outline-none font-medium text-white pb-1">
         </div>
-        <button onclick="removeQuoteItem(${idx})" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400 ml-2">
+        <button onclick="removeQuoteItem(${idx})" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400 ml-2 transition-colors">
           <i class="fas fa-times"></i>
         </button>
       </div>
@@ -1800,17 +1912,17 @@ function renderQuoteItems() {
         <div>
           <label class="text-xs text-slate-500 block mb-1">Cantidad</label>
           <input type="number" min="1" value="${item.quantity}" onchange="updateQuoteItem(${idx}, 'quantity', this.value)"
-            class="w-full bg-slate-700/50 rounded-lg px-2 py-1 text-center font-mono">
+            class="w-full bg-slate-900/50 border border-slate-600 rounded-lg px-2 py-1 text-center font-mono text-white focus:border-blue-500 focus:outline-none">
         </div>
         <div>
           <label class="text-xs text-slate-500 block mb-1">Precio Unit.</label>
           <input type="number" step="0.01" value="${item.price.toFixed(2)}" onchange="updateQuoteItem(${idx}, 'price', this.value)"
-            class="w-full bg-slate-700/50 rounded-lg px-2 py-1 text-right font-mono">
+            class="w-full bg-slate-900/50 border border-slate-600 rounded-lg px-2 py-1 text-right font-mono text-white focus:border-blue-500 focus:outline-none">
         </div>
         <div class="col-span-2 flex items-end justify-end">
           <div class="text-right">
             <div class="text-xs text-slate-500">Total línea</div>
-            <div class="font-mono font-bold">B/. ${(item.price * item.quantity).toFixed(2)}</div>
+            <div class="font-mono font-bold text-blue-400">B/. ${(item.price * item.quantity).toFixed(2)}</div>
           </div>
         </div>
       </div>
@@ -2036,7 +2148,7 @@ async function renderInvoices() {
   const tbody = document.getElementById('invoicesTable');
   tbody.innerHTML = filtered.map(inv => {
     const client = clients.find(c => c.id === inv.client_id);
-    const balance = (inv.total || 0) - (inv.paid || 0);
+    const balance = inv.total - (inv.paid || 0);
     
     const statusClass = {
       emitido: 'status-emitido',
@@ -2113,7 +2225,7 @@ function openInvoiceProductSelector() {
     container.innerHTML = filtered.map(p => {
       const price = calculatePrice(p);
       return `
-      <div class="flex justify-between items-center p-3 bg-slate-700/30 rounded-xl hover:bg-slate-700/50 cursor-pointer" onclick="addProductToInvoice('${p.id}')">
+      <div class="flex justify-between items-center p-3 bg-slate-800/50 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 cursor-pointer transition-colors" onclick="addProductToInvoice('${p.id}')">
         <div>
           <div class="font-medium">${p.name}</div>
           <div class="text-xs text-slate-400">${p.category} | SKU: ${p.sku || '-'}</div>
@@ -2150,18 +2262,18 @@ function addProductToInvoice(productId) {
 function renderInvoiceItems() {
   const container = document.getElementById('invoiceItems');
   if (tempInvoiceItems.length === 0) {
-    container.innerHTML = '<p class="text-slate-500 text-center py-8">Agrega productos desde el catálogo</p>';
+    container.innerHTML = '<p class="text-slate-500 text-center py-8 border-2 border-dashed border-slate-700 rounded-xl">Agrega productos desde el catálogo</p>';
     return;
   }
   
   container.innerHTML = tempInvoiceItems.map((item, idx) => `
-    <div class="item-card rounded-xl p-4 space-y-3">
+    <div class="item-card">
       <div class="flex justify-between items-start">
         <div class="flex-1">
           <input type="text" value="${item.name}" onchange="updateInvoiceItem(${idx}, 'name', this.value)" 
-            class="w-full bg-transparent border-b border-slate-600 focus:border-blue-500 focus:outline-none font-medium">
+            class="w-full bg-transparent border-b-2 border-slate-600 focus:border-blue-500 focus:outline-none font-medium text-white pb-1">
         </div>
-        <button onclick="removeInvoiceItem(${idx})" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400 ml-2">
+        <button onclick="removeInvoiceItem(${idx})" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400 ml-2 transition-colors">
           <i class="fas fa-times"></i>
         </button>
       </div>
@@ -2170,17 +2282,17 @@ function renderInvoiceItems() {
         <div>
           <label class="text-xs text-slate-500 block mb-1">Cantidad</label>
           <input type="number" min="1" value="${item.quantity}" onchange="updateInvoiceItem(${idx}, 'quantity', this.value)"
-            class="w-full bg-slate-700/50 rounded-lg px-2 py-1 text-center font-mono">
+            class="w-full bg-slate-900/50 border border-slate-600 rounded-lg px-2 py-1 text-center font-mono text-white focus:border-blue-500 focus:outline-none">
         </div>
         <div>
           <label class="text-xs text-slate-500 block mb-1">Precio Unit.</label>
           <input type="number" step="0.01" value="${item.price.toFixed(2)}" onchange="updateInvoiceItem(${idx}, 'price', this.value)"
-            class="w-full bg-slate-700/50 rounded-lg px-2 py-1 text-right font-mono">
+            class="w-full bg-slate-900/50 border border-slate-600 rounded-lg px-2 py-1 text-right font-mono text-white focus:border-blue-500 focus:outline-none">
         </div>
         <div class="col-span-2 flex items-end justify-end">
           <div class="text-right">
             <div class="text-xs text-slate-500">Total línea</div>
-            <div class="font-mono font-bold">B/. ${(item.price * item.quantity).toFixed(2)}</div>
+            <div class="font-mono font-bold text-emerald-400">B/. ${(item.price * item.quantity).toFixed(2)}</div>
           </div>
         </div>
       </div>
@@ -2226,7 +2338,7 @@ async function convertQuoteToInvoice() {
   const quoteId = document.getElementById('convertQuoteSelect').value;
   if (!quoteId) return;
   
-  const quote = await DB.getById('quotes', id);
+  const quote = await DB.getById('quotes', quoteId);
   if (!quote) return;
   
   // Update quote status
@@ -2492,7 +2604,7 @@ async function renderPayments() {
       <td class="text-xs">${p.reference || '-'}</td>
       <td class="text-right font-mono font-bold text-emerald-400">B/. ${p.amount.toFixed(2)}</td>
       <td class="text-right">
-        <button onclick="deletePayment('${p.id}')" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400">
+        <button onclick="deletePayment('${p.id}')" class="w-8 h-8 rounded-lg hover:bg-red-500/20 text-red-400 transition-colors">
           <i class="fas fa-trash"></i>
         </button>
       </td>

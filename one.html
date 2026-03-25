@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>A3 Solution ERP | Sistema Administrativo</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+* { 
+  -webkit-tap-highlight-color: transparent; 
+  box-sizing: border-box; 
+}
+
+body { 
+  font-family: 'Inter', sans-serif; 
+  overscroll-behavior: none; 
+  background: #0f172a; 
+  color: #f1f5f9; 
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Login Screen */
+#authScreen { 
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%); 
+  min-height: 100vh;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.glass-panel {
+  background: rgba(30, 41, 59, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Sidebar - Fixed positioning correcta */
+.sidebar { 
+  position: fixed;
+  left: 0;
+  top: 64px; /* Altura del header */
+  bottom: 0;
+  width: 260px;
+  background: rgba(15, 23, 42, 0.98);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255,255,255,0.1);
+  z-index: 30;
+  transform: translateX(-100%); 
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar.open { 
+  transform: translateX(0); 
+}
+
+@media (min-width: 1024px) { 
+  .sidebar { 
+    transform: translateX(0); 
+  }
+  main {
+    margin-left: 260px;
+  }
+}
+
+/* Header fijo correcto */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(15, 23, 42, 0.98);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+}
+
+/* Main content con padding correcto */
+main {
+  padding-top: 80px; /* 64px header + 16px gap */
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 2rem;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+  main {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn { 
+  from { opacity: 0; transform: translateY(10px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
+
+.fade-in { 
+  animation: fadeIn 0.3s ease-out; 
+}
+
+/* Módulos - Display control */
+.module { 
+  display: none;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.module.active { 
+  display: block; 
+}
+
+/* Inputs con contraste CORREGIDO */
+input, select, textarea {
+  background: #1e293b;
+  border: 2px solid #475569;
+  color: #ffffff !important;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #0f172a;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+input::placeholder, textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Fix para autofill de navegador */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0px 1000px #1e293b inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Select options */
+select option {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+/* Botones */
+.btn-primary { 
+  background: linear-gradient(135deg, #2563eb, #3b82f6); 
+  color: white; 
+  padding: 0.75rem 1.5rem; 
+  border-radius: 0.75rem; 
+  font-weight: 600; 
+  border: none; 
+  cursor: pointer; 
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover { 
+  transform: translateY(-2px); 
+  box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4); 
+}
+
+.btn-secondary { 
+  background: rgba(255,255,255,0.1); 
+  color: white; 
+  padding: 0.75rem 1.5rem; 
+  border-radius: 0.75rem; 
+  border: 1px solid rgba(255,255,255,0.2); 
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.btn-danger { 
+  background: linear-gradient(135deg, #dc2626, #ef4444); 
+  color: white; 
+  padding: 0.5rem 1rem; 
+  border-radius: 0.5rem; 
+  border: none; 
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-danger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
+.btn-success { 
+  background: linear-gradient(135deg, #059669, #10b981); 
+  color: white; 
+  padding: 0.5rem 1rem; 
+  border-radius: 0.5rem; 
+  border: none; 
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
+}
+
+/* Cards */
+.card { 
+  background: rgba(30, 41, 59, 0.6); 
+  border: 1px solid rgba(255,255,255,0.1); 
+  border-radius: 1rem; 
+  padding: 1.5rem; 
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3);
+}
+
+/* Tablas */
+.data-table { 
+  width: 100%; 
+  border-collapse: collapse; 
+}
+
+.data-table th { 
+  text-align: left; 
+  padding: 0.875rem 0.75rem; 
+  font-size: 0.75rem; 
+  text-transform: uppercase; 
+  color: #94a3b8; 
+  border-bottom: 1px solid #334155;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.data-table td { 
+  padding: 0.875rem 0.75rem; 
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.875rem;
+  vertical-align: middle;
+}
+
+.data-table tr:hover td {
+  background: rgba(255,255,255,0.02);
+}
+
+/* Badges */
+.badge { 
+  padding: 0.25rem 0.75rem; 
+  border-radius: 9999px; 
+  font-size: 0.75rem; 
+  font-weight: 600;
+  display: inline-block;
+}
+
+.badge-admin { 
+  background: rgba(239, 68, 68, 0.2); 
+  color: #ef4444; 
+  border: 1px solid rgba(239, 68, 68, 0.3); 
+}
+
+.badge-user { 
+  background: rgba(59, 130, 246, 0.2); 
+  color: #60a5fa; 
+  border: 1px solid rgba(59, 130, 246, 0.3); 
+}
+
+/* Modales - Centrado perfecto */
+.modal-overlay { 
+  position: fixed; 
+  inset: 0; 
+  background: rgba(0,0,0,0.8); 
+  backdrop-filter: blur(5px); 
+  z-index: 50; 
+  display: none; 
+  align-items: center; 
+  justify-content: center; 
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.modal-overlay.active { 
+  display: flex; 
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Utilidades de texto */
+.text-gradient {
+  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Grid de stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Asegurar que el contenido no se tape */
+.content-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix para móviles */
+@media (max-width: 640px) {
+  .card {
+    padding: 1rem;
+  }
+  
+  .data-table {
+    font-size: 0.875rem;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 0.625rem 0.5rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- LOGIN SCREEN -->
+<!-- ============================================ -->
+<div id="authScreen">
+  <div class="w-full max-w-md fade-in">
+    
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto mb-4 flex items-center justify-center text-3xl font-black shadow-2xl text-white">
+        A3
+      </div>
+      <h1 class="text-3xl font-bold text-white mb-2">A3 Solution ERP</h1>
+      <p class="text-blue-200">Sistema de Gestión Administrativa</p>
+    </div>
+
+    <!-- Login Form -->
+    <div class="glass-panel rounded-2xl p-8">
+      <h2 class="text-xl font-semibold mb-6 text-center text-white">Iniciar Sesión</h2>
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-2 text-slate-300">Usuario</label>
+          <input type="text" id="loginUsername" required placeholder="Nombre de usuario" autocomplete="username">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2 text-slate-300">Contraseña</label>
+          <input type="password" id="loginPassword" required placeholder="Contraseña" autocomplete="current-password">
+        </div>
+        <div id="loginError" class="text-red-400 text-sm hidden bg-red-500/10 p-3 rounded-lg border border-red-500/20"></div>
+        <button type="submit" class="btn-primary w-full mt-6">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>Ingresar al Sistema</span>
+        </button>
+      </form>
+      
+      <div class="mt-6 text-center text-xs text-slate-400 space-y-1">
+        <p>Sistema Privado • Acceso Restringido</p>
+        <p>Usuario demo: <strong class="text-slate-300">admin</strong> / Pass: <strong class="text-slate-300">admin123</strong></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MAIN APPLICATION -->
+<!-- ============================================ -->
+<div id="mainApp" class="hidden">
+
+  <!-- Header -->
+  <header>
+    <div class="flex items-center gap-4">
+      <button onclick="UI.toggleSidebar()" class="lg:hidden w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center border border-slate-700 hover:bg-slate-700 transition-colors">
+        <i class="fas fa-bars text-slate-300"></i>
+      </button>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center font-black shadow-lg text-white text-lg">
+          A3
+        </div>
+        <div>
+          <h1 class="font-bold leading-tight text-white">A3 Solution</h1>
+          <p class="text-xs text-slate-400" id="headerCompanyName">Empresa</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <!-- Admin Badge -->
+      <span id="adminBadge" class="hidden badge badge-admin">
+        <i class="fas fa-shield-alt mr-1"></i>ADMIN
+      </span>
+      
+      <!-- Impersonating Warning -->
+      <div id="impersonateBadge" class="hidden bg-yellow-500/20 text-yellow-300 px-3 py-1.5 rounded-full text-xs border border-yellow-500/30 flex items-center gap-2">
+        <i class="fas fa-user-secret"></i>
+        <span>Viendo como: <strong id="impersonateName" class="text-yellow-200"></strong></span>
+        <button onclick="Auth.stopImpersonating()" class="ml-1 text-yellow-300 hover:text-white transition-colors">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="hidden md:flex items-center gap-2 text-sm text-slate-300 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
+        <i class="fas fa-user-circle text-blue-400 text-lg"></i>
+        <span id="currentUserDisplay" class="font-medium">Usuario</span>
+      </div>
+      
+      <button onclick="Auth.logout()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center transition-all border border-slate-700 text-slate-400" title="Cerrar Sesión">
+        <i class="fas fa-power-off"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <nav class="p-4 space-y-1">
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-4 mt-2">
+        Menú Principal
+      </div>
+      
+      <button onclick="router.navigate('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left text-slate-300 hover:text-white" data-route="dashboard">
+        <i class="fas fa-chart-line w-5 text-center text-blue-400"></i>
+        <span class="font-medium">Dashboard</span>
+      </button>
+      
+      <button onclick="router.navigate('clients')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left text-slate-300 hover:text-white" data-route="clients">
+        <i class="fas fa-users w-5 text-center text-emerald-400"></i>
+        <span class="font-medium">Clientes</span>
+      </button>
+      
+      <button onclick="router.navigate('catalog')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left text-slate-300 hover:text-white" data-route="catalog">
+        <i class="fas fa-boxes w-5 text-center text-purple-400"></i>
+        <span class="font-medium">Catálogo</span>
+      </button>
+
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-4 mt-6">
+        Documentos
+      </div>
+      
+      <button onclick="router.navigate('quotes')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left text-slate-300 hover:text-white" data-route="quotes">
+        <i class="fas fa-file-invoice-dollar w-5 text-center text-yellow-400"></i>
+        <span class="font-medium">Cotizaciones</span>
+      </button>
+      
+      <button onclick="router.navigate('invoices')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left text-slate-300 hover:text-white" data-route="invoices">
+        <i class="fas fa-file-invoice w-5 text-center text-pink-400"></i>
+        <span class="font-medium">Facturas</span>
+      </button>
+      
+      <button onclick="router.navigate('payments')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left text-slate-300 hover:text-white" data-route="payments">
+        <i class="fas fa-credit-card w-5 text-center text-cyan-400"></i>
+        <span class="font-medium">Pagos</span>
+      </button>
+
+      <!-- ADMIN ONLY MENU -->
+      <div id="adminMenuSection" class="hidden">
+        <div class="text-xs font-bold text-red-400 uppercase tracking-wider mb-3 px-4 mt-6 flex items-center gap-2">
+          <i class="fas fa-lock text-xs"></i>
+          Administración
+        </div>
+        
+        <button onclick="router.navigate('users')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left border border-red-500/20 text-slate-300 hover:text-white mb-1" data-route="users">
+          <i class="fas fa-user-shield w-5 text-center text-red-400"></i>
+          <span class="font-medium">Gestión Usuarios</span>
+        </button>
+        
+        <button onclick="router.navigate('all-data')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left border border-red-500/20 text-slate-300 hover:text-white" data-route="all-data">
+          <i class="fas fa-database w-5 text-center text-red-400"></i>
+          <span class="font-medium">Ver Todos los Datos</span>
+        </button>
+      </div>
+
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-4 mt-6">
+        Sistema
+      </div>
+      
+      <button onclick="router.navigate('settings')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-all text-left text-slate-300 hover:text-white" data-route="settings">
+        <i class="fas fa-cog w-5 text-center text-slate-400"></i>
+        <span class="font-medium">Configuración</span>
+      </button>
+    </nav>
+    
+    <!-- Footer sidebar -->
+    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-800">
+      <div class="text-xs text-slate-600 text-center">
+        A3 Solution ERP v1.0
+      </div>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="content-wrapper">
+    
+    <!-- DASHBOARD -->
+    <div id="module-dashboard" class="module space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Dashboard</h2>
+          <p class="text-slate-400 text-sm mt-1" id="dashboardDate"></p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="router.navigate('quotes'); setTimeout(() => quotesModule.openModal(), 100)" class="btn-primary text-sm">
+            <i class="fas fa-plus"></i>
+            <span class="hidden sm:inline">Nueva Cotización</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="stats-grid" id="dashboardStats"></div>
+      
+      <div class="grid lg:grid-cols-2 gap-6">
+        <div class="card">
+          <h3 class="font-bold text-lg mb-4 text-white flex items-center gap-2">
+            <i class="fas fa-chart-pie text-blue-400"></i>
+            Resumen Mensual
+          </h3>
+          <div id="monthlySummary" class="space-y-3"></div>
+        </div>
+        
+        <div class="card">
+          <h3 class="font-bold text-lg mb-4 text-white flex items-center gap-2">
+            <i class="fas fa-bolt text-yellow-400"></i>
+            Acciones Rápidas
+          </h3>
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="router.navigate('quotes'); setTimeout(() => quotesModule.openModal(), 100)" class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 transition-all text-left group">
+              <i class="fas fa-file-invoice-dollar text-blue-400 text-2xl mb-2 group-hover:scale-110 transition-transform"></i>
+              <div class="font-medium text-white">Nueva Cotización</div>
+              <div class="text-xs text-slate-400 mt-1">Crear presupuesto</div>
+            </button>
+            <button onclick="router.navigate('invoices'); setTimeout(() => invoicesModule.openModal(), 100)" class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-left group">
+              <i class="fas fa-file-invoice text-emerald-400 text-2xl mb-2 group-hover:scale-110 transition-transform"></i>
+              <div class="font-medium text-white">Nueva Factura</div>
+              <div class="text-xs text-slate-400 mt-1">Emitir factura</div>
+            </button>
+            <button onclick="router.navigate('clients'); setTimeout(() => clientsModule.openModal(), 100)" class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all text-left group">
+              <i class="fas fa-user-plus text-purple-400 text-2xl mb-2 group-hover:scale-110 transition-transform"></i>
+              <div class="font-medium text-white">Nuevo Cliente</div>
+              <div class="text-xs text-slate-400 mt-1">Agregar contacto</div>
+            </button>
+            <button onclick="router.navigate('catalog'); setTimeout(() => catalogModule.openModal(), 100)" class="p-4 rounded-xl bg-pink-500/10 border border-pink-500/20 hover:bg-pink-500/20 transition-all text-left group">
+              <i class="fas fa-box-open text-pink-400 text-2xl mb-2 group-hover:scale-110 transition-transform"></i>
+              <div class="font-medium text-white">Nuevo Producto</div>
+              <div class="text-xs text-slate-400 mt-1">Agregar al catálogo</div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div id="module-clients" class="module space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Clientes</h2>
+          <p class="text-slate-400 text-sm">Gestión de contactos y empresas</p>
+        </div>
+        <button onclick="clientsModule.openModal()" class="btn-primary">
+          <i class="fas fa-plus"></i>
+          <span>Nuevo Cliente</span>
+        </button>
+      </div>
+      
+      <div class="card">
+        <div class="mb-4">
+          <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+            <input type="text" id="clientSearch" placeholder="Buscar cliente por nombre o RUC..." oninput="clientsModule.render()" 
+              class="pl-10 bg-slate-800 border-slate-700 text-white placeholder-slate-500">
+          </div>
+        </div>
+        <div class="overflow-x-auto -mx-4 px-4">
+          <table class="data-table min-w-full">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>RUC/CIU</th>
+                <th>Contacto</th>
+                <th class="text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="clientsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATALOG -->
+    <div id="module-catalog" class="module space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Catálogo de Productos</h2>
+          <p class="text-slate-400 text-sm">Inventario y servicios</p>
+        </div>
+        <button onclick="catalogModule.openModal()" class="btn-primary">
+          <i class="fas fa-plus"></i>
+          <span>Nuevo Producto</span>
+        </button>
+      </div>
+      
+      <div class="card">
+        <div class="mb-4">
+          <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+            <input type="text" id="productSearch" placeholder="Buscar producto..." oninput="catalogModule.render()" 
+              class="pl-10 bg-slate-800 border-slate-700 text-white placeholder-slate-500">
+          </div>
+        </div>
+        <div class="overflow-x-auto -mx-4 px-4">
+          <table class="data-table min-w-full">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Precio Venta</th>
+                <th>Stock</th>
+                <th class="text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="catalogTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUOTES -->
+    <div id="module-quotes" class="module space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Cotizaciones</h2>
+          <p class="text-slate-400 text-sm">Presupuestos y propuestas</p>
+        </div>
+        <button onclick="quotesModule.openModal()" class="btn-primary">
+          <i class="fas fa-plus"></i>
+          <span>Nueva Cotización</span>
+        </button>
+      </div>
+      
+      <div class="card">
+        <div class="overflow-x-auto -mx-4 px-4">
+          <table class="data-table min-w-full">
+            <thead>
+              <tr>
+                <th>Número</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th class="text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="quotesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVOICES -->
+    <div id="module-invoices" class="module space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Facturas</h2>
+          <p class="text-slate-400 text-sm">Facturación y cobros</p>
+        </div>
+        <button onclick="invoicesModule.openModal()" class="btn-primary">
+          <i class="fas fa-plus"></i>
+          <span>Nueva Factura</span>
+        </button>
+      </div>
+      
+      <div class="card">
+        <div class="overflow-x-auto -mx-4 px-4">
+          <table class="data-table min-w-full">
+            <thead>
+              <tr>
+                <th>Número</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th class="text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="invoicesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS (Placeholder) -->
+    <div id="module-payments" class="module space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Pagos</h2>
+          <p class="text-slate-400 text-sm">Registro de pagos recibidos</p>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="text-center py-12 text-slate-500">
+          <i class="fas fa-credit-card text-4xl mb-4 opacity-50"></i>
+          <p>Módulo de pagos en desarrollo</p>
+          <p class="text-sm mt-2">Los pagos se registran desde el módulo de Facturas</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN: USER MANAGEMENT -->
+    <div id="module-users" class="module space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-red-400 flex items-center gap-2">
+            <i class="fas fa-user-shield"></i>
+            Gestión de Usuarios
+          </h2>
+          <p class="text-slate-400 text-sm">Administración de cuentas y accesos</p>
+        </div>
+        <button onclick="adminModule.openCreateUserModal()" class="btn-primary bg-gradient-to-r from-red-600 to-red-500">
+          <i class="fas fa-plus"></i>
+          <span>Crear Usuario</span>
+        </button>
+      </div>
+      
+      <div class="card border-red-500/20 bg-red-950/10">
+        <div class="overflow-x-auto -mx-4 px-4">
+          <table class="data-table min-w-full">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Empresa</th>
+                <th>Rol</th>
+                <th>Creado</th>
+                <th class="text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card bg-blue-900/20 border-blue-500/30">
+        <h3 class="font-bold mb-2 text-blue-400 flex items-center gap-2">
+          <i class="fas fa-info-circle"></i>
+          Información de Administrador
+        </h3>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          Como administrador, puedes ver y modificar los datos de cualquier usuario. 
+          Usa <strong>"Ver como Usuario"</strong> para ingresar a su cuenta sin necesidad de su contraseña 
+          (útil para soporte y auditoría). Los usuarios normales no ven esta sección ni saben 
+          de la existencia de otros usuarios.
+        </p>
+      </div>
+    </div>
+
+    <!-- ADMIN: ALL DATA VIEW -->
+    <div id="module-all-data" class="module space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-red-400 flex items-center gap-2">
+            <i class="fas fa-database"></i>
+            Visor Global de Datos
+          </h2>
+          <p class="text-slate-400 text-sm">Dashboard consolidado de todos los usuarios</p>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <button onclick="adminModule.loadUserData('all')" class="card hover:bg-slate-700/50 transition-all text-left border-l-4 border-blue-500 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-2xl font-bold text-blue-400 group-hover:scale-105 transition-transform">Todos</div>
+              <div class="text-sm text-slate-400">Ver resumen global</div>
+            </div>
+            <i class="fas fa-globe text-slate-600 text-2xl"></i>
+          </div>
+        </button>
+        <div id="userDataButtons" class="contents"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="font-bold mb-4 text-lg text-white" id="dataViewTitle">Selecciona un usuario para ver sus datos</h3>
+        <div id="globalDataView" class="space-y-4">
+          <div class="text-center py-12 text-slate-500">
+            <i class="fas fa-mouse-pointer text-4xl mb-4 opacity-50"></i>
+            <p>Selecciona un usuario arriba para visualizar su información detallada</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="module-settings" class="module space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Configuración</h2>
+          <p class="text-slate-400 text-sm">Ajustes del sistema y empresa</p>
+        </div>
+      </div>
+      
+      <div class="grid lg:grid-cols-2 gap-6">
+        <div class="card space-y-4">
+          <h3 class="font-bold text-lg text-white flex items-center gap-2">
+            <i class="fas fa-building text-blue-400"></i>
+            Datos de la Empresa
+          </h3>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Nombre de la Empresa</label>
+              <input type="text" id="settingCompanyName" placeholder="Mi Empresa S.A.">
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">RUC</label>
+              <input type="text" id="settingCompanyRUC" placeholder="RUC o identificación fiscal">
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Dirección</label>
+              <textarea id="settingCompanyAddress" rows="3" placeholder="Dirección completa"></textarea>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card space-y-4">
+          <h3 class="font-bold text-lg text-white flex items-center gap-2">
+            <i class="fas fa-cogs text-purple-400"></i>
+            Parámetros del Sistema
+          </h3>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Prefijo Cotizaciones</label>
+              <input type="text" id="settingPrefixQuotes" placeholder="COT-" value="COT-">
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Prefijo Facturas</label>
+              <input type="text" id="settingPrefixInvoices" placeholder="FAC-" value="FAC-">
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Tasa de Impuesto (%)</label>
+              <input type="number" id="settingTaxRate" placeholder="7" value="7" step="0.01">
+            </div>
+          </div>
+          <button onclick="settingsModule.save()" class="btn-primary w-full mt-4">
+            <i class="fas fa-save"></i>
+            Guardar Configuración
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Container para modales dinámicos -->
+<div id="modalsContainer"></div>
+
+<!-- ============================================ -->
+<!-- SCRIPTS - Carga de módulos -->
+<!-- ============================================ -->
+<script src="database.js"></script>
+<script src="auth.js"></script>
+<script src="ui.js"></script>
+<script src="router.js"></script>
+<script src="dashboard.js"></script>
+<script src="clients.js"></script>
+<script src="catalog.js"></script>
+<script src="quotes.js"></script>
+<script src="invoices.js"></script>
+<script src="settings.js"></script>
+<script src="admin.js"></script>
+
+<script>
+// ============================================
+// APP INITIALIZATION
+// ============================================
+
+function init() {
+  // Crear admin por defecto si no existe
+  Auth.initDefaultAdmin();
+
+  // Verificar sesión activa
+  if (Auth.getCurrentUser()) {
+    showMainApp();
+  } else {
+    document.getElementById('authScreen').classList.remove('hidden');
+    document.getElementById('mainApp').classList.add('hidden');
+  }
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  
+  const result = Auth.login(username, password);
+  
+  if (result.success) {
+    showMainApp();
+  } else {
+    const errorEl = document.getElementById('loginError');
+    errorEl.textContent = result.error;
+    errorEl.classList.remove('hidden');
+  }
+}
+
+function showMainApp() {
+  const user = Auth.getCurrentUser();
+  
+  // Ocultar login, mostrar app
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  
+  // Configurar UI según rol
+  if (Auth.isAdmin()) {
+    document.getElementById('adminMenuSection').classList.remove('hidden');
+    document.getElementById('adminBadge').classList.remove('hidden');
+  }
+  
+  // Si está impersonando
+  if (Auth.isImpersonating()) {
+    const targetId = sessionStorage.getItem('a3_impersonate_user_id');
+    const targetUser = Auth.getUsers().find(u => u.id === targetId);
+    document.getElementById('impersonateBadge').classList.remove('hidden');
+    document.getElementById('impersonateName').textContent = targetUser?.username || 'Usuario';
+  }
+  
+  // Actualizar info de usuario
+  document.getElementById('currentUserDisplay').textContent = user.username;
+  document.getElementById('headerCompanyName').textContent = user.company_name;
+  
+  // Navegar al dashboard
+  router.navigate('dashboard');
+}
+
+// Iniciar aplicación
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A3 Solution - Control Central</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #0f172a; color: #f1f5f9; }
+.sidebar { position: fixed; left: 0; top: 64px; bottom: 0; width: 260px; background: #1e293b; border-right: 1px solid #334155; overflow-y: auto; z-index: 40; }
+.main-content { margin-left: 260px; padding: 2rem; padding-top: 80px; min-height: 100vh; }
+.card { background: #1e293b; border: 1px solid #334155; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 1rem; }
+input, select, textarea { 
+  background: #0f172a; 
+  border: 1px solid #475569; 
+  color: #fff; 
+  padding: 0.5rem 0.75rem; 
+  border-radius: 0.5rem; 
+  width: 100%; 
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: #3b82f6; }
+input::placeholder { color: #64748b; }
+.btn-primary { background: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; border: none; cursor: pointer; font-weight: 500; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-secondary { background: #334155; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; border: none; cursor: pointer; }
+.btn-danger { background: #dc2626; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; border: none; cursor: pointer; }
+.nav-btn { width: 100%; text-align: left; padding: 0.75rem 1rem; border-radius: 0.5rem; color: #94a3b8; border: none; background: transparent; cursor: pointer; margin-bottom: 0.25rem; }
+.nav-btn:hover, .nav-btn.active { background: #334155; color: white; }
+.hidden { display: none !important; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #334155; font-size: 0.875rem; }
+th { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 50; display: none; align-items: center; justify-content: center; padding: 1rem; }
+.modal.active { display: flex; }
+.alert { padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+.alert-error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; }
+.alert-success { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; }
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<header style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: #0f172a; border-bottom: 1px solid #334155; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem;">
+  <div style="display: flex; align-items: center; gap: 1rem;">
+    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #ef4444, #f97316); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+      <i class="fas fa-shield-alt"></i>
+    </div>
+    <div>
+      <h1 style="font-size: 1.125rem; font-weight: 700;">Control Central</h1>
+      <p style="font-size: 0.75rem; color: #94a3b8;">Administración del Sistema</p>
+    </div>
+  </div>
+  <div style="display: flex; align-items: center; gap: 1rem;">
+    <span style="background: rgba(239, 68, 68, 0.2); color: #f87171; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">
+      <i class="fas fa-crown mr-1"></i>ADMIN
+    </span>
+    <button onclick="logout()" style="background: #334155; color: white; border: none; width: 36px; height: 36px; border-radius: 0.5rem; cursor: pointer;">
+      <i class="fas fa-power-off"></i>
+    </button>
+  </div>
+</header>
+
+<aside class="sidebar" id="sidebar">
+  <nav style="padding: 1rem;">
+    <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem; padding: 0 0.75rem;">Gestión</div>
+    <button onclick="showSection('tenants')" class="nav-btn active" data-section="tenants">
+      <i class="fas fa-building mr-2"></i> Empresas / Usuarios
+    </button>
+    <button onclick="showSection('create')" class="nav-btn" data-section="create">
+      <i class="fas fa-user-plus mr-2"></i> Nuevo Usuario
+    </button>
+    
+    <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 600; margin: 1.5rem 0 0.5rem; padding: 0 0.75rem;">Sistema</div>
+    <button onclick="window.open('./erp.html', '_blank')" class="nav-btn">
+      <i class="fas fa-external-link-alt mr-2"></i> Ver como Usuario
+    </button>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <div id="alertContainer"></div>
+
+  <!-- Sección: Lista -->
+  <div id="section-tenants" class="section-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <div>
+        <h2 style="font-size: 1.5rem; font-weight: 700;">Gestión de Empresas</h2>
+        <p style="color: #64748b; font-size: 0.875rem;">Administra usuarios y accesos</p>
+      </div>
+      <input type="text" id="searchTenant" placeholder="Buscar empresa..." style="width: 250px;" onkeyup="filterTenants()">
+    </div>
+
+    <div id="tenantsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
+      <p style="color: #64748b; grid-column: 1/-1; text-align: center; padding: 3rem;">Cargando...</p>
+    </div>
+  </div>
+
+  <!-- Sección: Crear -->
+  <div id="section-create" class="section-content hidden" style="max-width: 800px;">
+    <div class="card">
+      <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">
+        <i class="fas fa-user-plus" style="color: #10b981;"></i> Crear Nuevo Usuario
+      </h2>
+      
+      <form id="createTenantForm" onsubmit="handleCreateTenant(event)">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="color: #94a3b8; font-size: 0.875rem;">Email *</label>
+            <input type="email" name="email" required placeholder="empresa@correo.com">
+          </div>
+          <div>
+            <label style="color: #94a3b8; font-size: 0.875rem;">Contraseña *</label>
+            <input type="password" name="password" required placeholder="Mínimo 6 caracteres" minlength="6">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="color: #94a3b8; font-size: 0.875rem;">Nombre de Usuario *</label>
+            <input type="text" name="username" required placeholder="Administrador">
+          </div>
+          <div>
+            <label style="color: #94a3b8; font-size: 0.875rem;">Empresa *</label>
+            <input type="text" name="company_name" required placeholder="Empresa S.A.">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="color: #94a3b8; font-size: 0.875rem;">RUC</label>
+            <input type="text" name="company_ruc" placeholder="000000000-0-00">
+          </div>
+          <div>
+            <label style="color: #94a3b8; font-size: 0.875rem;">Teléfono</label>
+            <input type="text" name="company_phone" placeholder="+507 0000-0000">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="color: #94a3b8; font-size: 0.875rem;">Dirección</label>
+          <textarea name="company_address" rows="2" placeholder="Dirección completa"></textarea>
+        </div>
+
+        <div style="border-top: 1px solid #334155; padding-top: 1rem; margin-bottom: 1rem;">
+          <label style="color: #94a3b8; font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">Logo (Opcional)</label>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div id="logoPreview" style="width: 100px; height: 100px; background: #0f172a; border: 2px dashed #475569; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+              <i class="fas fa-image" style="color: #475569; font-size: 1.5rem;"></i>
+            </div>
+            <div>
+              <input type="file" id="logoInput" accept="image/*" style="display: none;" onchange="previewLogo(this)">
+              <button type="button" onclick="document.getElementById('logoInput').click()" class="btn-secondary" style="margin-bottom: 0.5rem;">
+                <i class="fas fa-upload mr-1"></i> Seleccionar Logo
+              </button>
+              <p style="font-size: 0.75rem; color: #64748b;">PNG, JPG. Máx 2MB. Puede agregarlo luego.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+          <button type="submit" class="btn-primary" style="flex: 1; background: #059669;">
+            <i class="fas fa-save mr-1"></i> Crear Usuario
+          </button>
+          <button type="button" onclick="resetForm()" class="btn-secondary">Limpiar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<!-- Modal Editar -->
+<div id="editModal" class="modal">
+  <div class="card" style="width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: #60a5fa;">Editar Empresa</h3>
+    <form id="editTenantForm">
+      <input type="hidden" name="user_id">
+      <div style="margin-bottom: 1rem;">
+        <label style="color: #94a3b8; font-size: 0.875rem;">Nombre de Empresa</label>
+        <input type="text" name="company_name" required>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label style="color: #94a3b8; font-size: 0.875rem;">RUC</label>
+          <input type="text" name="company_ruc">
+        </div>
+        <div>
+          <label style="color: #94a3b8; font-size: 0.875rem;">Teléfono</label>
+          <input type="text" name="company_phone">
+        </div>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <label style="color: #94a3b8; font-size: 0.875rem;">Dirección</label>
+        <textarea name="company_address" rows="2"></textarea>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <button type="button" onclick="saveEditTenant()" class="btn-primary" style="flex: 1;">Guardar</button>
+        <button type="button" onclick="closeEditModal()" class="btn-secondary">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const CONFIG = {
+  SUPABASE_URL: 'https://fzlrjfebfodeptkynuuy.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6bHJqZmViZm9kZXB0a3ludXV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTYwODMsImV4cCI6MjA5MDAzMjA4M30.cPStv8NMccBSLKEJ8LqkwoZ3wLB8volzE0jMVL6No_I'
+};
+
+const supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+let currentTenants = [];
+let currentLogoFile = null;
+
+// Verificación de acceso
+window.addEventListener('DOMContentLoaded', async () => {
+  const session = JSON.parse(sessionStorage.getItem('a3_session') || '{}');
+  
+  if (!session.user_id || session.role !== 'admin') {
+    window.location.href = './one.html';
+    return;
+  }
+  
+  await loadTenants();
+});
+
+function showAlert(message, type = 'error') {
+  const container = document.getElementById('alertContainer');
+  const alert = document.createElement('div');
+  alert.className = `alert alert-${type}`;
+  alert.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'} mr-2"></i>${message}`;
+  container.appendChild(alert);
+  setTimeout(() => alert.remove(), 5000);
+}
+
+function showSection(section) {
+  document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+  document.getElementById(`section-${section}`).classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`[data-section="${section}"]`)?.classList.add('active');
+}
+
+function logout() {
+  sessionStorage.clear();
+  supabaseClient.auth.signOut().then(() => {
+    window.location.href = './one.html?logout=1';
+  });
+}
+
+async function loadTenants() {
+  try {
+    const { data: profiles, error } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .neq('role', 'admin')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    currentTenants = profiles || [];
+    renderTenants();
+  } catch (error) {
+    showAlert('Error cargando usuarios: ' + error.message);
+  }
+}
+
+function renderTenants() {
+  const container = document.getElementById('tenantsGrid');
+  const search = document.getElementById('searchTenant')?.value?.toLowerCase() || '';
+  
+  const filtered = currentTenants.filter(t => 
+    (t.company_name?.toLowerCase() || '').includes(search) ||
+    (t.username?.toLowerCase() || '').includes(search)
+  );
+  
+  container.innerHTML = filtered.map(t => `
+    <div class="card" style="transition: all 0.2s;">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div style="width: 48px; height: 48px; background: #0f172a; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            ${t.logo_url 
+              ? `<img src="${t.logo_url}" style="width: 100%; height: 100%; object-fit: cover;">` 
+              : '<i class="fas fa-building" style="color: #475569;"></i>'}
+          </div>
+          <div>
+            <h3 style="font-weight: 600;">${t.company_name || 'Sin nombre'}</h3>
+            <p style="font-size: 0.75rem; color: #64748b;">${t.username}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 1rem;">
+        <div>${t.email || 'Sin email'}</div>
+        <div style="margin-top: 0.25rem;">Creado: ${new Date(t.created_at).toLocaleDateString()}</div>
+      </div>
+      
+      <div style="display: flex; gap: 0.5rem;">
+        <button onclick="impersonateUser('${t.id}')" style="flex: 1; background: #059669; color: white; border: none; padding: 0.5rem; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
+          <i class="fas fa-eye mr-1"></i> Ver ERP
+        </button>
+        <button onclick="editTenant('${t.id}')" style="background: #334155; color: white; border: none; padding: 0.5rem 0.75rem; border-radius: 0.375rem; cursor: pointer;">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button onclick="deleteTenant('${t.id}')" style="background: #dc2626; color: white; border: none; padding: 0.5rem 0.75rem; border-radius: 0.375rem; cursor: pointer;">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `).join('') || '<p style="color: #64748b; grid-column: 1/-1; text-align: center; padding: 3rem;">No hay usuarios registrados</p>';
+}
+
+function filterTenants() {
+  renderTenants();
+}
+
+function previewLogo(input) {
+  if (input.files && input.files[0]) {
+    currentLogoFile = input.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('logoPreview').innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function resetForm() {
+  document.getElementById('createTenantForm').reset();
+  currentLogoFile = null;
+  document.getElementById('logoPreview').innerHTML = '<i class="fas fa-building" style="color: #475569; font-size: 1.5rem;"></i>';
+}
+
+async function uploadLogo(file, userId) {
+  try {
+    // Intentar crear bucket si no existe (ignorar error si ya existe)
+    try {
+      await supabaseClient.storage.createBucket('logos', { public: true });
+    } catch (e) {
+      // Bucket ya existe o no tenemos permisos, continuar
+    }
+    
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId}-${Date.now()}.${fileExt}`;
+    
+    const { data, error } = await supabaseClient
+      .storage
+      .from('logos')
+      .upload(fileName, file, { upsert: true });
+    
+    if (error) throw error;
+    
+    const { data: { publicUrl } } = supabaseClient
+      .storage
+      .from('logos')
+      .getPublicUrl(fileName);
+      
+    return publicUrl;
+  } catch (error) {
+    console.error('Error subiendo logo:', error);
+    showAlert('No se pudo subir el logo, pero el usuario se creará sin él');
+    return null;
+  }
+}
+
+async function handleCreateTenant(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = form.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Creando...';
+  
+  try {
+    // 1. Crear usuario en Auth
+    const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+      email: form.email.value,
+      password: form.password.value,
+      options: {
+        data: {
+          username: form.username.value,
+          company_name: form.company_name.value
+        }
+      }
+    });
+    
+    if (authError) {
+      if (authError.message.includes('already registered')) {
+        throw new Error('Este email ya está registrado');
+      }
+      throw authError;
+    }
+    
+    if (!authData.user) throw new Error('No se pudo crear el usuario');
+    
+    // 2. Subir logo si existe (opcional)
+    let logoUrl = null;
+    if (currentLogoFile) {
+      logoUrl = await uploadLogo(currentLogoFile, authData.user.id);
+    }
+    
+    // 3. Actualizar perfil con datos adicionales
+    const { error: updateError } = await supabaseClient
+      .from('profiles')
+      .update({
+        company_ruc: form.company_ruc.value,
+        company_phone: form.company_phone.value,
+        company_address: form.company_address.value,
+        logo_url: logoUrl,
+        email: form.email.value // Asegurar que el email esté en el perfil
+      })
+      .eq('id', authData.user.id);
+    
+    if (updateError) throw updateError;
+    
+    showAlert('Usuario creado exitosamente', 'success');
+    resetForm();
+    loadTenants();
+    showSection('tenants');
+    
+  } catch (error) {
+    showAlert(error.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save mr-1"></i> Crear Usuario';
+  }
+}
+
+function editTenant(userId) {
+  const tenant = currentTenants.find(t => t.id === userId);
+  if (!tenant) return;
+  
+  const form = document.getElementById('editTenantForm');
+  form.user_id.value = tenant.id;
+  form.company_name.value = tenant.company_name || '';
+  form.company_ruc.value = tenant.company_ruc || '';
+  form.company_phone.value = tenant.company_phone || '';
+  form.company_address.value = tenant.company_address || '';
+  
+  document.getElementById('editModal').classList.add('active');
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('active');
+}
+
+async function saveEditTenant() {
+  const form = document.getElementById('editTenantForm');
+  
+  try {
+    const { error } = await supabaseClient
+      .from('profiles')
+      .update({
+        company_name: form.company_name.value,
+        company_ruc: form.company_ruc.value,
+        company_phone: form.company_phone.value,
+        company_address: form.company_address.value
+      })
+      .eq('id', form.user_id.value);
+    
+    if (error) throw error;
+    closeEditModal();
+    loadTenants();
+    showAlert('Cambios guardados', 'success');
+  } catch (error) {
+    showAlert('Error: ' + error.message);
+  }
+}
+
+async function deleteTenant(userId) {
+  if (!confirm('¿Eliminar este usuario permanentemente?\n\nADVERTENCIA: Esto eliminará todos sus datos (cotizaciones, facturas, clientes).')) return;
+  
+  try {
+    // Método 1: Intentar usar Edge Function si existe
+    try {
+      const { data, error } = await supabaseClient.functions.invoke('delete-user', {
+        body: { user_id: userId }
+      });
+      if (!error) {
+        showAlert('Usuario eliminado', 'success');
+        loadTenants();
+        return;
+      }
+    } catch (e) {
+      // Falló la función, continuar con método alternativo
+    }
+    
+    // Método 2: Eliminar datos relacionados manualmente y luego el auth
+    // Nota: En una app real, esto debería hacerse en una Edge Function por seguridad
+    
+    // Eliminar datos de tablas (en orden por foreign keys)
+    await supabaseClient.from('quote_items').delete().eq('user_id', userId);
+    await supabaseClient.from('quotes').delete().eq('user_id', userId);
+    await supabaseClient.from('invoice_items').delete().eq('user_id', userId);
+    await supabaseClient.from('invoices').delete().eq('user_id', userId);
+    await supabaseClient.from('clients').delete().eq('user_id', userId);
+    await supabaseClient.from('products').delete().eq('user_id', userId);
+    await supabaseClient.from('settings').delete().eq('user_id', userId);
+    
+    // Eliminar perfil
+    await supabaseClient.from('profiles').delete().eq('id', userId);
+    
+    // Nota: El usuario en Auth no se puede eliminar desde el cliente por seguridad
+    // Se necesita una Edge Function para eso o hacerlo manualmente desde el panel de Supabase
+    
+    showAlert('Usuario eliminado de la base de datos (el auth requiere limpieza manual en Supabase)', 'success');
+    loadTenants();
+    
+  } catch (error) {
+    showAlert('Error eliminando: ' + error.message);
+  }
+}
+
+async function impersonateUser(userId) {
+  const adminSession = JSON.parse(sessionStorage.getItem('a3_session'));
+  sessionStorage.setItem('a3_admin_backup', JSON.stringify(adminSession));
+  
+  const { data: profile } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+  
+  sessionStorage.setItem('a3_session', JSON.stringify({
+    user_id: userId,
+    role: 'user',
+    username: profile.username,
+    company: profile.company_name,
+    impersonated: true
+  }));
+  
+  window.open('./erp.html', '_blank');
+}
+</script>
+
+</body>
+</html>

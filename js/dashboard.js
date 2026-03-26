@@ -2,11 +2,7 @@
 // DASHBOARD MODULE
 // ============================================
 
-import { supabase } from './supabase-client.js';
-import { Auth } from './auth.js';
-import { UI } from './ui.js';
-
-export const dashboardModule = {
+const dashboardModule = {
   async init() {
     this.updateDate();
     await this.renderStats();
@@ -24,17 +20,17 @@ export const dashboardModule = {
 
   async renderStats() {
     try {
-      const { data: quotes } = await supabase
+      const { data: quotes } = await supabaseClient
         .from('quotes')
         .select('id, status')
         .eq('user_id', Auth.currentUser.id);
 
-      const { data: invoices } = await supabase
+      const { data: invoices } = await supabaseClient
         .from('invoices')
         .select('id, status, total, paid')
         .eq('user_id', Auth.currentUser.id);
 
-      const { data: clients } = await supabase
+      const { data: clients } = await supabaseClient
         .from('clients')
         .select('id')
         .eq('user_id', Auth.currentUser.id);
@@ -80,7 +76,7 @@ export const dashboardModule = {
       const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
       const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
 
-      const { data: invoices } = await supabase
+      const { data: invoices } = await supabaseClient
         .from('invoices')
         .select('total, status')
         .eq('user_id', Auth.currentUser.id)
@@ -109,5 +105,3 @@ export const dashboardModule = {
     }
   }
 };
-
-window.dashboardModule = dashboardModule;

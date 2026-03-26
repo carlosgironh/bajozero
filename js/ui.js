@@ -2,7 +2,7 @@
 // UTILIDADES DE UI
 // ============================================
 
-export const UI = {
+const UI = {
   modal(id, show = true) {
     const el = document.getElementById(id);
     if (el) {
@@ -78,5 +78,3 @@ export const UI = {
     return div.innerHTML;
   }
 };
-
-window.UI = UI;

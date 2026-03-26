@@ -2,10 +2,7 @@
 // ROUTER SPA
 // ============================================
 
-import { Auth } from './auth.js';
-import { UI } from './ui.js';
-
-export const router = {
+const router = {
   currentRoute: 'dashboard',
 
   navigate(route) {
@@ -42,34 +39,32 @@ export const router = {
   initModule(route) {
     switch(route) {
       case 'dashboard': 
-        if (window.dashboardModule) window.dashboardModule.init(); 
+        if (window.dashboardModule) dashboardModule.init(); 
         break;
       case 'clients': 
-        if (window.clientsModule) window.clientsModule.load(); 
+        if (window.clientsModule) clientsModule.load(); 
         break;
       case 'catalog': 
-        if (window.productsModule) window.productsModule.load(); 
+        if (window.productsModule) productsModule.load(); 
         break;
       case 'quotes': 
-        if (window.quotesModule) window.quotesModule.load(); 
+        if (window.quotesModule) quotesModule.load(); 
         break;
       case 'invoices': 
-        if (window.invoicesModule) window.invoicesModule.load(); 
+        if (window.invoicesModule) invoicesModule.load(); 
         break;
       case 'payments': 
-        if (window.paymentsModule) window.paymentsModule.load(); 
+        if (window.paymentsModule) paymentsModule.load(); 
         break;
       case 'settings': 
-        if (window.settingsModule) window.settingsModule.load(); 
+        if (window.settingsModule) settingsModule.load(); 
         break;
       case 'users': 
-        if (window.adminModule) window.adminModule.loadUsers(); 
+        if (window.adminModule) adminModule.loadUsers(); 
         break;
       case 'all-data': 
-        if (window.adminModule) window.adminModule.loadDataView(); 
+        if (window.adminModule) adminModule.loadDataView(); 
         break;
     }
   }
 };
-
-window.router = router;

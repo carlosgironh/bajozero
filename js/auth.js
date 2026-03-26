@@ -5,6 +5,8 @@
 import { supabase, callEdgeFunction } from './supabase-client.js';
 import { CONFIG } from './config.js';
 
+console.log('[AUTH] Módulo cargado');
+
 export const Auth = {
   currentUser: null,
   currentProfile: null,
@@ -12,34 +14,58 @@ export const Auth = {
   originalUser: null,
 
   async init() {
-    const { data: { session } } = await supabase.auth.getSession();
+    console.log('[AUTH] Inicializando...');
     
-    if (session) {
-      await this.loadProfile(session.user.id);
-      return true;
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('[AUTH] Error al obtener sesión:', error);
+        return false;
+      }
+      
+      if (session) {
+        console.log('[AUTH] Sesión encontrada:', session.user.id);
+        await this.loadProfile(session.user.id);
+        return true;
+      }
+      
+      console.log('[AUTH] No hay sesión activa');
+      return false;
+    } catch (error) {
+      console.error('[AUTH] Error en init:', error);
+      return false;
     }
-    
-    return false;
   },
 
   async loadProfile(userId) {
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    console.log('[AUTH] Cargando perfil:', userId);
     
-    if (error) {
-      console.error('Error cargando perfil:', error);
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        console.error('Error cargando perfil:', error);
+        return false;
+      }
+      
+      this.currentProfile = profile;
+      this.currentUser = { id: userId, ...profile };
+      console.log('[AUTH] Perfil cargado:', profile);
+      return true;
+    } catch (error) {
+      console.error('[AUTH] Error en loadProfile:', error);
       return false;
     }
-    
-    this.currentProfile = profile;
-    this.currentUser = { id: userId, ...profile };
-    return true;
   },
 
   async login(email, password) {
+    console.log('[AUTH] Intentando login:', email);
+    
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -57,11 +83,14 @@ export const Auth = {
       };
       
     } catch (error) {
+      console.error('[AUTH] Error en login:', error);
       return { success: false, error: error.message };
     }
   },
 
   async register(email, password, username, companyName) {
+    console.log('[AUTH] Registrando usuario:', email);
+    
     try {
       const result = await callEdgeFunction('auth', {
         action: 'register',
@@ -76,12 +105,20 @@ export const Auth = {
       return await this.login(email, password);
       
     } catch (error) {
+      console.error('[AUTH] Error en registro:', error);
       return { success: false, error: error.message };
     }
   },
 
   async logout() {
-    await supabase.auth.signOut();
+    console.log('[AUTH] Cerrando sesión...');
+    
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('[AUTH] Error en logout:', error);
+    }
+    
     this.currentUser = null;
     this.currentProfile = null;
     this.isImpersonatingFlag = false;
@@ -116,6 +153,7 @@ export const Auth = {
       return { success: true, user: this.currentUser };
       
     } catch (error) {
+      console.error('[AUTH] Error en impersonate:', error);
       return { success: false, error: error.message };
     }
   },

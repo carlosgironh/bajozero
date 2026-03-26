@@ -2,11 +2,7 @@
 // CLIENTS MODULE
 // ============================================
 
-import { supabase } from './supabase-client.js';
-import { Auth } from './auth.js';
-import { UI } from './ui.js';
-
-export const clientsModule = {
+const clientsModule = {
   clients: [],
 
   async load() {
@@ -17,7 +13,7 @@ export const clientsModule = {
     const search = document.getElementById('clientSearch')?.value?.toLowerCase() || '';
     
     try {
-      let query = supabase
+      let query = supabaseClient
         .from('clients')
         .select('*')
         .eq('user_id', Auth.currentUser.id)
@@ -94,7 +90,7 @@ export const clientsModule = {
     }
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('clients')
         .insert({
           user_id: Auth.currentUser.id,
@@ -122,7 +118,7 @@ export const clientsModule = {
     const newName = prompt('Editar nombre:', client.name);
     if (newName && newName.trim()) {
       try {
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from('clients')
           .update({ name: newName.trim() })
           .eq('id', id);
@@ -141,7 +137,7 @@ export const clientsModule = {
     if (!UI.confirm('¿Eliminar este cliente permanentemente?')) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('clients')
         .delete()
         .eq('id', id);
@@ -155,5 +151,3 @@ export const clientsModule = {
     }
   }
 };
-
-window.clientsModule = clientsModule;

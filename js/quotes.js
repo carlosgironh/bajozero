@@ -2,11 +2,7 @@
 // QUOTES MODULE
 // ============================================
 
-import { supabase, callEdgeFunction } from './supabase-client.js';
-import { Auth } from './auth.js';
-import { UI } from './ui.js';
-
-export const quotesModule = {
+const quotesModule = {
   quotes: [],
   clients: [],
   products: [],
@@ -19,7 +15,7 @@ export const quotesModule = {
   },
 
   async loadClients() {
-    const { data } = await supabase
+    const { data } = await supabaseClient
       .from('clients')
       .select('id, name')
       .eq('user_id', Auth.currentUser.id)
@@ -28,7 +24,7 @@ export const quotesModule = {
   },
 
   async loadProducts() {
-    const { data } = await supabase
+    const { data } = await supabaseClient
       .from('products')
       .select('id, name, price')
       .eq('user_id', Auth.currentUser.id)
@@ -38,7 +34,7 @@ export const quotesModule = {
 
   async render() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('quotes')
         .select(`*, clients (name)`)
         .eq('user_id', Auth.currentUser.id)
@@ -226,7 +222,7 @@ export const quotesModule = {
     if (!UI.confirm(`¿Convertir cotización ${quote.number} a factura?`)) return;
 
     try {
-      const { data: items } = await supabase
+      const { data: items } = await supabaseClient
         .from('quote_items')
         .select('*')
         .eq('quote_id', quoteId);
@@ -258,5 +254,3 @@ export const quotesModule = {
     UI.showToast('Vista detallada en desarrollo');
   }
 };
-
-window.quotesModule = quotesModule;

@@ -2,11 +2,7 @@
 // PRODUCTS MODULE (Catálogo)
 // ============================================
 
-import { supabase } from './supabase-client.js';
-import { Auth } from './auth.js';
-import { UI } from './ui.js';
-
-export const productsModule = {
+const productsModule = {
   products: [],
   categories: [],
 
@@ -16,7 +12,7 @@ export const productsModule = {
   },
 
   async loadCategories() {
-    const { data } = await supabase
+    const { data } = await supabaseClient
       .from('categories')
       .select('*')
       .eq('user_id', Auth.currentUser.id);
@@ -27,7 +23,7 @@ export const productsModule = {
     const search = document.getElementById('productSearch')?.value?.toLowerCase() || '';
     
     try {
-      let query = supabase
+      let query = supabaseClient
         .from('products')
         .select('*, categories(name)')
         .eq('user_id', Auth.currentUser.id)
@@ -87,7 +83,7 @@ export const productsModule = {
           <input type="text" id="newProdName" placeholder="Nombre del producto *" class="bg-slate-800 border-slate-600 text-white placeholder-slate-500">
           <input type="text" id="newProdSKU" placeholder="SKU/Código" class="bg-slate-800 border-slate-600 text-white placeholder-slate-500">
           <select id="newProdCategory" class="bg-slate-800 border-slate-600 text-white">
-            ${this.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+            ${this.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('') || '<option value="">Sin categorías</option>'}
           </select>
           <div class="grid grid-cols-2 gap-3">
             <input type="number" id="newProdCost" placeholder="Costo" step="0.01" class="bg-slate-800 border-slate-600 text-white placeholder-slate-500">
@@ -112,11 +108,11 @@ export const productsModule = {
     }
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('products')
         .insert({
           user_id: Auth.currentUser.id,
-          category_id: document.getElementById('newProdCategory')?.value,
+          category_id: document.getElementById('newProdCategory')?.value || null,
           name,
           sku: document.getElementById('newProdSKU')?.value || '',
           cost: parseFloat(document.getElementById('newProdCost')?.value || 0),
@@ -141,7 +137,7 @@ export const productsModule = {
     const newName = prompt('Editar nombre:', p.name);
     if (newName && newName.trim()) {
       try {
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from('products')
           .update({ name: newName.trim() })
           .eq('id', id);
@@ -160,7 +156,7 @@ export const productsModule = {
     if (!UI.confirm('¿Eliminar este producto?')) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('products')
         .delete()
         .eq('id', id);
@@ -174,5 +170,3 @@ export const productsModule = {
     }
   }
 };
-
-window.productsModule = productsModule;

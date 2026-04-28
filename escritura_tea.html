@@ -24,14 +24,13 @@
     flex-direction: column;
   }
 
-  /* ===== PANEL DE CONTROLES ===== */
   .controls {
     background: var(--panel-bg);
-    padding: 12px 20px;
+    padding: 10px 16px;
     border-bottom: 2px solid var(--border-color);
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px;
     align-items: center;
     justify-content: center;
     position: sticky;
@@ -43,105 +42,84 @@
   .control-group {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
   }
 
   .control-group label {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: #444;
     white-space: nowrap;
   }
 
-  .control-group input[type="range"] {
-    width: 100px;
-    cursor: pointer;
-  }
-
+  .control-group input[type="range"] { width: 80px; cursor: pointer; }
   .control-group input[type="number"] {
-    width: 55px;
-    padding: 4px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    text-align: center;
-    font-size: 13px;
+    width: 50px; padding: 3px; border: 1px solid var(--border-color);
+    border-radius: 4px; text-align: center; font-size: 12px;
   }
-
   .control-group select {
-    padding: 4px 8px;
-    border-radius: 4px;
-    border: 1px solid var(--border-color);
-    font-size: 13px;
-    cursor: pointer;
+    padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border-color);
+    font-size: 12px; cursor: pointer;
   }
-
   .control-group button {
-    padding: 6px 14px;
-    border: none;
-    border-radius: 6px;
-    background: var(--accent-color);
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-    font-size: 13px;
+    padding: 5px 12px; border: none; border-radius: 6px;
+    background: var(--accent-color); color: white;
+    font-weight: 600; cursor: pointer; transition: background 0.2s; font-size: 12px;
   }
-
   .control-group button:hover { background: #236b43; }
-
-  .control-group button.secondary {
-    background: #6c757d;
-  }
+  .control-group button.secondary { background: #6c757d; }
   .control-group button.secondary:hover { background: #545b62; }
-
-  .control-group button.danger {
-    background: #dc3545;
-  }
+  .control-group button.danger { background: #dc3545; }
   .control-group button.danger:hover { background: #b02a37; }
+  .control-group button.active { background: #1e6f3e; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
 
   .value-display {
-    font-size: 12px;
-    color: #666;
-    min-width: 30px;
-    text-align: center;
-    font-weight: 600;
+    font-size: 11px; color: #666; min-width: 28px;
+    text-align: center; font-weight: 600;
   }
 
-  /* ===== ÁREA DE HOJA ===== */
+  .mode-toggle { background: #4a90d9 !important; }
+  .mode-toggle:hover { background: #357abd !important; }
+  .mode-toggle.active { background: #2a5a8a !important; }
+
+  .templates-bar {
+    background: #fff; padding: 6px 16px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+  }
+  .template-btn {
+    padding: 4px 10px; border: 1px solid var(--accent-color);
+    background: #e8f5e9; color: var(--accent-color);
+    border-radius: 12px; cursor: pointer;
+    font-size: 11px; font-weight: 600; transition: all 0.2s;
+  }
+  .template-btn:hover { background: var(--accent-color); color: white; }
+
   .sheet-container {
-    flex: 1;
-    padding: 30px 20px;
-    display: flex;
-    justify-content: center;
-    overflow-y: auto;
+    flex: 1; padding: 25px 15px;
+    display: flex; justify-content: center; overflow-y: auto;
   }
 
   .sheet {
     background: var(--bg-color);
-    width: 210mm;
-    min-height: 297mm;
-    padding: 25mm 20mm;
+    width: 210mm; min-height: 297mm;
+    padding: 20mm 18mm;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     position: relative;
-    /* Líneas de cuaderno */
-    background-image:
-      repeating-linear-gradient(
-        transparent,
-        transparent calc(var(--line-height) - 1px),
-        var(--line-color) calc(var(--line-height) - 1px),
-        var(--line-color) var(--line-height)
-      );
+  }
+
+  .sheet.normal-mode {
+    background-image: repeating-linear-gradient(
+      transparent, transparent calc(var(--line-height) - 1px),
+      var(--line-color) calc(var(--line-height) - 1px), var(--line-color) var(--line-height)
+    );
     background-size: 100% var(--line-height);
-    background-position: 0 25mm;
+    background-position: 0 20mm;
   }
 
   .sheet-title {
-    text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-    color: var(--text-color);
-    margin-bottom: 15px;
-    letter-spacing: 1px;
+    text-align: center; font-size: 20px; font-weight: bold;
+    color: var(--text-color); margin-bottom: 12px; letter-spacing: 1px;
   }
 
   .sheet-content {
@@ -151,106 +129,110 @@
     color: var(--text-color);
     letter-spacing: var(--letter-spacing, 2px);
     word-spacing: var(--word-spacing, 4px);
-    width: 100%;
-    min-height: 240mm;
-    border: none;
-    outline: none;
-    background: transparent;
-    resize: none;
-    overflow: hidden;
-    padding: 0 5px;
+    width: 100%; min-height: 240mm;
+    border: none; outline: none; background: transparent;
+    resize: none; overflow: hidden; padding: 0 5px;
     text-align: var(--text-align, left);
   }
+  .sheet-content::placeholder { color: #999; font-style: italic; }
 
-  .sheet-content::placeholder {
-    color: #999;
+  .trace-area {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+  }
+
+  .trace-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--line-color);
+    padding-bottom: 2px;
+    padding-top: 2px;
+  }
+
+  .trace-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .trace-canvas {
+    display: block;
+  }
+
+  .trace-label {
+    font-size: 10px;
+    color: #888;
+    margin-top: 1px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .trace-practice-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .trace-practice-label {
+    font-size: 9px;
+    color: #aaa;
+    margin-top: 1px;
     font-style: italic;
   }
 
-  /* ===== PLANTILLAS PRE-DEFINIDAS ===== */
-  .templates-bar {
-    background: #fff;
-    padding: 8px 20px;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .template-btn {
-    padding: 5px 12px;
-    border: 1px solid var(--accent-color);
-    background: #e8f5e9;
-    color: var(--accent-color);
-    border-radius: 15px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-    transition: all 0.2s;
-  }
-
-  .template-btn:hover {
-    background: var(--accent-color);
-    color: white;
-  }
-
-  /* ===== MODO OSCURO / ALTO CONTRASTE ===== */
   body.high-contrast {
-    --bg-color: #000000;
-    --line-color: #ffff00;
-    --text-color: #00ff00;
-    --panel-bg: #1a1a1a;
-    --border-color: #444;
+    --bg-color: #000000; --line-color: #ffff00;
+    --text-color: #00ff00; --panel-bg: #1a1a1a; --border-color: #444;
   }
+  body.high-contrast .sheet { box-shadow: 0 4px 20px rgba(255,255,255,0.1); }
 
-  body.high-contrast .sheet {
-    box-shadow: 0 4px 20px rgba(255,255,255,0.1);
-  }
-
-  /* ===== IMPRESIÓN ===== */
   @media print {
     body { background: white; }
     .controls, .templates-bar { display: none !important; }
     .sheet-container { padding: 0; }
     .sheet {
-      box-shadow: none;
-      width: 100%;
-      min-height: auto;
-      padding: 15mm 15mm;
-      page-break-after: always;
+      box-shadow: none; width: 100%; min-height: auto;
+      padding: 12mm 12mm; page-break-after: always;
     }
+    .sheet-content { min-height: auto; }
   }
 
-  /* ===== RESPONSIVE ===== */
   @media (max-width: 600px) {
-    .sheet { width: 100%; min-height: auto; padding: 15mm 10mm; }
-    .controls { gap: 8px; padding: 8px; }
-    .control-group label { font-size: 11px; }
+    .sheet { width: 100%; min-height: auto; padding: 12mm 8mm; }
+    .controls { gap: 6px; padding: 6px; }
+    .control-group label { font-size: 10px; }
   }
 </style>
+<base target="_blank">
 </head>
 <body>
 
-<!-- BARRA DE PLANTILLAS -->
 <div class="templates-bar">
-  <span style="font-size:12px; color:#666; align-self:center; font-weight:600;">📝 Plantillas rápidas:</span>
+  <span style="font-size:11px; color:#666; align-self:center; font-weight:600;">📝 Plantillas:</span>
   <button class="template-btn" onclick="loadTemplate('vocales')">Vocales</button>
-  <button class="template-btn" onclick="loadTemplate('abc')">ABC Completo</button>
-  <button class="template-btn" onclick="loadTemplate('numeros')">Números 1-10</button>
+  <button class="template-btn" onclick="loadTemplate('abc')">ABC</button>
+  <button class="template-btn" onclick="loadTemplate('numeros')">Números</button>
   <button class="template-btn" onclick="loadTemplate('nombre')">Mi Nombre</button>
-  <button class="template-btn" onclick="loadTemplate('frase')">Frase del día</button>
-  <button class="template-btn" onclick="loadTemplate('vacio')">Hoja en blanco</button>
+  <button class="template-btn" onclick="loadTemplate('frase')">Frase</button>
+  <button class="template-btn" onclick="loadTemplate('vacio')">En blanco</button>
 </div>
 
-<!-- PANEL DE CONTROLES -->
 <div class="controls">
   <div class="control-group">
+    <button class="mode-toggle active" id="btnNormal" onclick="setMode('normal')">✍️ Modo Libre</button>
+    <button class="mode-toggle" id="btnTrace" onclick="setMode('trace')">🔤 Modo Trazado</button>
+  </div>
+
+  <div class="control-group">
     <label>🔤 Fuente:</label>
-    <select id="fontSelect" onchange="updateStyle()">
-      <option value="'Comic Sans MS', cursive">Comic Sans (recomendada)</option>
+    <select id="fontSelect" onchange="updateAll()">
+      <option value="'Comic Sans MS', cursive">Comic Sans</option>
       <option value="'Arial Rounded MT Bold', Arial, sans-serif">Arial Redondeada</option>
-      <option value="'Courier New', monospace">Courier (monoespaciada)</option>
+      <option value="'Courier New', monospace">Courier</option>
       <option value="'Verdana', sans-serif">Verdana</option>
       <option value="'Georgia', serif">Georgia</option>
       <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
@@ -258,71 +240,133 @@
   </div>
 
   <div class="control-group">
-    <label>📏 Tamaño letra:</label>
-    <input type="range" id="fontSize" min="16" max="72" value="32" oninput="updateStyle()">
+    <label>📏 Tamaño:</label>
+    <input type="range" id="fontSize" min="16" max="120" value="32" oninput="updateAll()">
     <span class="value-display" id="fontSizeVal">32px</span>
   </div>
 
   <div class="control-group">
     <label>↕️ Interlineado:</label>
-    <input type="range" id="lineHeight" min="30" max="100" value="45" oninput="updateStyle()">
+    <input type="range" id="lineHeight" min="30" max="120" value="45" oninput="updateAll()">
     <span class="value-display" id="lineHeightVal">45px</span>
   </div>
 
   <div class="control-group">
-    <label>↔️ Espacio letras:</label>
-    <input type="range" id="letterSpacing" min="0" max="15" value="3" oninput="updateStyle()">
+    <label>↔️ Esp. letras:</label>
+    <input type="range" id="letterSpacing" min="0" max="20" value="3" oninput="updateAll()">
     <span class="value-display" id="letterSpacingVal">3px</span>
   </div>
 
   <div class="control-group">
-    <label>🌌 Espacio palabras:</label>
-    <input type="range" id="wordSpacing" min="0" max="30" value="8" oninput="updateStyle()">
+    <label>🌌 Esp. palabras:</label>
+    <input type="range" id="wordSpacing" min="0" max="40" value="8" oninput="updateAll()">
     <span class="value-display" id="wordSpacingVal">8px</span>
   </div>
 
   <div class="control-group">
-    <label>🎨 Color texto:</label>
-    <input type="color" id="textColor" value="#1a1a1a" onchange="updateStyle()">
+    <label>🎨 Color:</label>
+    <input type="color" id="textColor" value="#1a1a1a" onchange="updateAll()">
   </div>
 
   <div class="control-group">
     <label>📐 Alineación:</label>
-    <select id="textAlign" onchange="updateStyle()">
+    <select id="textAlign" onchange="updateAll()">
       <option value="left">Izquierda</option>
       <option value="center">Centro</option>
       <option value="justify">Justificado</option>
     </select>
   </div>
 
-  <div class="control-group">
-    <button class="secondary" onclick="toggleContrast()">🌓 Alto contraste</button>
+  <div class="control-group trace-only" style="display:none;">
+    <label>✒️ Estilo:</label>
+    <select id="traceStyle" onchange="updateAll()">
+      <option value="printUpper">Imprenta MAYÚSCULA</option>
+      <option value="printLower">Imprenta minúscula</option>
+      <option value="cursive">Cursiva / Corrida</option>
+    </select>
+  </div>
+
+  <div class="control-group trace-only" style="display:none;">
+    <label>🎯 Guía:</label>
+    <select id="traceGuide" onchange="updateAll()">
+      <option value="dots">Puntos para unir</option>
+      <option value="dashed">Línea punteada</option>
+      <option value="gray">Gris para calcar</option>
+      <option value="arrow">Con flechas de dirección</option>
+    </select>
+  </div>
+
+  <!-- NUEVO: Control de densidad de puntos/guía -->
+  <div class="control-group trace-only" style="display:none;">
+    <label>🔘 Densidad puntos:</label>
+    <input type="range" id="dotDensity" min="1" max="10" value="5" oninput="updateAll()">
+    <span class="value-display" id="dotDensityVal">5</span>
+  </div>
+
+  <div class="control-group trace-only" style="display:none;">
+    <label>🔁 Repeticiones:</label>
+    <input type="number" id="traceRepeat" min="1" max="10" value="4" onchange="updateAll()">
+  </div>
+
+  <div class="control-group trace-only" style="display:none;">
+    <label>📄 Líneas:</label>
+    <input type="number" id="traceLines" min="1" max="12" value="6" onchange="updateAll()">
   </div>
 
   <div class="control-group">
-    <button onclick="window.print()">🖨️ Imprimir / PDF</button>
+    <button class="secondary" onclick="toggleContrast()">🌓 Contraste</button>
   </div>
-
+  <div class="control-group">
+    <button onclick="window.print()">🖨️ Imprimir</button>
+  </div>
   <div class="control-group">
     <button class="danger" onclick="clearSheet()">🗑️ Limpiar</button>
   </div>
 </div>
 
-<!-- ÁREA DE HOJA -->
 <div class="sheet-container">
-  <div class="sheet" id="sheet">
+  <div class="sheet normal-mode" id="sheet">
     <div class="sheet-title" id="sheetTitle" contenteditable="true" spellcheck="false">Mi Cuaderno de Escritura</div>
-    <textarea 
-      class="sheet-content" 
-      id="sheetContent" 
-      spellcheck="false"
-      placeholder="Escribe aquí o selecciona una plantilla arriba...&#10;&#10;💡 Consejos para el entrenamiento:&#10;• Usa letras grandes al principio&#10;• Aumenta el espacio entre letras&#10;• Practica una línea a la vez&#10;• Lee en voz alta lo que escribes"></textarea>
+
+    <textarea class="sheet-content" id="sheetContent" spellcheck="false"
+      placeholder="Escribe aquí o selecciona una plantilla...&#10;&#10;💡 En Modo Trazado, este texto se convierte en guías para practicar.&#10;• Usa letras grandes al principio&#10;• Aumenta el espacio entre letras&#10;• Practica una línea a la vez"></textarea>
+
+    <div class="trace-area" id="traceArea"></div>
   </div>
 </div>
 
 <script>
+  let currentMode = 'normal';
   const sheet = document.getElementById('sheet');
   const content = document.getElementById('sheetContent');
+  const traceArea = document.getElementById('traceArea');
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('btnNormal').classList.toggle('active', mode === 'normal');
+    document.getElementById('btnTrace').classList.toggle('active', mode === 'trace');
+    document.querySelectorAll('.trace-only').forEach(el => {
+      el.style.display = mode === 'trace' ? 'flex' : 'none';
+    });
+    if (mode === 'normal') {
+      sheet.classList.add('normal-mode');
+      content.style.display = 'block';
+      traceArea.style.display = 'none';
+      document.getElementById('sheetTitle').style.display = 'block';
+      updateStyle();
+    } else {
+      sheet.classList.remove('normal-mode');
+      content.style.display = 'none';
+      traceArea.style.display = 'flex';
+      document.getElementById('sheetTitle').style.display = 'none';
+      generateTrace();
+    }
+  }
+
+  function updateAll() {
+    updateStyle();
+    if (currentMode === 'trace') generateTrace();
+  }
 
   function updateStyle() {
     const fontSize = document.getElementById('fontSize').value + 'px';
@@ -332,14 +376,14 @@
     const fontFamily = document.getElementById('fontSelect').value;
     const textColor = document.getElementById('textColor').value;
     const textAlign = document.getElementById('textAlign').value;
+    const dotDensity = document.getElementById('dotDensity').value;
 
-    // Actualizar displays
     document.getElementById('fontSizeVal').textContent = fontSize;
     document.getElementById('lineHeightVal').textContent = lineHeight;
     document.getElementById('letterSpacingVal').textContent = letterSpacing;
     document.getElementById('wordSpacingVal').textContent = wordSpacing;
+    document.getElementById('dotDensityVal').textContent = dotDensity;
 
-    // Aplicar estilos CSS variables
     sheet.style.setProperty('--font-size', fontSize);
     sheet.style.setProperty('--line-height', lineHeight);
     sheet.style.setProperty('--letter-spacing', letterSpacing);
@@ -356,63 +400,422 @@
     } else {
       document.getElementById('textColor').value = '#1a1a1a';
     }
-    updateStyle();
+    updateAll();
   }
 
   function clearSheet() {
     if (confirm('¿Borrar todo el contenido?')) {
       document.getElementById('sheetTitle').textContent = 'Mi Cuaderno de Escritura';
       content.value = '';
+      if (currentMode === 'trace') generateTrace();
+    }
+  }
+
+  /* ============================================================
+     DIBUJO DE LETRAS COMO UNA SOLA LÍNEA (SINGLE-LINE STROKES)
+     ============================================================ */
+
+  function stroke(ctx, segments) {
+    ctx.beginPath();
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments[i];
+      if (seg.t === 'M') ctx.moveTo(seg.x, seg.y);
+      else if (seg.t === 'L') ctx.lineTo(seg.x, seg.y);
+      else if (seg.t === 'Q') ctx.quadraticCurveTo(seg.cx, seg.cy, seg.x, seg.y);
+      else if (seg.t === 'C') ctx.bezierCurveTo(seg.c1x, seg.c1y, seg.c2x, seg.c2y, seg.x, seg.y);
+    }
+    ctx.stroke();
+  }
+
+  function drawLetter(ctx, ch, ox, oy, scale, color, guideType, density) {
+    const defs = LETTER_PATHS[ch];
+    if (!defs) return 50;
+
+    ctx.save();
+    ctx.translate(ox, oy);
+    ctx.scale(scale, scale);
+    ctx.strokeStyle = color;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    const fontSize = scale * 100;
+
+    // Calcular gap basado en densidad (1-10)
+    // densidad 1 = gap muy grande (pocos puntos)
+    // densidad 10 = gap muy pequeño (muchos puntos)
+    const baseGap = fontSize * 0.18;
+    const densityFactor = (11 - density) / 5; // 1->2.0, 5->1.2, 10->0.2
+    const gap = Math.max(fontSize * 0.03, baseGap * densityFactor);
+
+    switch(guideType) {
+      case 'dots':
+        ctx.setLineDash([0, gap]);
+        ctx.lineWidth = Math.max(2.2, fontSize * 0.025);
+        for (const segList of defs) {
+          stroke(ctx, segList);
+        }
+        break;
+
+      case 'dashed':
+        ctx.setLineDash([gap * 0.4, gap * 0.8]);
+        ctx.lineWidth = Math.max(1.1, fontSize * 0.014);
+        for (const segList of defs) {
+          stroke(ctx, segList);
+        }
+        break;
+
+      case 'gray':
+        ctx.strokeStyle = document.body.classList.contains('high-contrast') ? 'rgba(0,255,0,0.25)' : 'rgba(150,150,150,0.35)';
+        ctx.setLineDash([]);
+        ctx.lineWidth = Math.max(1.1, fontSize * 0.014);
+        for (const segList of defs) {
+          stroke(ctx, segList);
+        }
+        break;
+
+      case 'arrow':
+        ctx.setLineDash([gap * 0.35, gap * 0.65]);
+        ctx.lineWidth = Math.max(1.1, fontSize * 0.014);
+        for (const segList of defs) {
+          stroke(ctx, segList);
+        }
+        if (defs.length > 0 && defs[0].length > 0) {
+          const first = defs[0][0];
+          ctx.setLineDash([]);
+          ctx.fillStyle = color;
+          const as = fontSize * 0.055;
+          ctx.beginPath();
+          ctx.moveTo(first.x + as, first.y - as);
+          ctx.lineTo(first.x, first.y - as);
+          ctx.lineTo(first.x + as * 0.5, first.y - as * 1.3);
+          ctx.fill();
+        }
+        break;
+    }
+
+    ctx.restore();
+    return defs.width || 55;
+  }
+
+  const M = (x,y) => ({t:'M',x,y});
+  const L = (x,y) => ({t:'L',x,y});
+  const Q = (cx,cy,x,y) => ({t:'Q',cx,cy,x,y});
+  const C = (c1x,c1y,c2x,c2y,x,y) => ({t:'C',c1x,c1y,c2x,c2y,x,y});
+
+  const LETTER_PATHS = {};
+
+  // MAYÚSCULAS
+  LETTER_PATHS['A'] = [[M(15,72), L(35,8), L(55,72)], [M(25,45), L(45,45)]]; LETTER_PATHS['A'].width = 55;
+  LETTER_PATHS['B'] = [[M(15,8), L(15,72)], [M(15,8), Q(55,8,55,22), Q(55,36,15,36)], [M(15,36), Q(60,36,60,54), Q(60,72,15,72)]]; LETTER_PATHS['B'].width = 62;
+  LETTER_PATHS['C'] = [[M(58,18), Q(35,5,18,22), Q(5,40,18,58), Q(35,75,58,62)]]; LETTER_PATHS['C'].width = 55;
+  LETTER_PATHS['D'] = [[M(15,8), L(15,72)], [M(15,8), Q(55,8,65,22), Q(75,40,65,58), Q(55,72,15,72)]]; LETTER_PATHS['D'].width = 68;
+  LETTER_PATHS['E'] = [[M(55,8), L(15,8), L(15,72), L(55,72)], [M(15,38), L(45,38)]]; LETTER_PATHS['E'].width = 55;
+  LETTER_PATHS['F'] = [[M(55,8), L(15,8), L(15,72)], [M(15,38), L(45,38)]]; LETTER_PATHS['F'].width = 55;
+  LETTER_PATHS['G'] = [[M(58,18), Q(35,5,18,22), Q(5,40,18,58), Q(35,75,58,62)], [M(58,62), L(58,42), L(42,42)]]; LETTER_PATHS['G'].width = 58;
+  LETTER_PATHS['H'] = [[M(15,8), L(15,72)], [M(55,8), L(55,72)], [M(15,40), L(55,40)]]; LETTER_PATHS['H'].width = 60;
+  LETTER_PATHS['I'] = [[M(35,8), L(35,72)], [M(20,8), L(50,8)], [M(20,72), L(50,72)]]; LETTER_PATHS['I'].width = 55;
+  LETTER_PATHS['J'] = [[M(55,8), L(55,55), Q(55,78,35,78), Q(15,78,15,58)]]; LETTER_PATHS['J'].width = 58;
+  LETTER_PATHS['K'] = [[M(15,8), L(15,72)], [M(55,8), L(15,40), L(55,72)]]; LETTER_PATHS['K'].width = 58;
+  LETTER_PATHS['L'] = [[M(15,8), L(15,72), L(55,72)]]; LETTER_PATHS['L'].width = 55;
+  LETTER_PATHS['M'] = [[M(10,72), L(10,8), L(35,45), L(60,8), L(60,72)]]; LETTER_PATHS['M'].width = 65;
+  LETTER_PATHS['N'] = [[M(15,72), L(15,8), L(55,72), L(55,8)]]; LETTER_PATHS['N'].width = 60;
+  LETTER_PATHS['Ñ'] = [[M(15,72), L(15,8), L(55,72), L(55,8)], [M(22,0), Q(35,-8,48,0)]]; LETTER_PATHS['Ñ'].width = 60;
+  LETTER_PATHS['O'] = [[M(35,8), Q(10,8,10,40), Q(10,72,35,72), Q(60,72,60,40), Q(60,8,35,8)]]; LETTER_PATHS['O'].width = 60;
+  LETTER_PATHS['P'] = [[M(15,8), L(15,72)], [M(15,8), Q(55,8,55,24), Q(55,40,15,40)]]; LETTER_PATHS['P'].width = 55;
+  LETTER_PATHS['Q'] = [[M(35,8), Q(10,8,10,40), Q(10,72,35,72), Q(60,72,60,40), Q(60,8,35,8)], [M(45,55), L(60,78)]]; LETTER_PATHS['Q'].width = 62;
+  LETTER_PATHS['R'] = [[M(15,8), L(15,72)], [M(15,8), Q(55,8,55,24), Q(55,40,15,40)], [M(35,40), L(55,72)]]; LETTER_PATHS['R'].width = 58;
+  LETTER_PATHS['S'] = [[M(55,18), Q(35,5,20,18), Q(10,30,35,38), Q(60,46,50,58), Q(35,75,15,62)]]; LETTER_PATHS['S'].width = 55;
+  LETTER_PATHS['T'] = [[M(10,8), L(60,8)], [M(35,8), L(35,72)]]; LETTER_PATHS['T'].width = 60;
+  LETTER_PATHS['U'] = [[M(15,8), L(15,50), Q(15,75,35,75), Q(55,75,55,50), L(55,8)]]; LETTER_PATHS['U'].width = 60;
+  LETTER_PATHS['V'] = [[M(10,8), L(35,72), L(60,8)]]; LETTER_PATHS['V'].width = 60;
+  LETTER_PATHS['W'] = [[M(8,8), L(20,72), L(35,35), L(50,72), L(62,8)]]; LETTER_PATHS['W'].width = 65;
+  LETTER_PATHS['X'] = [[M(10,8), L(55,72)], [M(55,8), L(10,72)]]; LETTER_PATHS['X'].width = 60;
+  LETTER_PATHS['Y'] = [[M(10,8), L(35,40), L(60,8)], [M(35,40), L(35,72)]]; LETTER_PATHS['Y'].width = 60;
+  LETTER_PATHS['Z'] = [[M(10,8), L(55,8), L(10,72), L(55,72)]]; LETTER_PATHS['Z'].width = 58;
+
+  // MINÚSCULAS
+  LETTER_PATHS['a'] = [[M(30,48), Q(10,48,10,60), Q(10,72,30,72), Q(50,72,50,60), L(50,48)], [M(50,48), L(50,72)]]; LETTER_PATHS['a'].width = 52;
+  LETTER_PATHS['b'] = [[M(18,8), L(18,72)], [M(18,48), Q(18,72,38,72), Q(58,72,58,48), Q(58,28,38,28), Q(18,28,18,48)]]; LETTER_PATHS['b'].width = 58;
+  LETTER_PATHS['c'] = [[M(48,38), Q(30,28,18,38), Q(8,48,18,58), Q(30,68,48,58)]]; LETTER_PATHS['c'].width = 50;
+  LETTER_PATHS['d'] = [[M(52,8), L(52,72)], [M(52,48), Q(52,72,32,72), Q(12,72,12,48), Q(12,28,32,28), Q(52,28,52,48)]]; LETTER_PATHS['d'].width = 58;
+  LETTER_PATHS['e'] = [[M(50,48), Q(30,38,15,48), Q(5,58,15,68), Q(30,78,50,68)], [M(12,55), L(48,55)]]; LETTER_PATHS['e'].width = 52;
+  LETTER_PATHS['f'] = [[M(45,8), Q(30,5,25,18), L(25,72)], [M(15,38), L(40,38)]]; LETTER_PATHS['f'].width = 45;
+  LETTER_PATHS['g'] = [[M(50,28), Q(50,48,30,48), Q(10,48,10,28), Q(10,8,30,8), Q(50,8,50,28)], [M(50,48), L(50,68), Q(50,82,30,82), Q(15,82,15,72)]]; LETTER_PATHS['g'].width = 52;
+  LETTER_PATHS['h'] = [[M(15,8), L(15,72)], [M(15,42), Q(15,28,32,28), Q(50,28,50,42), L(50,72)]]; LETTER_PATHS['h'].width = 55;
+  LETTER_PATHS['i'] = [[M(35,35), L(35,72)], [M(35,18), L(35,20)]]; LETTER_PATHS['i'].width = 42;
+  LETTER_PATHS['j'] = [[M(45,35), L(45,68), Q(45,82,25,82), Q(10,82,10,72)], [M(45,18), L(45,20)]]; LETTER_PATHS['j'].width = 48;
+  LETTER_PATHS['k'] = [[M(15,8), L(15,72)], [M(48,28), L(15,48), L(48,72)]]; LETTER_PATHS['k'].width = 52;
+  LETTER_PATHS['l'] = [[M(35,8), L(35,72)]]; LETTER_PATHS['l'].width = 42;
+  LETTER_PATHS['m'] = [[M(10,72), L(10,35), Q(10,28,22,28), Q(35,28,35,38), L(35,72)], [M(35,38), Q(35,28,48,28), Q(60,28,60,38), L(60,72)]]; LETTER_PATHS['m'].width = 65;
+  LETTER_PATHS['n'] = [[M(12,72), L(12,35), Q(12,28,28,28), Q(45,28,45,38), L(45,72)]]; LETTER_PATHS['n'].width = 52;
+  LETTER_PATHS['ñ'] = [[M(12,72), L(12,35), Q(12,28,28,28), Q(45,28,45,38), L(45,72)], [M(18,18), Q(28,12,38,18)]]; LETTER_PATHS['ñ'].width = 52;
+  LETTER_PATHS['o'] = [[M(30,28), Q(8,28,8,50), Q(8,72,30,72), Q(52,72,52,50), Q(52,28,30,28)]]; LETTER_PATHS['o'].width = 52;
+  LETTER_PATHS['p'] = [[M(18,28), Q(18,48,35,48), Q(52,48,52,28), Q(52,8,35,8), Q(18,8,18,28)], [M(18,28), L(18,82)]]; LETTER_PATHS['p'].width = 52;
+  LETTER_PATHS['q'] = [[M(50,28), Q(50,48,33,48), Q(16,48,16,28), Q(16,8,33,8), Q(50,8,50,28)], [M(50,28), L(50,82)]]; LETTER_PATHS['q'].width = 52;
+  LETTER_PATHS['r'] = [[M(12,72), L(12,35), Q(12,28,25,28), Q(38,28,42,35)]]; LETTER_PATHS['r'].width = 45;
+  LETTER_PATHS['s'] = [[M(42,35), Q(28,28,18,35), Q(10,42,28,48), Q(46,54,38,62), Q(28,72,12,65)]]; LETTER_PATHS['s'].width = 48;
+  LETTER_PATHS['t'] = [[M(35,18), L(35,65), Q(35,72,45,72)], [M(20,42), L(48,42)]]; LETTER_PATHS['t'].width = 48;
+  LETTER_PATHS['u'] = [[M(12,28), L(12,55), Q(12,72,30,72), Q(48,72,48,55), L(48,28)]]; LETTER_PATHS['u'].width = 52;
+  LETTER_PATHS['v'] = [[M(10,28), L(30,72), L(50,28)]]; LETTER_PATHS['v'].width = 52;
+  LETTER_PATHS['w'] = [[M(8,28), L(18,72), L(30,42), L(42,72), L(52,28)]]; LETTER_PATHS['w'].width = 55;
+  LETTER_PATHS['x'] = [[M(10,28), L(50,72)], [M(50,28), L(10,72)]]; LETTER_PATHS['x'].width = 52;
+  LETTER_PATHS['y'] = [[M(10,28), L(30,55), L(50,28)], [M(30,55), L(30,78), Q(30,88,18,88)]]; LETTER_PATHS['y'].width = 52;
+  LETTER_PATHS['z'] = [[M(10,28), L(48,28), L(10,72), L(48,72)]]; LETTER_PATHS['z'].width = 52;
+
+  // NÚMEROS
+  LETTER_PATHS['0'] = [[M(35,8), Q(10,8,10,40), Q(10,72,35,72), Q(60,72,60,40), Q(60,8,35,8)]]; LETTER_PATHS['0'].width = 60;
+  LETTER_PATHS['1'] = [[M(25,18), L(35,8), L(35,72)], [M(20,72), L(50,72)]]; LETTER_PATHS['1'].width = 52;
+  LETTER_PATHS['2'] = [[M(15,22), Q(15,8,35,8), Q(55,8,55,25), Q(55,42,15,72), L(55,72)]]; LETTER_PATHS['2'].width = 58;
+  LETTER_PATHS['3'] = [[M(12,12), Q(30,5,48,15), Q(30,38,20,38)], [M(20,38), Q(50,38,50,55), Q(50,72,20,72)]]; LETTER_PATHS['3'].width = 55;
+  LETTER_PATHS['4'] = [[M(45,8), L(45,72)], [M(10,48), L(55,48)], [M(10,48), L(35,8)]]; LETTER_PATHS['4'].width = 55;
+  LETTER_PATHS['5'] = [[M(50,8), L(15,8), L(15,38)], [M(15,38), Q(50,35,50,55), Q(50,72,15,72)]]; LETTER_PATHS['5'].width = 55;
+  LETTER_PATHS['6'] = [[M(50,15), Q(30,5,15,20), Q(5,40,15,58), Q(30,75,50,58), Q(60,40,35,38)]]; LETTER_PATHS['6'].width = 58;
+  LETTER_PATHS['7'] = [[M(10,8), L(55,8), L(30,72)]]; LETTER_PATHS['7'].width = 55;
+  LETTER_PATHS['8'] = [[M(35,8), Q(10,8,10,28), Q(10,48,35,48), Q(60,48,60,28), Q(60,8,35,8)], [M(35,48), Q(10,48,10,62), Q(10,75,35,75), Q(60,75,60,62), Q(60,48,35,48)]]; LETTER_PATHS['8'].width = 60;
+  LETTER_PATHS['9'] = [[M(15,58), Q(30,75,50,58), Q(60,40,50,20), Q(30,5,15,20), Q(5,38,30,38)]]; LETTER_PATHS['9'].width = 58;
+
+  LETTER_PATHS[' '] = []; LETTER_PATHS[' '].width = 30;
+
+  function drawFallback(ctx, ch, ox, oy, size, color, guideType, density) {
+    ctx.save();
+    ctx.font = `bold ${size}px 'Comic Sans MS', Arial, sans-serif`;
+    ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'left';
+    const m = ctx.measureText(ch);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(1, size * 0.018);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    const baseGap = size * 0.18;
+    const densityFactor = (11 - density) / 5;
+    const gap = Math.max(size * 0.03, baseGap * densityFactor);
+
+    switch(guideType) {
+      case 'dots':
+        ctx.setLineDash([0, gap]);
+        ctx.lineWidth = Math.max(2, size * 0.025);
+        ctx.strokeText(ch, ox, oy);
+        break;
+      case 'dashed':
+        ctx.setLineDash([gap * 0.4, gap * 0.8]);
+        ctx.strokeText(ch, ox, oy);
+        break;
+      case 'gray':
+        ctx.strokeStyle = document.body.classList.contains('high-contrast') ? 'rgba(0,255,0,0.25)' : 'rgba(150,150,150,0.35)';
+        ctx.setLineDash([]);
+        ctx.strokeText(ch, ox, oy);
+        break;
+      case 'arrow':
+        ctx.setLineDash([gap * 0.35, gap * 0.65]);
+        ctx.strokeText(ch, ox, oy);
+        ctx.setLineDash([]);
+        ctx.fillStyle = color;
+        const as = size * 0.06;
+        ctx.beginPath();
+        ctx.moveTo(ox + as, oy - size * 0.68);
+        ctx.lineTo(ox, oy - size * 0.68);
+        ctx.lineTo(ox + as * 0.5, oy - size * 0.78);
+        ctx.fill();
+        break;
+    }
+    ctx.restore();
+    return m.width;
+  }
+
+  function prepareText(text, style) {
+    if (!text) return '';
+    if (style === 'printUpper') return text.toUpperCase();
+    if (style === 'printLower') return text.toLowerCase();
+    return text;
+  }
+
+  function drawGuidelines(ctx, w, h, baselineY) {
+    ctx.save();
+    ctx.strokeStyle = document.body.classList.contains('high-contrast') ? 'rgba(255,255,0,0.35)' : 'rgba(135, 206, 235, 0.45)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(0, baselineY);
+    ctx.lineTo(w, baselineY);
+    ctx.stroke();
+    ctx.strokeStyle = document.body.classList.contains('high-contrast') ? 'rgba(255,255,0,0.2)' : 'rgba(135, 206, 235, 0.25)';
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(0, baselineY - h * 0.35);
+    ctx.lineTo(w, baselineY - h * 0.35);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, baselineY - h * 0.72);
+    ctx.lineTo(w, baselineY - h * 0.72);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, baselineY + h * 0.28);
+    ctx.lineTo(w, baselineY + h * 0.28);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function generateTrace() {
+    if (currentMode !== 'trace') return;
+
+    const text = content.value || 'A';
+    const style = document.getElementById('traceStyle').value;
+    const guide = document.getElementById('traceGuide').value;
+    const repeat = parseInt(document.getElementById('traceRepeat').value) || 4;
+    const maxLines = parseInt(document.getElementById('traceLines').value) || 6;
+    const size = parseInt(document.getElementById('fontSize').value) || 32;
+    const density = parseInt(document.getElementById('dotDensity').value) || 5;
+
+    const prepared = prepareText(text, style);
+    const color = document.body.classList.contains('high-contrast') ? '#00ff00' : document.getElementById('textColor').value;
+
+    traceArea.innerHTML = '';
+
+    const scale = size / 100;
+    const cellH = size * 1.5;
+    const baselineY = cellH - size * 0.22;
+
+    const textLines = prepared.split('\n').filter(l => l.trim().length > 0);
+    if (textLines.length === 0) textLines.push(prepared);
+
+    let lineCount = 0;
+
+    for (let tl = 0; tl < textLines.length && lineCount < maxLines; tl++) {
+      const lineText = textLines[tl];
+
+      for (let r = 0; r < repeat && lineCount < maxLines; r++) {
+        const row = document.createElement('div');
+        row.className = 'trace-row';
+
+        for (let i = 0; i < lineText.length; i++) {
+          const ch = lineText[i];
+          const defs = LETTER_PATHS[ch];
+          const cellW = defs ? (defs.width * scale + size * 0.15) : (size * 0.85);
+
+          if (ch === ' ') {
+            const spacer = document.createElement('div');
+            spacer.style.width = (cellW) + 'px';
+            row.appendChild(spacer);
+            continue;
+          }
+
+          const wrapper = document.createElement('div');
+          wrapper.className = 'trace-cell';
+
+          const canvas = document.createElement('canvas');
+          canvas.className = 'trace-canvas';
+          canvas.width = Math.ceil(cellW);
+          canvas.height = Math.ceil(cellH);
+          canvas.style.width = Math.ceil(cellW) + 'px';
+          canvas.style.height = Math.ceil(cellH) + 'px';
+
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = document.body.classList.contains('high-contrast') ? '#000' : '#f5f5dc';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          drawGuidelines(ctx, canvas.width, cellH, baselineY);
+
+          if (defs) {
+            drawLetter(ctx, ch, 5, baselineY - 72 * scale, scale, color, guide, density);
+          } else {
+            drawFallback(ctx, ch, 5, baselineY, size, color, guide, density);
+          }
+
+          wrapper.appendChild(canvas);
+
+          if (r === 0) {
+            const label = document.createElement('div');
+            label.className = 'trace-label';
+            label.textContent = ch;
+            wrapper.appendChild(label);
+          }
+
+          row.appendChild(wrapper);
+        }
+
+        traceArea.appendChild(row);
+        lineCount++;
+      }
+
+      if (lineCount < maxLines) {
+        const practiceRow = document.createElement('div');
+        practiceRow.className = 'trace-row';
+        const pWidth = Math.min(800, size * lineText.replace(/\s/g, '').length * 0.7 + 50);
+
+        const practiceWrapper = document.createElement('div');
+        practiceWrapper.className = 'trace-practice-cell';
+
+        const pCanvas = document.createElement('canvas');
+        pCanvas.className = 'trace-canvas';
+        pCanvas.width = Math.ceil(pWidth);
+        pCanvas.height = Math.ceil(cellH);
+        pCanvas.style.width = Math.ceil(pWidth) + 'px';
+        pCanvas.style.height = Math.ceil(cellH) + 'px';
+
+        const pCtx = pCanvas.getContext('2d');
+        pCtx.fillStyle = document.body.classList.contains('high-contrast') ? '#000' : '#f5f5dc';
+        pCtx.fillRect(0, 0, pCanvas.width, pCanvas.height);
+        drawGuidelines(pCtx, pCanvas.width, cellH, baselineY);
+
+        pCtx.save();
+        pCtx.fillStyle = document.body.classList.contains('high-contrast') ? 'rgba(0,255,0,0.12)' : 'rgba(150,150,150,0.18)';
+        pCtx.font = `${size * 0.18}px sans-serif`;
+        pCtx.textAlign = 'center';
+        pCtx.fillText('✏️ Practica aquí', pCanvas.width / 2, cellH / 2);
+        pCtx.restore();
+
+        practiceWrapper.appendChild(pCanvas);
+        const pLabel = document.createElement('div');
+        pLabel.className = 'trace-practice-label';
+        pLabel.textContent = 'practica';
+        practiceWrapper.appendChild(pLabel);
+
+        practiceRow.appendChild(practiceWrapper);
+        traceArea.appendChild(practiceRow);
+        lineCount++;
+      }
     }
   }
 
   function loadTemplate(type) {
     const title = document.getElementById('sheetTitle');
     let text = '';
-
     switch(type) {
       case 'vocales':
         title.textContent = 'Practicando las Vocales';
-        text = `a   a   a   a   a   a   a   a   a   a
-e   e   e   e   e   e   e   e   e   e
-i   i   i   i   i   i   i   i   i   i
-o   o   o   o   o   o   o   o   o   o
-u   u   u   u   u   u   u   u   u   u
-
-aeiou   aeiou   aeiou   aeiou   aeiou`;
-        document.getElementById('fontSize').value = 42;
-        document.getElementById('lineHeight').value = 60;
+        text = `AEIOU
+AEIOU
+aeiou
+aeiou`;
+        document.getElementById('fontSize').value = 52;
+        document.getElementById('lineHeight').value = 70;
         document.getElementById('letterSpacing').value = 8;
         break;
-
       case 'abc':
         title.textContent = 'El Abecedario';
         text = `A B C D E F G H I J
-K L M N Ñ O P Q R S
-T U V W X Y Z
+K L M N O P Q R S T
+U V W X Y Z
 
 a b c d e f g h i j
-k l m n ñ o p q r s
-t u v w x y z`;
-        document.getElementById('fontSize').value = 36;
-        document.getElementById('lineHeight').value = 55;
+k l m n o p q r s t
+u v w x y z`;
+        document.getElementById('fontSize').value = 42;
+        document.getElementById('lineHeight').value = 60;
         document.getElementById('letterSpacing').value = 6;
         break;
-
       case 'numeros':
         title.textContent = 'Los Números del 1 al 10';
-        text = `1   2   3   4   5
-6   7   8   9   10
+        text = `1 2 3 4 5
+6 7 8 9 10
 
-uno     dos     tres
-cuatro  cinco   seis
-siete   ocho    nueve
-diez`;
-        document.getElementById('fontSize').value = 38;
-        document.getElementById('lineHeight').value = 55;
+uno dos tres
+cuatro cinco seis
+siete ocho nueve diez`;
+        document.getElementById('fontSize').value = 44;
+        document.getElementById('lineHeight').value = 60;
         document.getElementById('letterSpacing').value = 5;
         break;
-
       case 'nombre':
         title.textContent = 'Escribo Mi Nombre';
         text = `Mi nombre es:
@@ -426,7 +829,6 @@ ______________________________`;
         document.getElementById('lineHeight').value = 50;
         document.getElementById('letterSpacing').value = 3;
         break;
-
       case 'frase':
         title.textContent = 'Frase del Día';
         text = `Hoy es un buen día.
@@ -442,7 +844,6 @@ ______________________________`;
         document.getElementById('lineHeight').value = 45;
         document.getElementById('letterSpacing').value = 2;
         break;
-
       case 'vacio':
         title.textContent = 'Mi Cuaderno de Escritura';
         text = '';
@@ -451,32 +852,27 @@ ______________________________`;
         document.getElementById('letterSpacing').value = 3;
         break;
     }
-
     content.value = text;
-    updateStyle();
+    updateAll();
     content.focus();
   }
 
-  // Inicializar
-  updateStyle();
-  content.focus();
-
-  // Guardar en localStorage automáticamente
   content.addEventListener('input', () => {
     localStorage.setItem('tea_writer_content', content.value);
     localStorage.setItem('tea_writer_title', document.getElementById('sheetTitle').textContent);
+    if (currentMode === 'trace') generateTrace();
   });
 
   document.getElementById('sheetTitle').addEventListener('input', () => {
     localStorage.setItem('tea_writer_title', document.getElementById('sheetTitle').textContent);
   });
 
-  // Restaurar al cargar
   window.addEventListener('load', () => {
     const saved = localStorage.getItem('tea_writer_content');
     const savedTitle = localStorage.getItem('tea_writer_title');
     if (saved) content.value = saved;
     if (savedTitle) document.getElementById('sheetTitle').textContent = savedTitle;
+    updateAll();
   });
 </script>
 

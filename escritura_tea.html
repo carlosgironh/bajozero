@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escritura TEA - Entrenador de Caligrafía</title>
+<style>
+  :root {
+    --bg-color: #f5f5dc;
+    --line-color: #87CEEB;
+    --text-color: #1a1a1a;
+    --accent-color: #2E8B57;
+    --panel-bg: #ffffff;
+    --border-color: #ccc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #e8e8e8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== PANEL DE CONTROLES ===== */
+  .controls {
+    background: var(--panel-bg);
+    padding: 12px 20px;
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .control-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .control-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    white-space: nowrap;
+  }
+
+  .control-group input[type="range"] {
+    width: 100px;
+    cursor: pointer;
+  }
+
+  .control-group input[type="number"] {
+    width: 55px;
+    padding: 4px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  .control-group select {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .control-group button {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 6px;
+    background: var(--accent-color);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 13px;
+  }
+
+  .control-group button:hover { background: #236b43; }
+
+  .control-group button.secondary {
+    background: #6c757d;
+  }
+  .control-group button.secondary:hover { background: #545b62; }
+
+  .control-group button.danger {
+    background: #dc3545;
+  }
+  .control-group button.danger:hover { background: #b02a37; }
+
+  .value-display {
+    font-size: 12px;
+    color: #666;
+    min-width: 30px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  /* ===== ÁREA DE HOJA ===== */
+  .sheet-container {
+    flex: 1;
+    padding: 30px 20px;
+    display: flex;
+    justify-content: center;
+    overflow-y: auto;
+  }
+
+  .sheet {
+    background: var(--bg-color);
+    width: 210mm;
+    min-height: 297mm;
+    padding: 25mm 20mm;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    position: relative;
+    /* Líneas de cuaderno */
+    background-image:
+      repeating-linear-gradient(
+        transparent,
+        transparent calc(var(--line-height) - 1px),
+        var(--line-color) calc(var(--line-height) - 1px),
+        var(--line-color) var(--line-height)
+      );
+    background-size: 100% var(--line-height);
+    background-position: 0 25mm;
+  }
+
+  .sheet-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+  }
+
+  .sheet-content {
+    font-family: var(--font-family, 'Comic Sans MS', 'Chalkboard SE', cursive);
+    font-size: var(--font-size, 28px);
+    line-height: var(--line-height, 40px);
+    color: var(--text-color);
+    letter-spacing: var(--letter-spacing, 2px);
+    word-spacing: var(--word-spacing, 4px);
+    width: 100%;
+    min-height: 240mm;
+    border: none;
+    outline: none;
+    background: transparent;
+    resize: none;
+    overflow: hidden;
+    padding: 0 5px;
+    text-align: var(--text-align, left);
+  }
+
+  .sheet-content::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+
+  /* ===== PLANTILLAS PRE-DEFINIDAS ===== */
+  .templates-bar {
+    background: #fff;
+    padding: 8px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .template-btn {
+    padding: 5px 12px;
+    border: 1px solid var(--accent-color);
+    background: #e8f5e9;
+    color: var(--accent-color);
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .template-btn:hover {
+    background: var(--accent-color);
+    color: white;
+  }
+
+  /* ===== MODO OSCURO / ALTO CONTRASTE ===== */
+  body.high-contrast {
+    --bg-color: #000000;
+    --line-color: #ffff00;
+    --text-color: #00ff00;
+    --panel-bg: #1a1a1a;
+    --border-color: #444;
+  }
+
+  body.high-contrast .sheet {
+    box-shadow: 0 4px 20px rgba(255,255,255,0.1);
+  }
+
+  /* ===== IMPRESIÓN ===== */
+  @media print {
+    body { background: white; }
+    .controls, .templates-bar { display: none !important; }
+    .sheet-container { padding: 0; }
+    .sheet {
+      box-shadow: none;
+      width: 100%;
+      min-height: auto;
+      padding: 15mm 15mm;
+      page-break-after: always;
+    }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 600px) {
+    .sheet { width: 100%; min-height: auto; padding: 15mm 10mm; }
+    .controls { gap: 8px; padding: 8px; }
+    .control-group label { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BARRA DE PLANTILLAS -->
+<div class="templates-bar">
+  <span style="font-size:12px; color:#666; align-self:center; font-weight:600;">📝 Plantillas rápidas:</span>
+  <button class="template-btn" onclick="loadTemplate('vocales')">Vocales</button>
+  <button class="template-btn" onclick="loadTemplate('abc')">ABC Completo</button>
+  <button class="template-btn" onclick="loadTemplate('numeros')">Números 1-10</button>
+  <button class="template-btn" onclick="loadTemplate('nombre')">Mi Nombre</button>
+  <button class="template-btn" onclick="loadTemplate('frase')">Frase del día</button>
+  <button class="template-btn" onclick="loadTemplate('vacio')">Hoja en blanco</button>
+</div>
+
+<!-- PANEL DE CONTROLES -->
+<div class="controls">
+  <div class="control-group">
+    <label>🔤 Fuente:</label>
+    <select id="fontSelect" onchange="updateStyle()">
+      <option value="'Comic Sans MS', cursive">Comic Sans (recomendada)</option>
+      <option value="'Arial Rounded MT Bold', Arial, sans-serif">Arial Redondeada</option>
+      <option value="'Courier New', monospace">Courier (monoespaciada)</option>
+      <option value="'Verdana', sans-serif">Verdana</option>
+      <option value="'Georgia', serif">Georgia</option>
+      <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+    </select>
+  </div>
+
+  <div class="control-group">
+    <label>📏 Tamaño letra:</label>
+    <input type="range" id="fontSize" min="16" max="72" value="32" oninput="updateStyle()">
+    <span class="value-display" id="fontSizeVal">32px</span>
+  </div>
+
+  <div class="control-group">
+    <label>↕️ Interlineado:</label>
+    <input type="range" id="lineHeight" min="30" max="100" value="45" oninput="updateStyle()">
+    <span class="value-display" id="lineHeightVal">45px</span>
+  </div>
+
+  <div class="control-group">
+    <label>↔️ Espacio letras:</label>
+    <input type="range" id="letterSpacing" min="0" max="15" value="3" oninput="updateStyle()">
+    <span class="value-display" id="letterSpacingVal">3px</span>
+  </div>
+
+  <div class="control-group">
+    <label>🌌 Espacio palabras:</label>
+    <input type="range" id="wordSpacing" min="0" max="30" value="8" oninput="updateStyle()">
+    <span class="value-display" id="wordSpacingVal">8px</span>
+  </div>
+
+  <div class="control-group">
+    <label>🎨 Color texto:</label>
+    <input type="color" id="textColor" value="#1a1a1a" onchange="updateStyle()">
+  </div>
+
+  <div class="control-group">
+    <label>📐 Alineación:</label>
+    <select id="textAlign" onchange="updateStyle()">
+      <option value="left">Izquierda</option>
+      <option value="center">Centro</option>
+      <option value="justify">Justificado</option>
+    </select>
+  </div>
+
+  <div class="control-group">
+    <button class="secondary" onclick="toggleContrast()">🌓 Alto contraste</button>
+  </div>
+
+  <div class="control-group">
+    <button onclick="window.print()">🖨️ Imprimir / PDF</button>
+  </div>
+
+  <div class="control-group">
+    <button class="danger" onclick="clearSheet()">🗑️ Limpiar</button>
+  </div>
+</div>
+
+<!-- ÁREA DE HOJA -->
+<div class="sheet-container">
+  <div class="sheet" id="sheet">
+    <div class="sheet-title" id="sheetTitle" contenteditable="true" spellcheck="false">Mi Cuaderno de Escritura</div>
+    <textarea 
+      class="sheet-content" 
+      id="sheetContent" 
+      spellcheck="false"
+      placeholder="Escribe aquí o selecciona una plantilla arriba...&#10;&#10;💡 Consejos para el entrenamiento:&#10;• Usa letras grandes al principio&#10;• Aumenta el espacio entre letras&#10;• Practica una línea a la vez&#10;• Lee en voz alta lo que escribes"></textarea>
+  </div>
+</div>
+
+<script>
+  const sheet = document.getElementById('sheet');
+  const content = document.getElementById('sheetContent');
+
+  function updateStyle() {
+    const fontSize = document.getElementById('fontSize').value + 'px';
+    const lineHeight = document.getElementById('lineHeight').value + 'px';
+    const letterSpacing = document.getElementById('letterSpacing').value + 'px';
+    const wordSpacing = document.getElementById('wordSpacing').value + 'px';
+    const fontFamily = document.getElementById('fontSelect').value;
+    const textColor = document.getElementById('textColor').value;
+    const textAlign = document.getElementById('textAlign').value;
+
+    // Actualizar displays
+    document.getElementById('fontSizeVal').textContent = fontSize;
+    document.getElementById('lineHeightVal').textContent = lineHeight;
+    document.getElementById('letterSpacingVal').textContent = letterSpacing;
+    document.getElementById('wordSpacingVal').textContent = wordSpacing;
+
+    // Aplicar estilos CSS variables
+    sheet.style.setProperty('--font-size', fontSize);
+    sheet.style.setProperty('--line-height', lineHeight);
+    sheet.style.setProperty('--letter-spacing', letterSpacing);
+    sheet.style.setProperty('--word-spacing', wordSpacing);
+    sheet.style.setProperty('--font-family', fontFamily);
+    sheet.style.setProperty('--text-color', textColor);
+    sheet.style.setProperty('--text-align', textAlign);
+  }
+
+  function toggleContrast() {
+    document.body.classList.toggle('high-contrast');
+    if (document.body.classList.contains('high-contrast')) {
+      document.getElementById('textColor').value = '#00ff00';
+    } else {
+      document.getElementById('textColor').value = '#1a1a1a';
+    }
+    updateStyle();
+  }
+
+  function clearSheet() {
+    if (confirm('¿Borrar todo el contenido?')) {
+      document.getElementById('sheetTitle').textContent = 'Mi Cuaderno de Escritura';
+      content.value = '';
+    }
+  }
+
+  function loadTemplate(type) {
+    const title = document.getElementById('sheetTitle');
+    let text = '';
+
+    switch(type) {
+      case 'vocales':
+        title.textContent = 'Practicando las Vocales';
+        text = `a   a   a   a   a   a   a   a   a   a
+e   e   e   e   e   e   e   e   e   e
+i   i   i   i   i   i   i   i   i   i
+o   o   o   o   o   o   o   o   o   o
+u   u   u   u   u   u   u   u   u   u
+
+aeiou   aeiou   aeiou   aeiou   aeiou`;
+        document.getElementById('fontSize').value = 42;
+        document.getElementById('lineHeight').value = 60;
+        document.getElementById('letterSpacing').value = 8;
+        break;
+
+      case 'abc':
+        title.textContent = 'El Abecedario';
+        text = `A B C D E F G H I J
+K L M N Ñ O P Q R S
+T U V W X Y Z
+
+a b c d e f g h i j
+k l m n ñ o p q r s
+t u v w x y z`;
+        document.getElementById('fontSize').value = 36;
+        document.getElementById('lineHeight').value = 55;
+        document.getElementById('letterSpacing').value = 6;
+        break;
+
+      case 'numeros':
+        title.textContent = 'Los Números del 1 al 10';
+        text = `1   2   3   4   5
+6   7   8   9   10
+
+uno     dos     tres
+cuatro  cinco   seis
+siete   ocho    nueve
+diez`;
+        document.getElementById('fontSize').value = 38;
+        document.getElementById('lineHeight').value = 55;
+        document.getElementById('letterSpacing').value = 5;
+        break;
+
+      case 'nombre':
+        title.textContent = 'Escribo Mi Nombre';
+        text = `Mi nombre es:
+
+______________________________
+
+______________________________
+
+______________________________`;
+        document.getElementById('fontSize').value = 32;
+        document.getElementById('lineHeight').value = 50;
+        document.getElementById('letterSpacing').value = 3;
+        break;
+
+      case 'frase':
+        title.textContent = 'Frase del Día';
+        text = `Hoy es un buen día.
+
+El sol brilla.
+
+Yo puedo escribir.
+
+______________________________
+
+______________________________`;
+        document.getElementById('fontSize').value = 28;
+        document.getElementById('lineHeight').value = 45;
+        document.getElementById('letterSpacing').value = 2;
+        break;
+
+      case 'vacio':
+        title.textContent = 'Mi Cuaderno de Escritura';
+        text = '';
+        document.getElementById('fontSize').value = 32;
+        document.getElementById('lineHeight').value = 45;
+        document.getElementById('letterSpacing').value = 3;
+        break;
+    }
+
+    content.value = text;
+    updateStyle();
+    content.focus();
+  }
+
+  // Inicializar
+  updateStyle();
+  content.focus();
+
+  // Guardar en localStorage automáticamente
+  content.addEventListener('input', () => {
+    localStorage.setItem('tea_writer_content', content.value);
+    localStorage.setItem('tea_writer_title', document.getElementById('sheetTitle').textContent);
+  });
+
+  document.getElementById('sheetTitle').addEventListener('input', () => {
+    localStorage.setItem('tea_writer_title', document.getElementById('sheetTitle').textContent);
+  });
+
+  // Restaurar al cargar
+  window.addEventListener('load', () => {
+    const saved = localStorage.getItem('tea_writer_content');
+    const savedTitle = localStorage.getItem('tea_writer_title');
+    if (saved) content.value = saved;
+    if (savedTitle) document.getElementById('sheetTitle').textContent = savedTitle;
+  });
+</script>
+
+</body>
+</html>

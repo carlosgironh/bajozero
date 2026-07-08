@@ -63,7 +63,7 @@ data class Inspection(
     @SerialName("scheduled_date") val scheduledDate: String?,
     @SerialName("completion_date") val completionDate: String? = null,
     @SerialName("completion_time") val completionTime: String? = null,
-    @SerialName("technical_data") val technicalData: TechnicalData? = null,
+    @SerialName("technical_data") val technicalData: kotlinx.serialization.json.JsonElement? = null,
     val notes: String? = null,
     @SerialName("clients") val client: Client? = null
 )

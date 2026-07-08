@@ -650,8 +650,8 @@
 
     <script>
         // ==================== CONFIGURACIÓN SUPABASE ====================
-        const SUPABASE_URL = 'https://nuuehnixxoudctlzlwmi.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51dWVobml4eG91ZGN0bHpsd21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDM3NzYsImV4cCI6MjA4OTA3OTc3Nn0.DNc5wONm5QveZVTuz8zYtQMV6EzO2OsYU_ukDVsOB88';
+        const SUPABASE_URL = 'https://jqiqeyopvjsnutyihczh.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxaXFleW9wdmpzbnV0eWloY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjY0MDUsImV4cCI6MjA5OTEwMjQwNX0.v0a0G_hsRmaAKCTPBH5WHDtRF2gsTCBBJET2zXFLBTM';
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
@@ -669,7 +669,7 @@
             btn.innerHTML = '<div class="loading-spinner"></div> Verificando...';
             btn.disabled = true;
             
-            const email = document.getElementById('loginEmail').value;
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             
             try {
@@ -680,19 +680,20 @@
                 
                 if (error) throw error;
                 
-                // Verificar si es admin
-                const { data: adminData, error: adminError } = await supabaseClient
-                    .from('admins')
+                // Verificar si es admin o secretaria
+                const { data: profileData, error: profileError } = await supabaseClient
+                    .from('profiles')
                     .select('*')
-                    .eq('auth_user_id', data.user.id)
+                    .eq('id', data.user.id)
+                    .in('role', ['administrador', 'secretaria'])
                     .maybeSingle();
                 
-                if (adminError && adminError.code !== 'PGRST116') {
-                    console.error("Error verificando admin:", adminError);
+                if (profileError && profileError.code !== 'PGRST116') {
+                    console.error("Error verificando perfil:", profileError);
                 }
                 
-                if (!adminData) {
-                    throw new Error('Usuario no tiene permisos de administrador');
+                if (!profileData) {
+                    throw new Error('Usuario no tiene permisos de administrador o secretaria');
                 }
                 
                 currentUser = data.user;
@@ -765,7 +766,7 @@
             try {
                 const { data: inspections, error } = await supabaseClient
                     .from('inspections')
-                    .select('*, clients(contact_name), inspectors(full_name)')
+                    .select('*, clients(contact_name), profiles(full_name)')
                     .order('created_at', { ascending: false });
                     
                 if (error) throw error;
@@ -801,7 +802,7 @@
                                 </div>
                                 <div class="flex items-center gap-4">
                                     <span class="status-badge ${statusClass}">${inspection.status}</span>
-                                    <span class="text-sm text-gray-600">${inspection.inspectors?.full_name || 'Sin asignar'}</span>
+                                    <span class="text-sm text-gray-600">${inspection.profiles?.full_name || 'Sin asignar'}</span>
                                 </div>
                             </div>
                         `;
@@ -895,8 +896,9 @@
         async function loadTechnicians() {
             try {
                 const { data: technicians, error } = await supabaseClient
-                    .from('inspectors')
+                    .from('profiles')
                     .select('*')
+                    .eq('role', 'tecnico')
                     .eq('is_active', true)
                     .order('full_name');
                     
@@ -917,8 +919,9 @@
         async function loadTechniciansList() {
             try {
                 const { data: technicians, error } = await supabaseClient
-                    .from('inspectors')
+                    .from('profiles')
                     .select('*')
+                    .eq('role', 'tecnico')
                     .order('full_name');
                     
                 if (error) throw error;
@@ -1043,7 +1046,7 @@
             try {
                 const { data: inspections, error } = await supabaseClient
                     .from('inspections')
-                    .select('*, clients(contact_name, phone, address), inspectors(full_name)')
+                    .select('*, clients(contact_name, phone, address), profiles(full_name)')
                     .order('scheduled_date', { ascending: false });
                     
                 if (error) throw error;
@@ -1060,7 +1063,7 @@
                             <td class="px-6 py-4 font-semibold text-brand-primary">${inspection.inspection_number}</td>
                             <td class="px-6 py-4 text-gray-600">${formatDate(inspection.scheduled_date)}</td>
                             <td class="px-6 py-4 font-medium">${inspection.clients?.contact_name || 'N/A'}</td>
-                            <td class="px-6 py-4">${inspection.inspectors?.full_name || 'Sin asignar'}</td>
+                            <td class="px-6 py-4">${inspection.profiles?.full_name || 'Sin asignar'}</td>
                             <td class="px-6 py-4">
                                 <span class="status-badge ${statusClass}">${inspection.status}</span>
                             </td>
@@ -1082,7 +1085,7 @@
             try {
                 const { data: inspection, error } = await supabaseClient
                     .from('inspections')
-                    .select('*, clients(*), inspectors(*)')
+                    .select('*, clients(*), profiles(*)')
                     .eq('id', inspectionId)
                     .single();
                     
@@ -1115,7 +1118,7 @@
                             <h4 class="font-semibold mb-2">Detalles</h4>
                             <p><strong>Fecha:</strong> ${formatDate(inspection.scheduled_date)} ${inspection.scheduled_time ? 'a las ' + inspection.scheduled_time : ''}</p>
                             <p><strong>Equipo:</strong> ${inspection.equipment_type} ${inspection.equipment_brand ? '- ' + inspection.equipment_brand : ''}</p>
-                            <p><strong>Técnico Asignado:</strong> ${inspection.inspectors?.full_name || 'Sin asignar'}</p>
+                            <p><strong>Técnico Asignado:</strong> ${inspection.profiles?.full_name || 'Sin asignar'}</p>
                         </div>
                         
                         ${inspection.technician_notes ? `
@@ -1194,43 +1197,32 @@
                     throw new Error('No hay sesión activa. Por favor inicie sesión nuevamente.');
                 }
 
-                // Verificar primero si el email ya existe en inspectors
+                // Verificar primero si el email ya existe en perfiles
                 const { data: existingInspector, error: searchError } = await supabaseClient
-                    .from('inspectors')
+                    .from('profiles')
                     .select('id, email, full_name, is_active')
                     .eq('email', email)
                     .maybeSingle();
 
                 if (existingInspector) {
-                    throw new Error(`Ya existe un técnico con este email: ${existingInspector.full_name}. Use otro email.`);
+                    throw new Error(`Ya existe un usuario con este email: ${existingInspector.full_name}. Use otro email.`);
                 }
 
-                // Llamar a Edge Function con JWT
-                btn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Creando...';
-
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/create-technician`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${sessionData.session.access_token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        password: document.getElementById('techPassword').value,
-                        full_name: document.getElementById('techFullName').value,
-                        phone: document.getElementById('techPhone').value,
-                        specialty: document.getElementById('techSpecialty').value
-                    })
+                // Llamar a RPC en lugar de Edge Function
+                const { data: result, error: rpcError } = await supabaseClient.rpc('create_technician', {
+                    p_email: email,
+                    p_password: document.getElementById('techPassword').value,
+                    p_full_name: document.getElementById('techFullName').value,
+                    p_phone: document.getElementById('techPhone').value,
+                    p_specialty: document.getElementById('techSpecialty').value
                 });
 
-                const result = await response.json();
+                if (rpcError) {
+                    throw new Error(rpcError.message || 'Error al crear técnico');
+                }
 
-                if (!response.ok) {
-                    // Manejar error específico de email duplicado en auth
-                    if (result.auth_existing || (result.error && result.error.includes('already'))) {
-                        throw new Error('Este email ya está registrado en el sistema de autenticación. Use otro email.');
-                    }
-                    throw new Error(result.error || `Error ${response.status}: Error al crear técnico`);
+                if (!result.success) {
+                    throw new Error(result.error || 'Error desconocido al crear técnico');
                 }
 
                 alert(`✅ Técnico creado exitosamente.\n\n📧 Email: ${email}\n🔑 Contraseña temporal: ${result.temp_password || document.getElementById('techPassword').value}\n\nEl técnico debe cambiar su contraseña al iniciar sesión.`);
@@ -1294,20 +1286,14 @@
                 if (company) bodyData.company_name = company;
                 // NOTA: No enviamos 'ruc' porque la columna no existe en la BD
 
-                // Llamar a Edge Function con JWT
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/create-client`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${sessionData.session.access_token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(bodyData)
-                });
+                // Insertar directamente en la tabla clients
+                const { data: result, error: insertError } = await supabaseClient
+                    .from('clients')
+                    .insert([bodyData])
+                    .select();
 
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.error || `Error ${response.status}: Error al crear cliente`);
+                if (insertError) {
+                    throw new Error(insertError.message || 'Error al crear cliente');
                 }
 
                 alert('✅ Cliente creado exitosamente');
@@ -1343,14 +1329,15 @@
             // Check if user is already logged in
             supabaseClient.auth.getSession().then(({ data: { session } }) => {
                 if (session) {
-                    // Verificar si es admin
+                    // Verificar si es admin o secretaria
                     supabaseClient
-                        .from('admins')
+                        .from('profiles')
                         .select('*')
-                        .eq('auth_user_id', session.user.id)
+                        .eq('id', session.user.id)
+                        .in('role', ['administrador', 'secretaria'])
                         .maybeSingle()
-                        .then(({ data: adminData }) => {
-                            if (adminData) {
+                        .then(({ data: profileData }) => {
+                            if (profileData) {
                                 currentUser = session.user;
                                 showDashboard();
                             }

@@ -343,8 +343,8 @@
 
     <script>
         // Configuración de Supabase
-        const SUPABASE_URL = 'https://nuuehnixxoudctlzlwmi.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51dWVobml4eG91ZGN0bHpsd21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDM3NzYsImV4cCI6MjA4OTA3OTc3Nn0.DNc5wONm5QveZVTuz8zYtQMV6EzO2OsYU_ukDVsOB88';
+        const SUPABASE_URL = 'https://jqiqeyopvjsnutyihczh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxaXFleW9wdmpzbnV0eWloY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjY0MDUsImV4cCI6MjA5OTEwMjQwNX0.v0a0G_hsRmaAKCTPBH5WHDtRF2gsTCBBJET2zXFLBTM';
 
         // Inicializar Supabase
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -381,7 +381,7 @@
             
             const btn = document.getElementById('btnLogin');
             const errorDiv = document.getElementById('errorMessage');
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
             // Reset error
@@ -401,13 +401,13 @@
                 // 2. Obtener perfil y rol
                 const { data: profile, error: profileError } = await supabase
                     .from('profiles')
-                    .select('role, full_name, status')
+                    .select('role, full_name, is_active')
                     .eq('id', authData.user.id)
                     .single();
 
                 if (profileError) throw profileError;
 
-                if (profile.status !== 'active') {
+                if (profile.is_active !== true) {
                     throw new Error('Cuenta suspendida. Contacte al administrador.');
                 }
 
@@ -417,9 +417,9 @@
                 const roleText = document.getElementById('roleText');
 
                 const roleConfig = {
-                    'admin': { icon: '👑', text: 'Administrador', color: '#f59e0b' },
-                    'technician': { icon: '🔧', text: 'Técnico', color: '#3b82f6' },
-                    'customer': { icon: '👤', text: 'Cliente', color: '#10b981' }
+                    'administrador': { icon: '👑', text: 'Administrador', color: '#f59e0b' },
+                    'secretaria': { icon: '👩‍💼', text: 'Secretaria', color: '#8b5cf6' },
+                    'tecnico': { icon: '🔧', text: 'Técnico', color: '#3b82f6' }
                 };
 
                 const config = roleConfig[profile.role];
@@ -431,9 +431,9 @@
                 // 4. Redirigir según rol después de breve delay
                 setTimeout(() => {
                     const routes = {
-                        'admin': 'app/admin/dashboard.html',
-                        'technician': 'app/technician/dashboard.html',
-                        'customer': 'app/customer/dashboard.html'
+                        'administrador': 'admin.html',
+                        'secretaria': 'admin.html',
+                        'tecnico': 'panel.html'
                     };
                     window.location.href = routes[profile.role] || 'inicio.html';
                 }, 1500);
@@ -466,9 +466,9 @@
                 
                 if (profile) {
                     const routes = {
-                        'admin': 'app/admin/dashboard.html',
-                        'technician': 'app/technician/dashboard.html',
-                        'customer': 'app/customer/dashboard.html'
+                        'administrador': 'admin.html',
+                        'secretaria': 'admin.html',
+                        'tecnico': 'panel.html'
                     };
                     window.location.href = routes[profile.role] || 'inicio.html';
                 }

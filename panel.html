@@ -361,33 +361,29 @@
                                         <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">CABLE DE<br>SEÑAL 5x14</th>
                                         <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">CABLE DE<br>CORRIENTE 3x12</th>
                                         <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">SOPORTE<br>CONDENSADORA</th>
+                                        <th class="border-2 border-blue-800 p-3 text-sm font-bold text-blue-800">ACCIONES</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="modelo" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_basica" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_manga" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_recorrido" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="pies_tuberia" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_4x14" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_5x14" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_3x12" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="soporte" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="modelo2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_basica2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_manga2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_recorrido2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="pies_tuberia2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_4x14_2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_5x14_2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_3x12_2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
-                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="soporte2" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                                <tbody id="modelosTableBody">
+                                    <tr class="modelo-row">
+                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="modelo[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_basica[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_manga[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_recorrido[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="pies_tuberia[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_4x14[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_5x14[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_3x12[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                                        <td class="border-2 border-blue-800 p-2"><input type="text" name="soporte[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                                        <td class="border-2 border-blue-800 p-2 text-center"><button type="button" onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700" title="Eliminar"><i class="fas fa-trash"></i></button></td>
                                     </tr>
                                 </tbody>
                             </table>
+                            <div class="mt-4 text-right">
+                                <button type="button" onclick="agregarModelo()" class="bg-blue-100 text-blue-700 px-4 py-2 rounded font-semibold hover:bg-blue-200 transition-colors">
+                                    <i class="fas fa-plus"></i> Agregar Otro Equipo
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -617,8 +613,8 @@
 
     <script>
         // ==================== CONFIGURACIÓN SUPABASE ====================
-        const SUPABASE_URL = 'https://nuuehnixxoudctlzlwmi.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51dWVobml4eG91ZGN0bHpsd21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDM3NzYsImV4cCI6MjA4OTA3OTc3Nn0.DNc5wONm5QveZVTuz8zYtQMV6EzO2OsYU_ukDVsOB88';
+        const SUPABASE_URL = 'https://jqiqeyopvjsnutyihczh.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxaXFleW9wdmpzbnV0eWloY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjY0MDUsImV4cCI6MjA5OTEwMjQwNX0.v0a0G_hsRmaAKCTPBH5WHDtRF2gsTCBBJET2zXFLBTM';
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
@@ -651,10 +647,10 @@
                 
                 // Verificar si es técnico
                 const { data: techData, error: techError } = await supabaseClient
-                    .from('technicians')
+                    .from('profiles')
                     .select('*')
-                    .eq('auth_user_id', data.user.id)
-                    .eq('is_active', true)
+                    .eq('id', data.user.id)
+                    .eq('role', 'tecnico')
                     .maybeSingle();
                 
                 if (techError && techError.code !== 'PGRST116') {
@@ -741,7 +737,7 @@
                 const { data: inspections, error } = await supabaseClient
                     .from('inspections')
                     .select('*, clients(contact_name, phone, address)')
-                    .eq('assigned_technician_id', currentTechnician.id)
+                    .eq('inspector_id', currentTechnician.id)
                     .eq('status', 'asignada')
                     .order('scheduled_date', { ascending: true });
                     
@@ -797,7 +793,7 @@
                 const { data: inspections, error } = await supabaseClient
                     .from('inspections')
                     .select('*, clients(contact_name)')
-                    .eq('assigned_technician_id', currentTechnician.id)
+                    .eq('inspector_id', currentTechnician.id)
                     .eq('status', 'completada')
                     .order('completed_at', { ascending: false });
                     
@@ -971,6 +967,25 @@
             return canvas.toDataURL('image/png');
         }
         
+        function agregarModelo() {
+            const tbody = document.getElementById('modelosTableBody');
+            const tr = document.createElement('tr');
+            tr.className = 'modelo-row';
+            tr.innerHTML = `
+                <td class="border-2 border-blue-800 p-2"><input type="text" name="modelo[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_basica[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_manga[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                <td class="border-2 border-blue-800 p-2"><input type="text" name="inst_recorrido[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                <td class="border-2 border-blue-800 p-2"><input type="text" name="pies_tuberia[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_4x14[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_5x14[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                <td class="border-2 border-blue-800 p-2"><input type="text" name="cable_3x12[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                <td class="border-2 border-blue-800 p-2"><input type="text" name="soporte[]" class="w-full p-2 border border-gray-300 rounded text-center"></td>
+                <td class="border-2 border-blue-800 p-2 text-center"><button type="button" onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700" title="Eliminar"><i class="fas fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+        
         // ==================== ENVIAR INSPECCIÓN ====================
         
         async function submitInspection(e) {
@@ -987,16 +1002,20 @@
             
             try {
                 // 1. Recopilar datos del formulario técnico
+                const modelos = Array.from(document.querySelectorAll('.modelo-row')).map(row => ({
+                    modelo: row.querySelector('input[name="modelo[]"]').value,
+                    inst_basica: row.querySelector('input[name="inst_basica[]"]').value,
+                    inst_manga: row.querySelector('input[name="inst_manga[]"]').value,
+                    inst_recorrido: row.querySelector('input[name="inst_recorrido[]"]').value,
+                    pies_tuberia: row.querySelector('input[name="pies_tuberia[]"]').value,
+                    cable_4x14: row.querySelector('input[name="cable_4x14[]"]').value,
+                    cable_5x14: row.querySelector('input[name="cable_5x14[]"]').value,
+                    cable_3x12: row.querySelector('input[name="cable_3x12[]"]').value,
+                    soporte: row.querySelector('input[name="soporte[]"]').value
+                }));
+
                 const formData = {
-                    modelo: document.querySelector('input[name="modelo"]').value,
-                    inst_basica: document.querySelector('input[name="inst_basica"]').value,
-                    inst_manga: document.querySelector('input[name="inst_manga"]').value,
-                    inst_recorrido: document.querySelector('input[name="inst_recorrido"]').value,
-                    pies_tuberia: document.querySelector('input[name="pies_tuberia"]').value,
-                    cable_4x14: document.querySelector('input[name="cable_4x14"]').value,
-                    cable_5x14: document.querySelector('input[name="cable_5x14"]').value,
-                    cable_3x12: document.querySelector('input[name="cable_3x12"]').value,
-                    soporte: document.querySelector('input[name="soporte"]').value,
+                    modelos: modelos,
                     
                     // Checklist
                     manga_obstruida: document.querySelector('input[name="manga_obstruida"]:checked')?.value || '',
@@ -1099,17 +1118,21 @@
                                 <th style="border: 1px solid #999; padding: 8px;">Cable 3x12</th>
                                 <th style="border: 1px solid #999; padding: 8px;">Soporte</th>
                             </tr>
-                            <tr>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.modelo || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.inst_basica || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.inst_manga || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.inst_recorrido || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.pies_tuberia || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.cable_4x14 || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.cable_5x14 || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.cable_3x12 || '-'}</td>
-                                <td style="border: 1px solid #999; padding: 8px; text-align: center;">${formData.soporte || '-'}</td>
-                            </tr>
+                            ${formData.modelos && formData.modelos.length > 0 ? formData.modelos.map(m => `
+                                <tr>
+                                    <td style="border: 1px solid #999; padding: 8px; text-align: center;">${m.modelo || '-'}</td>
+                                    <td style="border: 1px solid #999; padding: 8px; text-align: center;">${m.inst_basica || '-'}</td>
+                                    <td style="border: 1px solid #999; padding: 8px; text-align: center;">${m.inst_manga || '-'}</td>
+                                    <td style="border: 1px solid #999; padding: 8px; text-align: center;">${m.inst_recorrido || '-'}</td>
+                                    <td style="border: 1px solid #999; padding: 8px; text-align: center;">${m.pies_tuberia || '-'}</td>
+                                    <td style="border: 1px solid #999; padding: 8px; text-align: center;">${m.cable_4x14 || '-'}</td>
+                                    <td style="border: 1px solid #999; padding: 8px; text-align: center;">${m.cable_5x14 || '-'}</td>
+                                    <td style="border: 1px solid #999; padding: 8px; text-align: center;">${m.cable_3x12 || '-'}</td>
+                                    <td style="border: 1px solid #999; padding: 8px; text-align: center;">${m.soporte || '-'}</td>
+                                </tr>
+                            `).join('') : `
+                                <tr><td colspan="9" style="border: 1px solid #999; padding: 8px; text-align: center;">Sin equipos registrados</td></tr>
+                            `}
                         </table>
                     </div>
                     

@@ -5,7 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,11 +26,13 @@ fun DashboardScreen(
 ) {
     var inspections by remember { mutableStateOf<List<Inspection>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     var selectedTab by remember { mutableStateOf(0) } // 0 = Asignadas, 1 = Completadas
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(selectedTab) {
         isLoading = true
+        errorMessage = null
         try {
             val user = supabase.auth.currentUserOrNull()
             if (user != null) {
@@ -46,6 +49,7 @@ fun DashboardScreen(
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            errorMessage = e.message ?: "Error desconocido"
         } finally {
             isLoading = false
         }
@@ -67,7 +71,7 @@ fun DashboardScreen(
                             onLogout()
                         }
                     }) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Cerrar sesión")
+                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Cerrar sesión")
                     }
                 }
             )
@@ -94,6 +98,10 @@ fun DashboardScreen(
             if (isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
+                }
+            } else if (errorMessage != null) {
+                Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                    Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
                 }
             } else if (inspections.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -131,14 +139,14 @@ fun InspectionCard(inspection: Inspection, onClick: () -> Unit) {
         Column(modifier = Modifier.padding(20.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Default.List,
+                    imageVector = Icons.AutoMirrored.Filled.List,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = inspection.inspectionNumber,
+                    text = inspection.inspectionNumber ?: "Sin número",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = androidx.compose.ui.text.font.FontWeight.Bold

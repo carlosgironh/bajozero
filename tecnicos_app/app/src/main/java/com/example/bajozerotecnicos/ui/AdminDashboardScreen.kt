@@ -2,6 +2,8 @@ package com.example.bajozerotecnicos.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,7 +18,7 @@ import kotlinx.coroutines.launch
 
 sealed class BottomNavItem(val title: String, val icon: ImageVector) {
     object Dashboard : BottomNavItem("Dashboard", Icons.Default.Home)
-    object Tareas : BottomNavItem("Tareas", Icons.Default.List)
+    object Tareas : BottomNavItem("Tareas", Icons.AutoMirrored.Filled.List)
     object Personal : BottomNavItem("Personal", Icons.Default.Person)
     object Clientes : BottomNavItem("Clientes", Icons.Default.Face)
 }
@@ -52,7 +54,7 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
                             }
                         }
                     }) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Cerrar Sesión")
+                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Cerrar Sesión")
                     }
                 }
             )

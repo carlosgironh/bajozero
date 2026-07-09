@@ -56,11 +56,11 @@ data class TechnicalData(
 @Serializable
 data class Inspection(
     val id: String,
-    @SerialName("inspection_number") val inspectionNumber: String,
+    @SerialName("inspection_number") val inspectionNumber: String? = null,
     @SerialName("client_id") val clientId: String?,
     @SerialName("inspector_id") val inspectorId: String?,
-    val status: String,
-    @SerialName("scheduled_date") val scheduledDate: String?,
+    val status: String? = "pendiente",
+    @SerialName("scheduled_date") val scheduledDate: String? = null,
     @SerialName("completion_date") val completionDate: String? = null,
     @SerialName("completion_time") val completionTime: String? = null,
     @SerialName("technical_data") val technicalData: kotlinx.serialization.json.JsonElement? = null,

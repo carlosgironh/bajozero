@@ -1,6 +1,9 @@
 package com.example.bajozerotecnicos.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,83 +25,165 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
-    Column(
+    // Fondo degradado premium
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
     ) {
-        Text(text = "BajoZero Técnicos", style = MaterialTheme.typography.headlineLarge)
-        Spacer(modifier = Modifier.height(32.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Contraseña") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        if (errorMessage != null) {
-            Text(text = errorMessage!!, color = MaterialTheme.colorScheme.error)
-            Spacer(modifier = Modifier.height(16.dp))
+        // Decoración de fondo (Círculos difuminados)
+        Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .size(300.dp)
+                    .offset(x = (-100).dp, y = (-100).dp)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), shape = androidx.compose.foundation.shape.CircleShape)
+            )
+            Box(
+                modifier = Modifier
+                    .size(300.dp)
+                    .offset(x = 200.dp, y = 400.dp)
+                    .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f), shape = androidx.compose.foundation.shape.CircleShape)
+            )
         }
 
-        Button(
-            onClick = {
-                scope.launch {
-                    isLoading = true
-                    errorMessage = null
-                    try {
-                        supabase.auth.signInWith(Email) {
-                            this.email = email.trim()
-                            this.password = password
-                        }
-                        
-                        val user = supabase.auth.currentUserOrNull()
-                        if (user != null) {
-                            val profile = supabase.postgrest["profiles"]
-                                .select { filter { eq("id", user.id) } }
-                                .decodeSingleOrNull<Profile>()
-                                
-                            if (profile != null && profile.isActive) {
-                                if (profile.role == "tecnico" || profile.role == "administrador" || profile.role == "secretaria") {
-                                    onLoginSuccess(profile.role)
-                                } else {
-                                    supabase.auth.signOut()
-                                    errorMessage = "Tu rol actual no tiene acceso a esta aplicación."
+        // Tarjeta principal (Glassmorphism)
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Logo o Icono
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), shape = androidx.compose.foundation.shape.CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.Person,
+                        contentDescription = "Logo",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    text = "BajoZero",
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Portal de Personal",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = androidx.compose.ui.graphics.Color.Gray
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Correo Electrónico") },
+                    leadingIcon = { Icon(androidx.compose.material.icons.Icons.Default.Email, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = androidx.compose.ui.graphics.Color(0xFFE5E7EB),
+                        focusedBorderColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Contraseña") },
+                    leadingIcon = { Icon(androidx.compose.material.icons.Icons.Default.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = androidx.compose.ui.graphics.Color(0xFFE5E7EB),
+                        focusedBorderColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+                
+                Spacer(modifier = Modifier.height(24.dp))
+
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage!!, 
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        scope.launch {
+                            isLoading = true
+                            errorMessage = null
+                            try {
+                                supabase.auth.signInWith(Email) {
+                                    this.email = email.trim()
+                                    this.password = password
                                 }
-                            } else {
-                                supabase.auth.signOut()
-                                errorMessage = "Cuenta inactiva o no encontrada."
+                                
+                                val user = supabase.auth.currentUserOrNull()
+                                if (user != null) {
+                                    val profile = supabase.postgrest["profiles"]
+                                        .select { filter { eq("id", user.id) } }
+                                        .decodeSingleOrNull<Profile>()
+                                        
+                                    if (profile != null && profile.isActive) {
+                                        if (profile.role == "tecnico" || profile.role == "administrador" || profile.role == "secretaria") {
+                                            onLoginSuccess(profile.role)
+                                        } else {
+                                            supabase.auth.signOut()
+                                            errorMessage = "Tu rol actual no tiene acceso a esta aplicación."
+                                        }
+                                    } else {
+                                        supabase.auth.signOut()
+                                        errorMessage = "Cuenta inactiva o no encontrada."
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                errorMessage = "Error: Verifica tu conexión a internet o credenciales."
+                            } finally {
+                                isLoading = false
                             }
                         }
-                    } catch (e: Exception) {
-                        errorMessage = "Error al iniciar sesión: ${e.message}"
-                    } finally {
-                        isLoading = false
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = androidx.compose.ui.graphics.Color.White)
+                    } else {
+                        Text("Ingresar al Portal", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, color = androidx.compose.ui.graphics.Color.White)
                     }
                 }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading && email.isNotBlank() && password.isNotBlank()
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
-            } else {
-                Text("Acceder al Panel")
             }
         }
     }

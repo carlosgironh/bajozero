@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.util.Base64
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -34,7 +35,7 @@ fun SignaturePad(onSignatureCaptured: (String?) -> Unit) {
                 .fillMaxWidth()
                 .height(200.dp)
                 .background(Color.White, shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
-                .androidx.compose.foundation.border(1.dp, Color(0xFFE5E7EB), shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+                .border(1.dp, Color(0xFFE5E7EB), shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()

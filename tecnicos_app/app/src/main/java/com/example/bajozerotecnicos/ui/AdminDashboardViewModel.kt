@@ -36,7 +36,7 @@ class AdminDashboardViewModel : ViewModel() {
             _isLoading.value = true
             try {
                 // Fetch all tasks
-                val allTasks = supabase.postgrest["inspections"]
+                val allTasks = supabase.postgrest["tasks"]
                     .select {
                         // TODO: maybe fetch joined clients
                     }

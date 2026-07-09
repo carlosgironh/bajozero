@@ -38,7 +38,7 @@ fun DashboardScreen(
             if (user != null) {
                 val statusFilter = if (selectedTab == 0) "asignada" else "completada"
                 // Supabase Kotlin select with relations
-                inspections = supabase.postgrest["inspections"]
+                inspections = supabase.postgrest["tasks"]
                     .select(columns = io.github.jan.supabase.postgrest.query.Columns.raw("*, clients(*)")) {
                         filter {
                             eq("inspector_id", user.id)

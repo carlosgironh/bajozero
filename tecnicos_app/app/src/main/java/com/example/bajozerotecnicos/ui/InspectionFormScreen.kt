@@ -150,7 +150,7 @@ fun InspectionFormScreen(
                             )
                             
                             // Using Kotlinx Serialization inside Supabase client handles JSON conversion automatically
-                            supabase.postgrest["inspections"]
+                            supabase.postgrest["tasks"]
                                 .update(
                                     {
                                         set("status", "completada")

@@ -36,6 +36,7 @@ CREATE TABLE public.clients (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     contact_name TEXT NOT NULL,
     company_name TEXT,
+    ruc TEXT,
     email TEXT,
     phone TEXT,
     address TEXT,
@@ -150,3 +151,18 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- CREATE TRIGGER on_auth_user_created
 --   AFTER INSERT ON auth.users
 --   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- ====================================================================
+-- SYSTEM SETTINGS
+-- ====================================================================
+CREATE TABLE public.system_settings (
+    id INTEGER PRIMARY KEY DEFAULT 1,
+    inactivity_timeout_minutes INTEGER NOT NULL DEFAULT 15,
+    CONSTRAINT single_row CHECK (id = 1)
+);
+
+ALTER TABLE public.system_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read for system_settings" ON public.system_settings FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Admin write for system_settings" ON public.system_settings FOR UPDATE TO authenticated USING (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'administrador'));
+CREATE POLICY "Admin insert for system_settings" ON public.system_settings FOR INSERT TO authenticated WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'administrador'));

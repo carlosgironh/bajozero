@@ -51,7 +51,12 @@ fun InspectionFormScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Inspección ${inspection.inspectionNumber}") },
+                title = { Text("Inspección ${inspection.inspectionNumber}", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = androidx.compose.ui.graphics.Color.White,
+                    navigationIconContentColor = androidx.compose.ui.graphics.Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
@@ -68,11 +73,19 @@ fun InspectionFormScreen(
                 .padding(16.dp)
         ) {
             // Cabecera Cliente
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Cliente: ${inspection.client?.contactName ?: ""}")
-                    Text("Teléfono: ${inspection.client?.phone ?: ""}")
-                    Text("Dirección: ${inspection.client?.address ?: ""}")
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color.White),
+                border = androidx.compose.foundation.BorderStroke(1.dp, androidx.compose.ui.graphics.Color(0xFFE5E7EB)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text("Cliente: ${inspection.client?.contactName ?: ""}", fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("Teléfono: ${inspection.client?.phone ?: ""}", color = androidx.compose.ui.graphics.Color.Gray)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text("Dirección: ${inspection.client?.address ?: ""}", color = androidx.compose.ui.graphics.Color.Gray)
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -169,12 +182,19 @@ fun InspectionFormScreen(
 
 @Composable
 fun ModeloInputForm(modelo: ModeloRow, onUpdate: (ModeloRow) -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(8.dp)) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color.White),
+        border = androidx.compose.foundation.BorderStroke(1.dp, androidx.compose.ui.graphics.Color(0xFFE5E7EB)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             OutlinedTextField(value = modelo.modelo, onValueChange = { onUpdate(modelo.copy(modelo = it)) }, label = { Text("Modelo") }, modifier = Modifier.fillMaxWidth())
+            Spacer(modifier = Modifier.height(8.dp))
             Row {
                 OutlinedTextField(value = modelo.instBasica, onValueChange = { onUpdate(modelo.copy(instBasica = it)) }, label = { Text("Inst. Básica") }, modifier = Modifier.weight(1f))
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 OutlinedTextField(value = modelo.instManga, onValueChange = { onUpdate(modelo.copy(instManga = it)) }, label = { Text("Inst. Manga") }, modifier = Modifier.weight(1f))
             }
         }

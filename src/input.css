@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  /* Glassmorphism utilities */
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+  
+  .glass-card {
+    @apply bg-white/90 backdrop-blur-sm border border-gray-100 shadow-lg rounded-2xl hover:shadow-xl transition-shadow duration-300;
+  }
+
+  /* Form Inputs */
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:bg-white focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all duration-200;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply bg-gradient-to-r from-brand-primary to-brand-accent hover:from-brand-secondary hover:to-brand-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 py-3 px-6 rounded-xl font-semibold shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2;
+  }
+
+  /* Navigation Item */
+  .nav-item {
+    @apply flex items-center px-4 py-3 mx-4 mb-1.5 text-sm font-medium text-gray-600 hover:text-brand-primary hover:bg-brand-light rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden;
+  }
+  
+  .nav-item.active {
+    @apply bg-brand-primary text-white shadow-md;
+  }
+  
+  .nav-item i {
+    @apply w-6 text-center text-lg transition-transform duration-200;
+  }
+  
+  .nav-item:hover i {
+    transform: scale(1.1);
+  }
+
+  /* Status Badges */
+  .badge {
+    @apply px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
+  }
+  .badge-pending {
+    @apply bg-amber-100 text-amber-800 border border-amber-200;
+  }
+  .badge-assigned {
+    @apply bg-blue-100 text-blue-800 border border-blue-200;
+  }
+  .badge-completed {
+    @apply bg-emerald-100 text-emerald-800 border border-emerald-200;
+  }
+}
+
+/* Animations */
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -54,7 +54,12 @@ fun DashboardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Panel del Técnico") },
+                title = { Text("Panel del Técnico", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = androidx.compose.ui.graphics.Color.White,
+                    actionIconContentColor = androidx.compose.ui.graphics.Color.White
+                ),
                 actions = {
                     IconButton(onClick = {
                         scope.launch {
@@ -118,18 +123,41 @@ fun InspectionCard(inspection: Inspection, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color.White),
+        border = androidx.compose.foundation.BorderStroke(1.dp, androidx.compose.ui.graphics.Color(0xFFE5E7EB)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.List,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = inspection.inspectionNumber,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            // Show client name if available
             Text(
-                text = "Inspección: ${inspection.inspectionNumber}",
-                style = MaterialTheme.typography.titleMedium
+                text = inspection.client?.contactName ?: "Cliente sin nombre", 
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                color = androidx.compose.ui.graphics.Color(0xFF1F2937)
             )
             Spacer(modifier = Modifier.height(4.dp))
-            // Show client name if available
-            Text(text = "Cliente: ${inspection.client?.contactName ?: "Sin nombre"}", style = MaterialTheme.typography.bodyLarge)
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(text = "Fecha programada: ${inspection.scheduledDate ?: "N/A"}", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = "Programada para: ${inspection.scheduledDate ?: "Sin fecha"}", 
+                style = MaterialTheme.typography.bodyMedium,
+                color = androidx.compose.ui.graphics.Color(0xFF6B7280)
+            )
         }
     }
 }

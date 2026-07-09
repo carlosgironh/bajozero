@@ -15,7 +15,7 @@ import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
+fun LoginScreen(onLoginSuccess: (String) -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
@@ -69,16 +69,20 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                         
                         val user = supabase.auth.currentUserOrNull()
                         if (user != null) {
-                            // Check if role is tecnico
                             val profile = supabase.postgrest["profiles"]
                                 .select { filter { eq("id", user.id) } }
                                 .decodeSingleOrNull<Profile>()
                                 
-                            if (profile != null && profile.role == "tecnico" && profile.isActive) {
-                                onLoginSuccess()
+                            if (profile != null && profile.isActive) {
+                                if (profile.role == "tecnico" || profile.role == "administrador" || profile.role == "secretaria") {
+                                    onLoginSuccess(profile.role)
+                                } else {
+                                    supabase.auth.signOut()
+                                    errorMessage = "Tu rol actual no tiene acceso a esta aplicación."
+                                }
                             } else {
                                 supabase.auth.signOut()
-                                errorMessage = "No tienes permisos de técnico o cuenta inactiva."
+                                errorMessage = "Cuenta inactiva o no encontrada."
                             }
                         }
                     } catch (e: Exception) {

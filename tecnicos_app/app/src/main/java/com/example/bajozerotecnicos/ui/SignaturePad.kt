@@ -33,7 +33,8 @@ fun SignaturePad(onSignatureCaptured: (String?) -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
-                .background(Color.White)
+                .background(Color.White, shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+                .androidx.compose.foundation.border(1.dp, Color(0xFFE5E7EB), shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()

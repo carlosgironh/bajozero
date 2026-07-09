@@ -535,6 +535,59 @@ async function impersonateUser(userId) {
   
   window.open('./erp.html', '_blank');
 }
+
+// ==================== INACTIVITY TIMEOUT ====================
+(function() {
+    let time;
+    let INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // Default 15 minutos
+    
+    // Expose a global function to update the limit dynamically
+    window.updateInactivityLimit = function(minutes) {
+        if(minutes && !isNaN(minutes)) {
+            INACTIVITY_LIMIT_MS = minutes * 60 * 1000;
+            resetTimer();
+        }
+    };
+    
+    async function fetchTimeoutConfig() {
+        try {
+            const { data, error } = await supabaseClient
+                .from('system_settings')
+                .select('inactivity_timeout_minutes')
+                .eq('id', 1)
+                .single();
+                
+            if (!error && data && data.inactivity_timeout_minutes) {
+                window.updateInactivityLimit(data.inactivity_timeout_minutes);
+            }
+        } catch (e) {
+            console.error('Error fetching inactivity timeout:', e);
+        }
+    }
+
+    function logout() {
+        alert("⏳ Tu sesión ha expirado por inactividad. Por favor, vuelve a iniciar sesión.");
+        supabaseClient.auth.signOut().then(() => {
+            window.location.href = "login.html";
+        });
+    }
+
+    function resetTimer() {
+        clearTimeout(time);
+        time = setTimeout(logout, INACTIVITY_LIMIT_MS);
+    }
+
+    window.onload = function() {
+        resetTimer();
+        setTimeout(fetchTimeoutConfig, 1000); 
+    };
+    document.onmousemove = resetTimer;
+    document.onkeydown = resetTimer;
+    document.onclick = resetTimer;
+    document.onscroll = resetTimer;
+    
+    resetTimer();
+})();
 </script>
 
 </body>

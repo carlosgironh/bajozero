@@ -37,7 +37,18 @@ fun MainNavigation() {
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
             com.example.bajozerotecnicos.ui.LoginScreen(
-                onLoginSuccess = { navController.navigate("dashboard") { popUpTo("login") { inclusive = true } } }
+                onLoginSuccess = { role -> 
+                    if (role == "administrador" || role == "secretaria") {
+                        navController.navigate("adminDashboard") { popUpTo("login") { inclusive = true } }
+                    } else {
+                        navController.navigate("dashboard") { popUpTo("login") { inclusive = true } }
+                    }
+                }
+            )
+        }
+        composable("adminDashboard") {
+            com.example.bajozerotecnicos.ui.AdminDashboardScreen(
+                onLogout = { navController.navigate("login") { popUpTo("adminDashboard") { inclusive = true } } }
             )
         }
         composable("dashboard") {

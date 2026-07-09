@@ -6,90 +6,14 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Panel Administrativo | Bajo Zero Panamá</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css?v=3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            primary: '#0066b2',
-                            secondary: '#005a9e',
-                            light: '#e6f2fa',
-                            accent: '#00a8e8',
-                            success: '#10b981',
-                            warning: '#f59e0b',
-                            danger: '#ef4444'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    
 
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-        }
-        .sidebar {
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-        }
-        .nav-item {
-            transition: all 0.3s ease;
-        }
-        .nav-item:hover, .nav-item.active {
-            background: rgba(255, 255, 255, 0.1);
-            border-left: 3px solid #00a8e8;
-        }
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,102,178,0.15);
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .loading-spinner {
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid #0066b2;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        .status-pendiente { background: #fef3c7; color: #92400e; }
-        .status-asignada { background: #dbeafe; color: #1e40af; }
-        .status-completada { background: #d1fae5; color: #065f46; }
-        .mobile-menu {
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-        }
-        .mobile-menu.open {
-            transform: translateX(0);
-        }
-    </style>
+    
 </head>
 <body class="bg-gray-100">
 
@@ -102,14 +26,14 @@
                 </div>
                 <div class="text-sm text-gray-500 font-bold tracking-widest mt-2">PANAMÁ</div>
                 <h1 class="text-2xl font-bold text-gray-800 mt-4">Panel Administrativo</h1>
-                <p class="text-gray-600 mt-2">Gestión de Inspecciones y Técnicos</p>
+                <p class="text-gray-600 mt-2">Gestión de Tareas y Personal</p>
             </div>
 
             <form id="loginForm" class="space-y-6" onsubmit="handleLogin(event)">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico</label>
                     <div class="relative">
-                        <i class="fas fa-envelope absolute left-4 top-3.5 text-gray-400"></i>
+                        <i class="fas fa-envelope absolute left-4 top-3.5 text-gray-500"></i>
                         <input type="email" id="loginEmail" required 
                             class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition bg-gray-50 focus:bg-white"
                             placeholder="admin@bajozero.net">
@@ -119,11 +43,11 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Contraseña</label>
                     <div class="relative">
-                        <i class="fas fa-lock absolute left-4 top-3.5 text-gray-400"></i>
+                        <i class="fas fa-lock absolute left-4 top-3.5 text-gray-500"></i>
                         <input type="password" id="loginPassword" required 
                             class="w-full pl-12 pr-12 py-3 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition bg-gray-50 focus:bg-white"
                             placeholder="••••••••">
-                        <button type="button" onclick="togglePassword()" class="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600">
+                        <button type="button" onclick="togglePassword()" class="absolute right-4 top-3.5 text-gray-500 hover:text-gray-600">
                             <i class="fas fa-eye" id="eyeIcon"></i>
                         </button>
                     </div>
@@ -155,54 +79,62 @@
     <div id="dashboardScreen" class="hidden min-h-screen flex">
         
         <!-- Sidebar Desktop -->
-        <aside class="sidebar w-64 fixed h-full text-white z-40 hidden md:block">
-            <div class="p-6 border-b border-gray-700">
+        <aside class="sidebar w-64 fixed h-screen bg-white border-r border-gray-200 z-40 hidden md:block flex flex-col">
+            <div class="p-6 border-b border-gray-200">
                 <div class="flex items-center gap-3">
                     <div class="bg-brand-primary text-white px-3 py-2 rounded-lg font-black text-xl italic">
                         BZ
                     </div>
                     <div>
                         <div class="font-bold">Bajo Zero</div>
-                        <div class="text-xs text-gray-400">Panel Admin</div>
+                        <div class="text-xs text-gray-500">Panel Admin</div>
                     </div>
                 </div>
             </div>
 
-            <nav class="mt-6">
-                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-6 py-4 text-gray-300 hover:text-white">
+            <nav class="mt-6 flex-1 overflow-y-auto">
+                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3  ">
                     <i class="fas fa-home w-5"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" onclick="showSection('newInspection')" class="nav-item flex items-center gap-3 px-6 py-4 text-gray-300 hover:text-white">
+                <a href="#" onclick="showSection('newInspection')" class="nav-item flex items-center gap-3  ">
                     <i class="fas fa-plus-circle w-5"></i>
-                    <span>Nueva Inspección</span>
+                    <span>Nueva Tarea</span>
                 </a>
-                <a href="#" onclick="showSection('inspections')" class="nav-item flex items-center gap-3 px-6 py-4 text-gray-300 hover:text-white">
+                <a href="#" onclick="showSection('inspections')" class="nav-item flex items-center gap-3  ">
                     <i class="fas fa-clipboard-list w-5"></i>
-                    <span>Inspecciones</span>
+                    <span>Tareas</span>
                 </a>
-                <a href="#" onclick="showSection('technicians')" class="nav-item flex items-center gap-3 px-6 py-4 text-gray-300 hover:text-white">
+                <a href="#" onclick="showSection('technicians')" class="nav-item flex items-center gap-3  ">
                     <i class="fas fa-users-cog w-5"></i>
-                    <span>Técnicos</span>
+                    <span>Personal</span>
                 </a>
-                <a href="#" onclick="showSection('clients')" class="nav-item flex items-center gap-3 px-6 py-4 text-gray-300 hover:text-white">
+                <a href="#" onclick="showSection('clients')" class="nav-item flex items-center gap-3  ">
                     <i class="fas fa-users w-5"></i>
                     <span>Clientes</span>
                 </a>
+                <a href="#" onclick="showSection('roles')" id="rolesNavBtn" class="nav-item flex items-center gap-3   hidden">
+                    <i class="fas fa-user-shield w-5"></i>
+                    <span>Roles y Permisos</span>
+                </a>
+                <a href="#" onclick="showSection('settings')" class="nav-item flex items-center gap-3  ">
+                    <i class="fas fa-cog w-5"></i>
+                    <span>Configuración</span>
+                </a>
             </nav>
 
-            <div class="absolute bottom-0 w-full p-6 border-t border-gray-700">
+            <div class="mt-auto w-full p-4 border-t border-gray-200 bg-white">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center">
+                    <div class="w-10 h-10 bg-brand-primary text-white rounded-full flex items-center justify-center shadow-inner">
                         <i class="fas fa-user-shield"></i>
                     </div>
                     <div>
-                        <div id="userName" class="font-semibold text-sm">Administrador</div>
-                        <div id="userEmail" class="text-xs text-gray-400">admin@bajozero.net</div>
+                        <div id="userName" class="font-semibold text-sm text-gray-800">Administrador</div>
+                        <div id="userEmail" class="text-xs text-gray-500">admin@bajozero.net</div>
                     </div>
                 </div>
-                <button onclick="logout()" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-sm font-semibold transition">
-                    <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
+                <button onclick="logout()" class="w-full bg-red-50 hover:bg-red-600 hover:text-white text-red-600 border border-red-200 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                 </button>
             </div>
         </aside>
@@ -217,18 +149,19 @@
 
         <!-- Mobile Menu -->
         <div id="mobileMenu" class="mobile-menu fixed inset-0 z-50 bg-gray-900 text-white md:hidden">
-            <div class="p-4 flex justify-between items-center border-b border-gray-700">
+            <div class="p-4 flex justify-between items-center border-b border-gray-200">
                 <div class="font-black italic text-xl">BAJO ZERO - ADMIN</div>
                 <button onclick="toggleMobileMenu()" class="text-2xl">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <nav class="p-4">
-                <a href="#" onclick="showSection('dashboard'); toggleMobileMenu()" class="block py-4 text-gray-300 hover:text-white border-b border-gray-700">Dashboard</a>
-                <a href="#" onclick="showSection('newInspection'); toggleMobileMenu()" class="block py-4 text-gray-300 hover:text-white border-b border-gray-700">Nueva Inspección</a>
-                <a href="#" onclick="showSection('inspections'); toggleMobileMenu()" class="block py-4 text-gray-300 hover:text-white border-b border-gray-700">Inspecciones</a>
-                <a href="#" onclick="showSection('technicians'); toggleMobileMenu()" class="block py-4 text-gray-300 hover:text-white border-b border-gray-700">Técnicos</a>
-                <a href="#" onclick="showSection('clients'); toggleMobileMenu()" class="block py-4 text-gray-300 hover:text-white border-b border-gray-700">Clientes</a>
+                <a href="#" onclick="showSection('dashboard'); toggleMobileMenu()" class="block py-4  border-b border-gray-200">Dashboard</a>
+                <a href="#" onclick="showSection('newInspection'); toggleMobileMenu()" class="block py-4  border-b border-gray-200">Nueva Tarea</a>
+                <a href="#" onclick="showSection('inspections'); toggleMobileMenu()" class="block py-4  border-b border-gray-200">Tareas</a>
+                <a href="#" onclick="showSection('technicians'); toggleMobileMenu()" class="block py-4  border-b border-gray-200">Personal</a>
+                <a href="#" onclick="showSection('clients'); toggleMobileMenu()" class="block py-4  border-b border-gray-200">Clientes</a>
+                <a href="#" onclick="showSection('settings'); toggleMobileMenu()" class="block py-4  border-b border-gray-200">Configuración</a>
                 <button onclick="logout()" class="w-full mt-4 bg-red-600 text-white py-3 rounded-lg font-semibold">Cerrar Sesión</button>
             </nav>
         </div>
@@ -241,11 +174,11 @@
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h1 class="text-3xl font-bold text-gray-800">Dashboard Administrativo</h1>
-                        <p class="text-gray-600 mt-1">Gestión de inspecciones y asignaciones</p>
+                        <p class="text-gray-600 mt-1">Gestión de tareas y asignaciones</p>
                     </div>
                     <button onclick="showSection('newInspection')" class="bg-brand-primary hover:bg-brand-secondary text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition flex items-center gap-2">
                         <i class="fas fa-plus"></i>
-                        Nueva Inspección
+                        Nueva Tarea
                     </button>
                 </div>
 
@@ -258,7 +191,7 @@
                             </div>
                         </div>
                         <div class="text-3xl font-black text-gray-800" id="totalInspections">0</div>
-                        <div class="text-gray-500 text-sm">Total Inspecciones</div>
+                        <div class="text-gray-500 text-sm">Total Tareas</div>
                     </div>
 
                     <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 card-hover">
@@ -278,7 +211,7 @@
                             </div>
                         </div>
                         <div class="text-3xl font-black text-gray-800" id="assignedInspections">0</div>
-                        <div class="text-gray-500 text-sm">Asignadas a Técnicos</div>
+                        <div class="text-gray-500 text-sm">Asignadas al Personal</div>
                     </div>
 
                     <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 card-hover">
@@ -295,13 +228,13 @@
                 <!-- Recent Inspections -->
                 <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                     <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                        <h2 class="text-xl font-bold text-gray-800">Inspecciones Recientes</h2>
+                        <h2 class="text-xl font-bold text-gray-800">Tareas Recientes</h2>
                         <a href="#" onclick="showSection('inspections')" class="text-brand-primary font-semibold hover:underline">Ver todas</a>
                     </div>
                     <div id="recentInspectionsList" class="divide-y divide-gray-100">
                         <div class="p-8 text-center text-gray-500">
                             <div class="loading-spinner mx-auto mb-4"></div>
-                            Cargando inspecciones...
+                            Cargando tareas...
                         </div>
                     </div>
                 </div>
@@ -311,15 +244,15 @@
             <div id="newInspectionSection" class="section hidden animate-fade-in">
                 <div class="flex justify-between items-center mb-8">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-800">Crear Nueva Inspección</h1>
-                        <p class="text-gray-600 mt-1">Asigna una nueva inspección a un técnico</p>
+                        <h1 class="text-3xl font-bold text-gray-800">Crear Nueva Tarea</h1>
+                        <p class="text-gray-600 mt-1">Asigna una nueva tarea al personal</p>
                     </div>
                     <button onclick="showSection('dashboard')" class="text-gray-600 hover:text-gray-800 font-semibold">
                         <i class="fas fa-arrow-left mr-2"></i>Volver
                     </button>
                 </div>
 
-                <form id="inspectionForm" onsubmit="saveInspection(event)" class="space-y-6">
+                <form id="inspectionForm" onsubmit="saveTask(event)" class="space-y-6">
                     <!-- Client Info -->
                     <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
                         <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -329,25 +262,29 @@
                         <div class="grid md:grid-cols-2 gap-4">
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Cliente Existente</label>
-                                <select id="existingClient" onchange="fillClientData()" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
+                                <select id="existingClient" onchange="fillClientData()" class="input-field">
                                     <option value="">Nuevo cliente...</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre del Cliente *</label>
-                                <input type="text" id="clientName" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Nombre completo">
+                                <input type="text" id="clientName" required class="input-field" placeholder="Nombre completo">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono *</label>
-                                <input type="tel" id="clientPhone" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="6000-0000">
+                                <input type="tel" id="clientPhone" required class="input-field" placeholder="6000-0000">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">RUC</label>
+                                <input type="text" id="clientRuc" class="input-field" placeholder="Opcional">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico</label>
-                                <input type="email" id="clientEmail" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="cliente@email.com">
+                                <input type="email" id="clientEmail" class="input-field" placeholder="cliente@email.com">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Dirección *</label>
-                                <input type="text" id="clientAddress" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Dirección completa de la instalación">
+                                <input type="text" id="clientAddress" required class="input-field" placeholder="Dirección completa de la instalación">
                             </div>
                         </div>
                     </div>
@@ -356,20 +293,20 @@
                     <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
                         <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                             <i class="fas fa-clipboard-check text-brand-primary"></i>
-                            Detalles de la Inspección
+                            Detalles de la Tarea
                         </h3>
                         <div class="grid md:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">N° de Inspección</label>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">N° de Tarea</label>
                                 <input type="text" id="inspectionNumber" readonly class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 outline-none" placeholder="Se genera automáticamente">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha Programada *</label>
-                                <input type="date" id="scheduledDate" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
+                                <input type="date" id="scheduledDate" required class="input-field">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Hora Programada</label>
-                                <input type="time" id="scheduledTime" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
+                                <input type="time" id="scheduledTime" class="input-field">
                             </div>
                         </div>
                     </div>
@@ -383,7 +320,7 @@
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Equipo *</label>
-                                <select id="equipmentType" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
+                                <select id="equipmentType" required class="input-field">
                                     <option value="">Seleccionar...</option>
                                     <option value="split">Aire Acondicionado Split</option>
                                     <option value="ventana">Aire Acondicionado Ventana</option>
@@ -395,15 +332,15 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Marca (si se conoce)</label>
-                                <input type="text" id="equipmentBrand" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="LG, Samsung, Carrier...">
+                                <input type="text" id="equipmentBrand" class="input-field" placeholder="LG, Samsung, Carrier...">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Modelo (si se conoce)</label>
-                                <input type="text" id="equipmentModel" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Modelo del equipo">
+                                <input type="text" id="equipmentModel" class="input-field" placeholder="Modelo del equipo">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">BTU/Capacidad</label>
-                                <input type="text" id="equipmentCapacity" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Ej: 12000 BTU">
+                                <input type="text" id="equipmentCapacity" class="input-field" placeholder="Ej: 12000 BTU">
                             </div>
                         </div>
                     </div>
@@ -412,18 +349,27 @@
                     <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
                         <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                             <i class="fas fa-user-hard-hat text-brand-primary"></i>
-                            Asignación
+                            Detalles y Asignación
                         </h3>
-                        <div class="grid md:grid-cols-2 gap-4">
+                        <div class="grid md:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Asignar a Técnico *</label>
-                                <select id="assignedTechnician" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
-                                    <option value="">Seleccionar técnico...</option>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Tarea *</label>
+                                <select id="taskType" required class="input-field">
+                                    <option value="inspeccion">Inspección</option>
+                                    <option value="instalacion">Instalación</option>
+                                    <option value="retiro">Retiro</option>
+                                    <option value="mantenimiento">Mantenimiento</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Asignar a Personal *</label>
+                                <select id="assignedTechnician" required class="input-field">
+                                    <option value="">Seleccionar personal...</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Prioridad</label>
-                                <select id="priority" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
+                                <select id="priority" class="input-field">
                                     <option value="normal">Normal</option>
                                     <option value="alta">Alta</option>
                                     <option value="urgente">Urgente</option>
@@ -431,16 +377,16 @@
                             </div>
                         </div>
                         <div class="mt-4">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Notas para el Técnico</label>
-                            <textarea id="technicianNotes" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Instrucciones especiales, ubicación específica, etc."></textarea>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Notas para el Personal</label>
+                            <textarea id="technicianNotes" rows="3" class="input-field" placeholder="Instrucciones especiales, ubicación específica, etc."></textarea>
                         </div>
                     </div>
 
                     <!-- Actions -->
                     <div class="flex flex-col md:flex-row gap-4">
-                        <button type="submit" id="saveInspectionBtn" class="flex-1 bg-brand-primary hover:bg-brand-secondary text-white py-4 rounded-xl font-bold text-lg shadow-lg transition flex items-center justify-center gap-2">
+                        <button type="submit" id="saveTaskBtn" class="flex-1 btn-primary w-full">
                             <i class="fas fa-save"></i>
-                            Crear y Asignar Inspección
+                            Crear y Asignar Tarea
                         </button>
                     </div>
                 </form>
@@ -450,8 +396,8 @@
             <div id="inspectionsSection" class="section hidden animate-fade-in">
                 <div class="flex justify-between items-center mb-8">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-800">Gestión de Inspecciones</h1>
-                        <p class="text-gray-600 mt-1">Todas las inspecciones del sistema</p>
+                        <h1 class="text-3xl font-bold text-gray-800">Gestión de Tareas</h1>
+                        <p class="text-gray-600 mt-1">Todas las tareas del sistema</p>
                     </div>
                     <div class="flex gap-2">
                         <select id="filterStatus" onchange="filterInspections()" class="px-4 py-2 rounded-xl border border-gray-300 focus:border-brand-primary outline-none">
@@ -471,16 +417,45 @@
                         <table class="w-full">
                             <thead class="bg-gray-50 border-b border-gray-200">
                                 <tr>
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">N° Inspección</th>
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Fecha</th>
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Cliente</th>
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Técnico</th>
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Estado</th>
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Acciones</th>
+                                    <th class=" text-left text-sm font-semibold text-gray-700">N° Tarea</th>
+                                    <th class=" text-left text-sm font-semibold text-gray-700">Fecha</th>
+                                    <th class=" text-left text-sm font-semibold text-gray-700">Cliente</th>
+                                    <th class=" text-left text-sm font-semibold text-gray-700">Personal</th>
+                                    <th class=" text-left text-sm font-semibold text-gray-700">Estado</th>
+                                    <th class=" text-left text-sm font-semibold text-gray-700">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="inspectionsTableBody" class="divide-y divide-gray-100">
-                                <tr><td colspan="6" class="p-8 text-center text-gray-500">Cargando inspecciones...</td></tr>
+                                <tr><td colspan="6" class="p-8 text-center text-gray-500">Cargando tareas...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roles & Permissions Section -->
+            <div id="rolesSection" class="section hidden animate-fade-in">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">Roles y Permisos</h1>
+                        <p class="text-gray-600 mt-1">Configuración de permisos por rol</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class=" font-bold text-gray-700">Rol</th>
+                                    <th class=" font-bold text-gray-700">Crear Tareas</th>
+                                    <th class=" font-bold text-gray-700">Editar Tareas</th>
+                                    <th class=" font-bold text-gray-700">Eliminar Tareas</th>
+                                    <th class=" font-bold text-gray-700">Bloquear Tareas</th>
+                                    <th class=" font-bold text-gray-700">Añadir Notas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rolesTableBody">
+                                <!-- Loaded dynamically -->
                             </tbody>
                         </table>
                     </div>
@@ -491,13 +466,13 @@
             <div id="techniciansSection" class="section hidden animate-fade-in">
                 <div class="flex justify-between items-center mb-8">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-800">Gestión de Técnicos</h1>
-                        <p class="text-gray-600 mt-1">Administrar técnicos del sistema</p>
+                        <h1 class="text-3xl font-bold text-gray-800">Gestión de Personal</h1>
+                        <p class="text-gray-600 mt-1">Administrar Personal del sistema</p>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="openTechnicianModal()" class="bg-brand-primary hover:bg-brand-secondary text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition flex items-center gap-2">
                             <i class="fas fa-plus"></i>
-                            Nuevo Técnico
+                            Nuevo Personal
                         </button>
                         <button onclick="showSection('dashboard')" class="text-gray-600 hover:text-gray-800 font-semibold px-4 py-3">
                             <i class="fas fa-arrow-left mr-2"></i>Volver
@@ -531,15 +506,48 @@
                 </div>
             </div>
 
+            <!-- Settings Section -->
+            <div id="settingsSection" class="section hidden animate-fade-in">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-800">Configuración del Sistema</h1>
+                    <p class="text-gray-600 mt-1">Ajustes globales para la aplicación</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 max-w-2xl">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <i class="fas fa-shield-alt text-brand-primary"></i>
+                        Seguridad y Sesiones
+                    </h2>
+                    
+                    <form onsubmit="saveSettings(event)" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Cierre de Sesión por Inactividad (Minutos)</label>
+                            <div class="flex items-center gap-3">
+                                <input type="number" id="inactivityTimeout" required min="1" max="1440" class="w-32 px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none text-center font-bold" placeholder="15">
+                                <span class="text-gray-500 text-sm">minutos sin mover el ratón ni usar el teclado</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">Este ajuste aplica globalmente para administradores, secretarias y Personal en sus respectivos paneles.</p>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-gray-100 flex justify-end">
+                            <button type="submit" id="saveSettingsBtn" class="bg-brand-primary hover:bg-brand-secondary text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition flex items-center gap-2">
+                                <i class="fas fa-save"></i>
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </main>
     </div>
 
     <!-- Inspection Detail Modal -->
-    <div id="inspectionModal" class="fixed inset-0 z-50 bg-black/50 hidden items-center justify-center p-4">
+    <div id="taskModal" class="fixed inset-0 z-50 bg-black/50 hidden items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-gray-800">Detalle de Inspección</h2>
-                <button onclick="closeInspectionModal()" class="text-gray-500 hover:text-gray-700 text-2xl">
+                <h2 class="text-2xl font-bold text-gray-800">Detalle de Tarea</h2>
+                <button onclick="closeTaskModal()" class="text-gray-500 hover:text-gray-700 text-2xl">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -549,11 +557,11 @@
         </div>
     </div>
 
-    <!-- Modal Crear Técnico -->
+    <!-- Modal Crear Personal -->
     <div id="technicianModal" class="fixed inset-0 z-50 bg-black/50 hidden items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-gray-800">Nuevo Técnico</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Nuevo Personal</h2>
                 <button onclick="closeTechnicianModal()" class="text-gray-500 hover:text-gray-700 text-2xl">
                     <i class="fas fa-times"></i>
                 </button>
@@ -562,39 +570,50 @@
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre Completo *</label>
-                        <input type="text" id="techFullName" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Juan Pérez">
+                        <input type="text" id="techFullName" required class="input-field" placeholder="Juan Pérez">
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico *</label>
-                        <input type="email" id="techEmail" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="tecnico@bajozero.net">
+                        <input type="email" id="techEmail" required class="input-field" placeholder="tecnico@bajozero.net">
                     </div>
                 </div>
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono</label>
-                        <input type="tel" id="techPhone" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="6000-0000">
+                        <input type="tel" id="techPhone" class="input-field" placeholder="6000-0000">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Especialidad</label>
-                        <input type="text" id="techSpecialty" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Aire Acondicionado, Refrigeración...">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Rol</label>
+                        <select id="techRole" class="input-field bg-white">
+                            <option value="supervisor">Supervisor</option>
+                            <option value="tecnico">Técnico</option>
+                            <option value="asistente">Asistente</option>
+                        </select>
                     </div>
                 </div>
+                <div class="mb-4 mt-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Especialidad</label>
+                    <input type="text" id="techSpecialty" class="input-field" placeholder="Aire Acondicionado, Refrigeración...">
+                </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Contraseña Temporal *</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Contraseña *</label>
                     <div class="flex gap-2">
-                        <input type="text" id="techPassword" required class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Mínimo 6 caracteres" value="Temp123!">
-                        <button type="button" onclick="generateTechPassword()" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-600">
+                        <input type="text" id="techPassword" required class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Mínimo 6 caracteres">
+                        <button type="button" onclick="generateTechPassword()" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-600" title="Generar contraseña al azar">
                             <i class="fas fa-random"></i>
                         </button>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">El técnico deberá cambiarla en su primer login.</p>
+                    <div class="mt-2 flex items-center">
+                        <input type="checkbox" id="techRequirePasswordChange" class="form-checkbox h-4 w-4 text-brand-primary rounded" checked>
+                        <label for="techRequirePasswordChange" class="ml-2 text-sm text-gray-700">Requerir cambio de contraseña al iniciar sesión (Contraseña temporal)</label>
+                    </div>
                 </div>
                 <div class="pt-4 border-t flex gap-3">
                     <button type="button" onclick="closeTechnicianModal()" class="flex-1 px-4 py-3 border border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition">
                         Cancelar
                     </button>
                     <button type="submit" id="saveTechBtn" class="flex-1 px-4 py-3 bg-brand-primary hover:bg-brand-secondary text-white rounded-xl font-semibold transition">
-                        Crear Técnico
+                        Crear Personal
                     </button>
                 </div>
             </form>
@@ -614,25 +633,29 @@
                 <div class="grid md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre de Contacto *</label>
-                        <input type="text" id="newClientName" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Nombre completo">
+                        <input type="text" id="newClientName" required class="input-field" placeholder="Nombre completo">
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono *</label>
-                        <input type="tel" id="newClientPhone" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="6000-0000">
+                        <input type="tel" id="newClientPhone" required class="input-field" placeholder="6000-0000">
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico</label>
-                        <input type="email" id="newClientEmail" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="cliente@email.com">
+                        <input type="email" id="newClientEmail" class="input-field" placeholder="cliente@email.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">RUC</label>
+                        <input type="text" id="newClientRuc" class="input-field" placeholder="Opcional">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Dirección</label>
-                    <textarea id="newClientAddress" rows="2" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Dirección completa..."></textarea>
+                    <textarea id="newClientAddress" rows="2" class="input-field" placeholder="Dirección completa..."></textarea>
                 </div>
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre de Empresa</label>
-                        <input type="text" id="newClientCompany" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none" placeholder="Opcional">
+                        <input type="text" id="newClientCompany" class="input-field" placeholder="Opcional">
                     </div>
                     <!-- CAMPO RUC ELIMINADO - NO EXISTE EN LA BASE DE DATOS -->
                 </div>
@@ -648,6 +671,7 @@
         </div>
     </div>
 
+    <script src="js/print_report.js"></script>
     <script>
         // ==================== CONFIGURACIÓN SUPABASE ====================
         const SUPABASE_URL = 'https://jqiqeyopvjsnutyihczh.supabase.co';
@@ -657,6 +681,9 @@
         
         // Variables globales
         let currentUser = null;
+        let currentEditTaskId = null;
+        let currentUserRole = null;
+        let currentUserPermissions = null;
         let currentInspection = null;
         
         // ==================== AUTENTICACIÓN ====================
@@ -680,12 +707,12 @@
                 
                 if (error) throw error;
                 
-                // Verificar si es admin o secretaria
+                // Verificar si es superadmin, admin o coordinador
                 const { data: profileData, error: profileError } = await supabaseClient
                     .from('profiles')
                     .select('*')
                     .eq('id', data.user.id)
-                    .in('role', ['administrador', 'secretaria'])
+                    .in('role', ['superadmin', 'admin', 'coordinador'])
                     .maybeSingle();
                 
                 if (profileError && profileError.code !== 'PGRST116') {
@@ -693,10 +720,33 @@
                 }
                 
                 if (!profileData) {
-                    throw new Error('Usuario no tiene permisos de administrador o secretaria');
+                    throw new Error('Usuario no tiene permisos para acceder a esta área.');
                 }
                 
                 currentUser = data.user;
+                currentUserRole = profileData.role;
+                
+                // Cargar permisos
+                const { data: permData } = await supabaseClient
+                    .from('role_permissions')
+                    .select('*')
+                    .eq('role_name', currentUserRole)
+                    .maybeSingle();
+                
+                const perms = permData?.permissions || [];
+                currentUserPermissions = {
+                    can_manage_users: perms.includes('manage_users'),
+                    can_create_tasks: perms.includes('create_task'),
+                    can_edit_tasks: perms.includes('edit_task'),
+                    can_delete_tasks: perms.includes('delete_task'),
+                    can_block_tasks: perms.includes('block_task'),
+                    can_add_notes: perms.includes('add_note')
+                };
+                
+                if (currentUserRole === 'superadmin') {
+                    document.getElementById('rolesNavBtn').classList.remove('hidden');
+                }
+                
                 showDashboard();
                 
             } catch (error) {
@@ -740,6 +790,16 @@
         // ==================== NAVEGACIÓN ====================
         
         function showSection(sectionName) {
+            if (sectionName === 'newInspection' && currentEditTaskId === null) {
+                document.getElementById('inspectionForm').reset();
+                document.querySelector('#newInspectionSection h1').textContent = 'Crear Nueva Tarea';
+                document.querySelector('#newInspectionSection p').textContent = 'Asigna una nueva tarea al personal';
+                document.getElementById('saveTaskBtn').innerHTML = '<i class="fas fa-save"></i> Crear y Asignar Tarea';
+                generateInspectionNumber();
+            } else if (sectionName !== 'newInspection') {
+                currentEditTaskId = null; // Reset when leaving
+            }
+
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.add('hidden');
             });
@@ -748,25 +808,262 @@
             
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
+                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(`showSection('${sectionName}')`)) {
+                    item.classList.add('active');
+                }
             });
             
             if (sectionName === 'dashboard') loadDashboardData();
             if (sectionName === 'inspections') loadAllInspections();
             if (sectionName === 'technicians') loadTechniciansList();
             if (sectionName === 'clients') loadClientsList();
+            if (sectionName === 'settings') loadSettings();
+            if (sectionName === 'roles') loadRoles();
         }
         
         function toggleMobileMenu() {
             document.getElementById('mobileMenu').classList.toggle('open');
         }
         
+        // ==================== CONFIGURACIÓN ====================
+        
+        async function loadSettings() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('system_settings')
+                    .select('inactivity_timeout_minutes')
+                    .eq('id', 1)
+                    .single();
+                    
+                if (error && error.code !== 'PGRST116') throw error;
+                
+                if (data) {
+                    document.getElementById('inactivityTimeout').value = data.inactivity_timeout_minutes;
+                }
+            } catch (error) {
+                console.error("Error loading settings:", error);
+            }
+        }
+        
+        async function saveSettings(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveSettingsBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Guardando...';
+            btn.disabled = true;
+            
+            try {
+                const timeoutMins = parseInt(document.getElementById('inactivityTimeout').value);
+                
+                const { error } = await supabaseClient
+                    .from('system_settings')
+                    .upsert({ id: 1, inactivity_timeout_minutes: timeoutMins });
+                    
+                if (error) throw error;
+                
+                alert('✅ Configuración guardada exitosamente');
+                
+                // Update local timer variables right away if possible
+                if (window.updateInactivityLimit) {
+                    window.updateInactivityLimit(timeoutMins);
+                }
+            } catch (error) {
+                alert('Error al guardar configuración: ' + error.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        
         // ==================== DASHBOARD ====================
         
+        // ==================== ACCIONES DE TAREAS ====================
+        
+        async function deleteTask(taskId) {
+            if (!confirm('¿Está seguro de que desea eliminar esta tarea?')) return;
+            try {
+                const { error } = await supabaseClient.from('tasks').delete().eq('id', taskId);
+                if (error) throw error;
+                alert('Tarea eliminada exitosamente');
+                loadAllInspections();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar la tarea: ' + error.message);
+            }
+        }
+        
+        async function toggleBlockTask(taskId, isBlocked) {
+            if (!confirm(`¿Está seguro de que desea ${isBlocked ? 'bloquear' : 'desbloquear'} esta tarea?`)) return;
+            try {
+                const { error } = await supabaseClient.from('tasks').update({ is_blocked: isBlocked }).eq('id', taskId);
+                if (error) throw error;
+                loadAllInspections();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al bloquear/desbloquear: ' + error.message);
+            }
+        }
+        
+        async function addTaskNote(taskId) {
+            const note = prompt('Ingrese una nota adicional para esta tarea:');
+            if (!note) return;
+            try {
+                // Fetch current notes first
+                const { data: task, error: fetchError } = await supabaseClient.from('tasks').select('technician_notes').eq('id', taskId).single();
+                if (fetchError) throw fetchError;
+                
+                const currentNotes = task.technician_notes ? task.technician_notes + '\n\n' : '';
+                const newNotes = currentNotes + `--- Nota añadida el ${new Date().toLocaleString()} ---\n${note}`;
+                
+                const { error: updateError } = await supabaseClient.from('tasks').update({ technician_notes: newNotes }).eq('id', taskId);
+                if (updateError) throw updateError;
+                alert('Nota añadida exitosamente');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al añadir nota: ' + error.message);
+            }
+        }
+        
+        async function editTask(taskId) {
+            try {
+                // Fetch task data
+                const { data: task, error } = await supabaseClient
+                    .from('tasks')
+                    .select('*, clients(*)')
+                    .eq('id', taskId)
+                    .single();
+                    
+                if (error) throw error;
+                
+                currentEditTaskId = taskId;
+                
+                // Show form
+                showSection('newInspection');
+                document.querySelector('#newInspectionSection h1').textContent = 'Editar Tarea';
+                document.querySelector('#newInspectionSection p').textContent = 'Actualizar detalles de la tarea';
+                document.getElementById('saveTaskBtn').innerHTML = '<i class="fas fa-save"></i> Guardar Cambios';
+                
+                // Populate client
+                if (task.clients) {
+                    document.getElementById('clientName').value = task.clients.contact_name || '';
+                    document.getElementById('clientPhone').value = task.clients.phone || '';
+                    document.getElementById('clientRuc').value = task.clients.ruc || '';
+                    document.getElementById('clientEmail').value = task.clients.email || '';
+                    document.getElementById('clientAddress').value = task.clients.address || '';
+                    document.getElementById('existingClient').value = task.client_id || '';
+                }
+                
+                // Populate task details
+                document.getElementById('inspectionNumber').value = task.task_number || '';
+                document.getElementById('scheduledDate').value = task.scheduled_date || '';
+                document.getElementById('scheduledTime').value = task.scheduled_time || '';
+                
+                document.getElementById('equipmentType').value = task.equipment_type || '';
+                document.getElementById('equipmentBrand').value = task.equipment_brand || '';
+                document.getElementById('equipmentModel').value = task.equipment_model || '';
+                document.getElementById('equipmentCapacity').value = task.equipment_capacity || '';
+                
+                document.getElementById('taskType').value = task.task_type || '';
+                document.getElementById('assignedTechnician').value = task.inspector_id || '';
+                document.getElementById('priority').value = task.priority || 'normal';
+                document.getElementById('technicianNotes').value = task.technician_notes || '';
+                
+            } catch (error) {
+                console.error('Error al cargar la tarea para editar:', error);
+                alert('Error al cargar la tarea');
+            }
+        }
+
+        // ==================== ROLES Y PERMISOS ====================
+        
+        async function loadRoles() {
+            try {
+                const { data: roles, error } = await supabaseClient
+                    .from('role_permissions')
+                    .select('*')
+                    .order('role_name');
+                    
+                if (error) throw error;
+                
+                const tbody = document.getElementById('rolesTableBody');
+                tbody.innerHTML = '';
+                
+                roles.forEach(roleData => {
+                    const rName = roleData.role_name;
+                    const perms = roleData.permissions || [];
+                    
+                    const canCreate = perms.includes('create_task');
+                    const canEdit = perms.includes('edit_task');
+                    const canDelete = perms.includes('delete_task');
+                    const canBlock = perms.includes('block_task');
+                    const canAddNotes = perms.includes('add_note');
+                    
+                    const isSuperadmin = rName === 'superadmin';
+                    const disabledAttr = isSuperadmin ? 'disabled' : '';
+                    const checkboxClass = isSuperadmin ? 'form-checkbox h-5 w-5 text-gray-500 rounded cursor-not-allowed' : 'form-checkbox h-5 w-5 text-brand-primary rounded cursor-pointer';
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 border-b border-gray-50">
+                            <td class=" font-semibold ${isSuperadmin ? 'text-brand-primary' : 'text-gray-800'} capitalize">${rName}</td>
+                            <td class="">
+                                <input type="checkbox" ${canCreate ? 'checked' : ''} ${disabledAttr} onchange="updateRolePermission('${rName}', 'create_task', this.checked)" class="${checkboxClass}">
+                            </td>
+                            <td class="">
+                                <input type="checkbox" ${canEdit ? 'checked' : ''} ${disabledAttr} onchange="updateRolePermission('${rName}', 'edit_task', this.checked)" class="${checkboxClass}">
+                            </td>
+                            <td class="">
+                                <input type="checkbox" ${canDelete ? 'checked' : ''} ${disabledAttr} onchange="updateRolePermission('${rName}', 'delete_task', this.checked)" class="${checkboxClass}">
+                            </td>
+                            <td class="">
+                                <input type="checkbox" ${canBlock ? 'checked' : ''} ${disabledAttr} onchange="updateRolePermission('${rName}', 'block_task', this.checked)" class="${checkboxClass}">
+                            </td>
+                            <td class="">
+                                <input type="checkbox" ${canAddNotes ? 'checked' : ''} ${disabledAttr} onchange="updateRolePermission('${rName}', 'add_note', this.checked)" class="${checkboxClass}">
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading roles:', error);
+            }
+        }
+        
+        async function updateRolePermission(roleName, permissionName, value) {
+            try {
+                // Fetch current perms
+                const { data: roleData, error: fetchError } = await supabaseClient
+                    .from('role_permissions')
+                    .select('permissions')
+                    .eq('role_name', roleName)
+                    .single();
+                if (fetchError) throw fetchError;
+                
+                let perms = roleData.permissions || [];
+                if (value) {
+                    if (!perms.includes(permissionName)) perms.push(permissionName);
+                } else {
+                    perms = perms.filter(p => p !== permissionName);
+                }
+                
+                const { error } = await supabaseClient
+                    .from('role_permissions')
+                    .update({ permissions: perms })
+                    .eq('role_name', roleName);
+                    
+                if (error) throw error;
+                console.log(`Permiso ${permissionName} actualizado para ${roleName}`);
+            } catch (error) {
+                console.error('Error updating permission:', error);
+                alert('Error al actualizar permiso');
+            }
+        }
+
         async function loadDashboardData() {
             try {
                 const { data: inspections, error } = await supabaseClient
-                    .from('inspections')
-                    .select('*, clients(contact_name), profiles(full_name)')
+                    .from('tasks')
+                    .select('*, clients(contact_name), profiles!inspector_id(full_name)')
                     .order('created_at', { ascending: false });
                     
                 if (error) throw error;
@@ -790,13 +1087,13 @@
                                           inspection.status === 'asignada' ? 'status-asignada' : 'status-completada';
                         
                         recentList.innerHTML += `
-                            <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer" onclick="viewInspectionDetail('${inspection.id}')">
+                            <div class=" flex items-center justify-between hover:bg-gray-50 cursor-pointer" onclick="viewTaskDetail('${inspection.id}')">
                                 <div class="flex items-center gap-4">
                                     <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-brand-primary">
                                         <i class="fas fa-clipboard-check"></i>
                                     </div>
                                     <div>
-                                        <div class="font-semibold text-gray-800">${inspection.inspection_number}</div>
+                                        <div class="font-semibold text-gray-800">${inspection.task_number}</div>
                                         <div class="text-sm text-gray-500">${inspection.clients?.contact_name || 'Cliente'} • ${formatDate(inspection.scheduled_date)}</div>
                                     </div>
                                 </div>
@@ -808,7 +1105,7 @@
                         `;
                     });
                 } else {
-                    recentList.innerHTML = '<div class="p-8 text-center text-gray-500">No hay inspecciones recientes</div>';
+                    recentList.innerHTML = '<div class="p-8 text-center text-gray-500">No hay tareas recientes</div>';
                 }
                 
             } catch (error) {
@@ -891,7 +1188,7 @@
             }
         }
         
-        // ==================== TÉCNICOS ====================
+        // ==================== Personal ====================
         
         async function loadTechnicians() {
             try {
@@ -905,7 +1202,7 @@
                 if (error) throw error;
                 
                 const select = document.getElementById('assignedTechnician');
-                select.innerHTML = '<option value="">Seleccionar técnico...</option>';
+                select.innerHTML = '<option value="">Seleccionar personal...</option>';
                 
                 technicians.forEach(tech => {
                     select.innerHTML += `<option value="${tech.id}">${tech.full_name} - ${tech.specialty || 'Técnico'}</option>`;
@@ -963,7 +1260,7 @@
             try {
                 const year = new Date().getFullYear();
                 const { data, error } = await supabaseClient
-                    .rpc('generate_inspection_number', { year: year });
+                    .rpc('generate_task_number', { year: year });
                 
                 if (error) throw error;
                 document.getElementById('inspectionNumber').value = data;
@@ -975,9 +1272,9 @@
             }
         }
         
-        async function saveInspection(e) {
+        async function saveTask(e) {
             e.preventDefault();
-            const btn = document.getElementById('saveInspectionBtn');
+            const btn = document.getElementById('saveTaskBtn');
             btn.innerHTML = '<div class="loading-spinner"></div> Guardando...';
             btn.disabled = true;
             
@@ -992,7 +1289,8 @@
                             contact_name: document.getElementById('clientName').value,
                             phone: document.getElementById('clientPhone').value,
                             email: document.getElementById('clientEmail').value,
-                            address: document.getElementById('clientAddress').value
+                            address: document.getElementById('clientAddress').value,
+                            ruc: document.getElementById('clientRuc').value
                         })
                         .select()
                         .single();
@@ -1001,9 +1299,10 @@
                     clientId = newClient.id;
                 }
                 
-                // 2. Save inspection
-                const inspectionData = {
-                    inspection_number: document.getElementById('inspectionNumber').value,
+                // 2. Save task
+                const taskData = {
+                    task_number: document.getElementById('inspectionNumber').value,
+                    task_type: document.getElementById('taskType').value,
                     client_id: clientId,
                     scheduled_date: document.getElementById('scheduledDate').value,
                     scheduled_time: document.getElementById('scheduledTime').value,
@@ -1018,15 +1317,26 @@
                     created_by: currentUser.id
                 };
                 
-                const { data: savedInspection, error: inspectionError } = await supabaseClient
-                    .from('inspections')
-                    .insert(inspectionData)
-                    .select()
-                    .single();
-                    
-                if (inspectionError) throw inspectionError;
-                
-                alert('Inspección creada y asignada exitosamente');
+                if (currentEditTaskId) {
+                    // Update existing
+                    delete taskData.created_by; // Don't override creator
+                    delete taskData.status; // Don't override status here
+                    const { error: taskError } = await supabaseClient
+                        .from('tasks')
+                        .update(taskData)
+                        .eq('id', currentEditTaskId);
+                        
+                    if (taskError) throw taskError;
+                    alert('Tarea actualizada exitosamente');
+                } else {
+                    // Insert new
+                    const { error: taskError } = await supabaseClient
+                        .from('tasks')
+                        .insert(taskData);
+                        
+                    if (taskError) throw taskError;
+                    alert('Tarea creada y asignada exitosamente');
+                }
                 
                 // Reset form and generate new number
                 document.getElementById('inspectionForm').reset();
@@ -1037,7 +1347,7 @@
                 console.error('Error saving inspection:', error);
                 alert('Error al guardar: ' + error.message);
             } finally {
-                btn.innerHTML = '<i class="fas fa-save"></i> Crear y Asignar Inspección';
+                btn.innerHTML = '<i class="fas fa-save"></i> Crear y Asignar Tarea';
                 btn.disabled = false;
             }
         }
@@ -1045,8 +1355,8 @@
         async function loadAllInspections() {
             try {
                 const { data: inspections, error } = await supabaseClient
-                    .from('inspections')
-                    .select('*, clients(contact_name, phone, address), profiles(full_name)')
+                    .from('tasks')
+                    .select('*, clients(contact_name, phone, address), profiles!inspector_id(full_name)')
                     .order('scheduled_date', { ascending: false });
                     
                 if (error) throw error;
@@ -1058,19 +1368,63 @@
                     const statusClass = inspection.status === 'pendiente' ? 'status-pendiente' : 
                                       inspection.status === 'asignada' ? 'status-asignada' : 'status-completada';
                     
+                    let actionsHtml = `
+                        <button onclick="viewTaskDetail('${inspection.id}')" class="text-brand-primary hover:text-brand-secondary mx-1" title="Ver detalle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    `;
+                    
+                    if (currentUserPermissions && currentUserPermissions.can_edit_tasks) {
+                        actionsHtml += `
+                            <button onclick="editTask('${inspection.id}')" class="text-blue-500 hover:text-blue-700 mx-1" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        `;
+                    }
+                    if (currentUserPermissions && currentUserPermissions.can_delete_tasks) {
+                        actionsHtml += `
+                            <button onclick="deleteTask('${inspection.id}')" class="text-red-500 hover:text-red-700 mx-1" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        `;
+                    }
+                    if (currentUserPermissions && currentUserPermissions.can_block_tasks) {
+                        const blockIcon = inspection.is_blocked ? 'fa-unlock' : 'fa-ban';
+                        const blockColor = inspection.is_blocked ? 'text-green-500 hover:text-green-700' : 'text-orange-500 hover:text-orange-700';
+                        const blockTitle = inspection.is_blocked ? 'Desbloquear' : 'Bloquear';
+                        actionsHtml += `
+                            <button onclick="toggleBlockTask('${inspection.id}', ${!inspection.is_blocked})" class="${blockColor} mx-1" title="${blockTitle}">
+                                <i class="fas ${blockIcon}"></i>
+                            </button>
+                        `;
+                    }
+                    if (currentUserPermissions && currentUserPermissions.can_add_notes) {
+                        actionsHtml += `
+                            <button onclick="addTaskNote('${inspection.id}')" class="text-gray-500 hover:text-gray-700 mx-1" title="Adjuntar Nota">
+                                <i class="fas fa-sticky-note"></i>
+                            </button>
+                        `;
+                    }
+                    if (inspection.status === 'completada') {
+                        actionsHtml += `
+                            <button onclick="printTaskReport('${inspection.id}')" class="text-purple-500 hover:text-purple-700 mx-1" title="Imprimir Reporte">
+                                <i class="fas fa-print"></i>
+                            </button>
+                        `;
+                    }
+
                     tbody.innerHTML += `
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 font-semibold text-brand-primary">${inspection.inspection_number}</td>
-                            <td class="px-6 py-4 text-gray-600">${formatDate(inspection.scheduled_date)}</td>
-                            <td class="px-6 py-4 font-medium">${inspection.clients?.contact_name || 'N/A'}</td>
-                            <td class="px-6 py-4">${inspection.profiles?.full_name || 'Sin asignar'}</td>
-                            <td class="px-6 py-4">
+                        <tr class="hover:bg-gray-50 ${inspection.is_blocked ? 'bg-red-50 opacity-75' : ''}">
+                            <td class=" font-semibold text-brand-primary">${inspection.task_number} <br><span class="text-xs text-gray-500 uppercase">${inspection.task_type || 'inspeccion'}</span></td>
+                            <td class=" text-gray-600">${formatDate(inspection.scheduled_date)}</td>
+                            <td class=" font-medium">${inspection.clients?.contact_name || 'N/A'}</td>
+                            <td class="">${inspection.profiles?.full_name || 'Sin asignar'}</td>
+                            <td class="">
                                 <span class="status-badge ${statusClass}">${inspection.status}</span>
+                                ${inspection.is_blocked ? '<span class="status-badge bg-red-100 text-red-700 ml-1">Bloqueada</span>' : ''}
                             </td>
-                            <td class="px-6 py-4">
-                                <button onclick="viewInspectionDetail('${inspection.id}')" class="text-brand-primary hover:text-brand-secondary" title="Ver detalle">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+                            <td class=" flex gap-2">
+                                ${actionsHtml}
                             </td>
                         </tr>
                     `;
@@ -1081,11 +1435,11 @@
             }
         }
         
-        async function viewInspectionDetail(inspectionId) {
+        async function viewTaskDetail(inspectionId) {
             try {
                 const { data: inspection, error } = await supabaseClient
-                    .from('inspections')
-                    .select('*, clients(*), profiles(*)')
+                    .from('tasks')
+                    .select('*, clients(*), profiles!inspector_id(*)')
                     .eq('id', inspectionId)
                     .single();
                     
@@ -1098,8 +1452,8 @@
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="text-sm text-gray-500">N° Inspección</label>
-                                <p class="font-semibold text-lg">${inspection.inspection_number}</p>
+                                <label class="text-sm text-gray-500">N° Tarea</label>
+                                <p class="font-semibold text-lg">${inspection.task_number}</p>
                             </div>
                             <div>
                                 <label class="text-sm text-gray-500">Estado</label>
@@ -1118,29 +1472,29 @@
                             <h4 class="font-semibold mb-2">Detalles</h4>
                             <p><strong>Fecha:</strong> ${formatDate(inspection.scheduled_date)} ${inspection.scheduled_time ? 'a las ' + inspection.scheduled_time : ''}</p>
                             <p><strong>Equipo:</strong> ${inspection.equipment_type} ${inspection.equipment_brand ? '- ' + inspection.equipment_brand : ''}</p>
-                            <p><strong>Técnico Asignado:</strong> ${inspection.profiles?.full_name || 'Sin asignar'}</p>
+                            <p><strong>Personal Asignado:</strong> ${inspection.profiles?.full_name || 'Sin asignar'}</p>
                         </div>
                         
                         ${inspection.technician_notes ? `
                         <div class="border-t pt-4">
-                            <h4 class="font-semibold mb-2">Notas para el Técnico</h4>
+                            <h4 class="font-semibold mb-2">Notas para el Personal</h4>
                             <p class="text-gray-600 bg-gray-50 p-3 rounded-lg">${inspection.technician_notes}</p>
                         </div>
                         ` : ''}
                     </div>
                 `;
                 
-                document.getElementById('inspectionModal').classList.remove('hidden');
-                document.getElementById('inspectionModal').classList.add('flex');
+                document.getElementById('taskModal').classList.remove('hidden');
+                document.getElementById('taskModal').classList.add('flex');
                 
             } catch (error) {
                 console.error('Error loading inspection detail:', error);
             }
         }
         
-        function closeInspectionModal() {
-            document.getElementById('inspectionModal').classList.add('hidden');
-            document.getElementById('inspectionModal').classList.remove('flex');
+        function closeTaskModal() {
+            document.getElementById('taskModal').classList.add('hidden');
+            document.getElementById('taskModal').classList.remove('flex');
         }
         
         function filterInspections() {
@@ -1156,7 +1510,7 @@
             });
         }
         
-        // ==================== CREAR TÉCNICOS (Edge Function con JWT) ====================
+        // ==================== CREAR Personal (Edge Function con JWT) ====================
         
         function openTechnicianModal() {
             document.getElementById('technicianModal').classList.remove('hidden');
@@ -1179,7 +1533,7 @@
             document.getElementById('techPassword').value = password;
         }
         
-        // CREAR TÉCNICO (llamada a Edge Function con JWT verification)
+        // Crear Personal (llamada a Edge Function con JWT verification)
         async function saveTechnician(e) {
             e.preventDefault();
             const btn = document.getElementById('saveTechBtn');
@@ -1214,18 +1568,16 @@
                     p_password: document.getElementById('techPassword').value,
                     p_full_name: document.getElementById('techFullName').value,
                     p_phone: document.getElementById('techPhone').value,
-                    p_specialty: document.getElementById('techSpecialty').value
+                    p_specialty: document.getElementById('techSpecialty').value,
+                    p_role: document.getElementById('techRole').value,
+                    p_require_password_change: document.getElementById('techRequirePasswordChange').checked
                 });
 
                 if (rpcError) {
-                    throw new Error(rpcError.message || 'Error al crear técnico');
+                    throw new Error(rpcError.message || 'Error al Crear Personal');
                 }
 
-                if (!result.success) {
-                    throw new Error(result.error || 'Error desconocido al crear técnico');
-                }
-
-                alert(`✅ Técnico creado exitosamente.\n\n📧 Email: ${email}\n🔑 Contraseña temporal: ${result.temp_password || document.getElementById('techPassword').value}\n\nEl técnico debe cambiar su contraseña al iniciar sesión.`);
+                alert(`✅ Personal creado exitosamente.\n\n📧 Email: ${email}\n🔑 Contraseña: ${document.getElementById('techPassword').value}`);
                 
                 closeTechnicianModal();
                 loadTechnicians();
@@ -1280,11 +1632,12 @@
                 const email = document.getElementById('newClientEmail').value;
                 const address = document.getElementById('newClientAddress').value;
                 const company = document.getElementById('newClientCompany').value;
+                const ruc = document.getElementById('newClientRuc').value;
 
                 if (email) bodyData.email = email;
                 if (address) bodyData.address = address;
                 if (company) bodyData.company_name = company;
-                // NOTA: No enviamos 'ruc' porque la columna no existe en la BD
+                if (ruc) bodyData.ruc = ruc;
 
                 // Insertar directamente en la tabla clients
                 const { data: result, error: insertError } = await supabaseClient
@@ -1329,17 +1682,41 @@
             // Check if user is already logged in
             supabaseClient.auth.getSession().then(({ data: { session } }) => {
                 if (session) {
-                    // Verificar si es admin o secretaria
+                    // Verificar si es superadmin, admin o coordinador
                     supabaseClient
                         .from('profiles')
                         .select('*')
                         .eq('id', session.user.id)
-                        .in('role', ['administrador', 'secretaria'])
+                        .in('role', ['superadmin', 'admin', 'coordinador'])
                         .maybeSingle()
                         .then(({ data: profileData }) => {
                             if (profileData) {
                                 currentUser = session.user;
-                                showDashboard();
+                                currentUserRole = profileData.role;
+                                
+                                supabaseClient
+                                    .from('role_permissions')
+                                    .select('*')
+                                    .eq('role_name', currentUserRole)
+                                    .maybeSingle()
+                                    .then(({ data: permData }) => {
+                                        const perms = permData?.permissions || [];
+                                        currentUserPermissions = {
+                                            can_manage_users: perms.includes('manage_users'),
+                                            can_create_tasks: perms.includes('create_task'),
+                                            can_edit_tasks: perms.includes('edit_task'),
+                                            can_delete_tasks: perms.includes('delete_task'),
+                                            can_block_tasks: perms.includes('block_task'),
+                                            can_add_notes: perms.includes('add_note')
+                                        };
+                                        if (currentUserRole === 'superadmin') {
+                                            document.getElementById('rolesNavBtn').classList.remove('hidden');
+                                        }
+                                        showDashboard();
+                                    });
+                            } else {
+                                // Redirigir a login si no tiene el rol
+                                window.location.href = 'login.html';
                             }
                         });
                 }
@@ -1348,6 +1725,59 @@
             // Set today's date as default
             document.getElementById('scheduledDate').valueAsDate = new Date();
         });
+
+        // ==================== INACTIVITY TIMEOUT ====================
+        (function() {
+            let time;
+            let INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // Default 15 minutos
+            
+            // Expose a global function to update the limit dynamically
+            window.updateInactivityLimit = function(minutes) {
+                if(minutes && !isNaN(minutes)) {
+                    INACTIVITY_LIMIT_MS = minutes * 60 * 1000;
+                    resetTimer();
+                }
+            };
+            
+            async function fetchTimeoutConfig() {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('system_settings')
+                        .select('inactivity_timeout_minutes')
+                        .eq('id', 1)
+                        .single();
+                        
+                    if (!error && data && data.inactivity_timeout_minutes) {
+                        window.updateInactivityLimit(data.inactivity_timeout_minutes);
+                    }
+                } catch (e) {
+                    console.error('Error fetching inactivity timeout:', e);
+                }
+            }
+
+            function logout() {
+                alert("⏳ Tu sesión ha expirado por inactividad. Por favor, vuelve a iniciar sesión.");
+                supabaseClient.auth.signOut().then(() => {
+                    window.location.href = "login.html";
+                });
+            }
+
+            function resetTimer() {
+                clearTimeout(time);
+                time = setTimeout(logout, INACTIVITY_LIMIT_MS);
+            }
+
+            window.onload = function() {
+                resetTimer();
+                setTimeout(fetchTimeoutConfig, 1000); 
+            };
+            document.onmousemove = resetTimer;
+            document.onkeydown = resetTimer;
+            document.onclick = resetTimer;
+            document.onscroll = resetTimer;
+            
+            resetTimer();
+        })();
     </script>
 
 </body>

@@ -153,7 +153,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                                         .decodeSingleOrNull<Profile>()
                                         
                                     if (profile != null && profile.isActive) {
-                                        if (profile.role == "tecnico" || profile.role == "administrador" || profile.role == "secretaria") {
+                                        if (profile.role == "tecnico" || profile.role == "supervisor" || profile.role == "superadmin" || profile.role == "coordinador") {
                                             onLoginSuccess(profile.role)
                                         } else {
                                             supabase.auth.signOut()

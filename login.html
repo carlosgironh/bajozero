@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso | Bajo Zero Panamá</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
     <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-900 to-blue-600 flex items-center justify-center p-4 relative overflow-hidden">
@@ -84,12 +85,7 @@
     </div>
 
     <script>
-        // Configuración de Supabase
-        const SUPABASE_URL = 'https://jqiqeyopvjsnutyihczh.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxaXFleW9wdmpzbnV0eWloY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjY0MDUsImV4cCI6MjA5OTEwMjQwNX0.v0a0G_hsRmaAKCTPBH5WHDtRF2gsTCBBJET2zXFLBTM';
-
-        // Inicializar Supabase
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // La configuración y el supabaseClient se inicializan en js/config.js
 
         // Generar partículas de fondo
         function createParticles() {
@@ -160,9 +156,9 @@
 
                 const roleConfig = {
                     'superadmin': { icon: '👑', text: 'Super Administrador', color: '#f59e0b' },
-                    'admin': { icon: '💼', text: 'Administrador', color: '#10b981' },
-                    'coordinador': { icon: '👩‍💼', text: 'Coordinador', color: '#8b5cf6' },
-                    'supervisor': { icon: '🔧', text: 'Supervisor', color: '#3b82f6' }
+                    'coordinador': { icon: '👩‍💼', text: 'Coordinador(a)', color: '#8b5cf6' },
+                    'supervisor': { icon: '👁️', text: 'Supervisor', color: '#10b981' },
+                    'tecnico': { icon: '🔧', text: 'Técnico', color: '#3b82f6' }
                 };
 
                 const config = roleConfig[profile.role] || { icon: '👤', text: 'Usuario', color: '#64748b' };
@@ -175,11 +171,9 @@
                 setTimeout(() => {
                     const routes = {
                         'superadmin': 'admin.html',
-                        'admin': 'admin.html',
                         'coordinador': 'admin.html',
                         'supervisor': 'panel.html',
-                        'tecnico': 'panel.html',
-                        'asistente': 'panel.html'
+                        'tecnico': 'panel.html'
                     };
                     window.location.href = routes[profile.role] || 'inicio.html';
                 }, 1500);
@@ -213,11 +207,9 @@
                 if (profile) {
                     const routes = {
                         'superadmin': 'admin.html',
-                        'admin': 'admin.html',
                         'coordinador': 'admin.html',
                         'supervisor': 'panel.html',
-                        'tecnico': 'panel.html',
-                        'asistente': 'panel.html'
+                        'tecnico': 'panel.html'
                     };
                     window.location.href = routes[profile.role] || 'inicio.html';
                 }

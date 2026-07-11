@@ -19,8 +19,9 @@ CREATE TABLE public.profiles (
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- Políticas para Profiles
-CREATE POLICY "Perfiles públicos para usuarios autenticados" 
-ON public.profiles FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Visibilidad de perfiles" 
+ON public.profiles FOR SELECT TO authenticated 
+USING (id = auth.uid() OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('administrador', 'secretaria')));
 
 CREATE POLICY "Solo administradores pueden insertar perfiles" 
 ON public.profiles FOR INSERT TO authenticated 
@@ -50,11 +51,13 @@ ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Usuarios autenticados pueden ver clientes" 
 ON public.clients FOR SELECT TO authenticated USING (true);
 
-CREATE POLICY "Usuarios autenticados pueden insertar clientes" 
-ON public.clients FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Admin/Secre pueden insertar clientes" 
+ON public.clients FOR INSERT TO authenticated 
+WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('administrador', 'secretaria')));
 
-CREATE POLICY "Usuarios autenticados pueden actualizar clientes" 
-ON public.clients FOR UPDATE TO authenticated USING (true);
+CREATE POLICY "Admin/Secre pueden actualizar clientes" 
+ON public.clients FOR UPDATE TO authenticated 
+USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('administrador', 'secretaria')));
 
 
 -- 3. TABLA DE INSPECCIONES
@@ -142,7 +145,7 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
   INSERT INTO public.profiles (id, email, full_name, role)
-  VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name', COALESCE(new.raw_user_meta_data->>'role', 'tecnico'));
+  VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name', 'tecnico');
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

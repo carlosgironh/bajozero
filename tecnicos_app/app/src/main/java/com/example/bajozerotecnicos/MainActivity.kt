@@ -38,7 +38,7 @@ fun MainNavigation() {
         composable("login") {
             com.example.bajozerotecnicos.ui.LoginScreen(
                 onLoginSuccess = { role -> 
-                    if (role == "administrador" || role == "secretaria") {
+                    if (role == "superadmin" || role == "coordinador") {
                         navController.navigate("adminDashboard") { popUpTo("login") { inclusive = true } }
                     } else {
                         navController.navigate("dashboard") { popUpTo("login") { inclusive = true } }

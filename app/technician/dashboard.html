@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Técnico | Bajo Zero</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/config.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -555,10 +557,8 @@
 
     <script>
         // Configuración Supabase
-        const SUPABASE_URL = 'https://jqiqeyopvjsnutyihczh.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51dWVobml4eG91ZGN0bHpsd21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDM3NzYsImV4cCI6MjA4OTA3OTc3Nn0.DNc5wONm5QveZVTuz8zYtQMV6EzO2OsYU_ukDVsOB88';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // La configuración global y supabaseClient se inicializan en js/config.js
+        const supabase = window.supabaseClient;
         let currentUser = null;
         let currentTech = null;
 

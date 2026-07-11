@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <!-- Tailwind CSS -->  
 
     
 
@@ -17,63 +19,7 @@
 </head>
 <body class="bg-gray-100">
 
-    <!-- Login Screen -->
-    <div id="loginScreen" class="fixed inset-0 z-50 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 flex items-center justify-center p-4">
-        <div class="glass-panel rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-md">
-            <div class="text-center mb-10">
-                <div class="inline-block bg-brand-primary text-white px-6 py-3 rounded-xl font-black text-3xl italic tracking-tighter mb-2 shadow-lg">
-                    BAJO <span class="text-blue-200">ZERO</span>
-                </div>
-                <div class="text-sm text-gray-500 font-bold tracking-widest mt-2">PANAMÁ</div>
-                <h1 class="text-2xl font-bold text-gray-800 mt-4">Panel Administrativo</h1>
-                <p class="text-gray-600 mt-2">Gestión de Tareas y Personal</p>
-            </div>
-
-            <form id="loginForm" class="space-y-6" onsubmit="handleLogin(event)">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico</label>
-                    <div class="relative">
-                        <i class="fas fa-envelope absolute left-4 top-3.5 text-gray-500"></i>
-                        <input type="email" id="loginEmail" required 
-                            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition bg-gray-50 focus:bg-white"
-                            placeholder="admin@bajozero.net">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Contraseña</label>
-                    <div class="relative">
-                        <i class="fas fa-lock absolute left-4 top-3.5 text-gray-500"></i>
-                        <input type="password" id="loginPassword" required 
-                            class="w-full pl-12 pr-12 py-3 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition bg-gray-50 focus:bg-white"
-                            placeholder="••••••••">
-                        <button type="button" onclick="togglePassword()" class="absolute right-4 top-3.5 text-gray-500 hover:text-gray-600">
-                            <i class="fas fa-eye" id="eyeIcon"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div id="loginError" class="hidden bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
-                    <div class="flex items-center">
-                        <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
-                        <span class="text-red-700 text-sm font-medium">Credenciales incorrectas o sin permisos de administrador.</span>
-                    </div>
-                </div>
-
-                <button type="submit" id="loginBtn" 
-                    class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-4 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-[1.02] shadow-lg flex items-center justify-center gap-2">
-                    <span>Acceder al Panel Admin</span>
-                </button>
-            </form>
-
-            <div class="mt-8 text-center">
-                <a href="index.html" class="text-gray-500 hover:text-gray-700 text-sm flex items-center justify-center gap-2 transition">
-                    <i class="fas fa-arrow-left"></i>
-                    Volver a bajozero.net
-                </a>
-            </div>
-        </div>
-    </div>
+    <!-- Login Screen removed, using login.html -->
 
     <!-- Main Dashboard (Hidden by default) -->
     <div id="dashboardScreen" class="hidden min-h-screen flex">
@@ -674,10 +620,7 @@
     <script src="js/print_report.js"></script>
     <script>
         // ==================== CONFIGURACIÓN SUPABASE ====================
-        const SUPABASE_URL = 'https://jqiqeyopvjsnutyihczh.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxaXFleW9wdmpzbnV0eWloY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjY0MDUsImV4cCI6MjA5OTEwMjQwNX0.v0a0G_hsRmaAKCTPBH5WHDtRF2gsTCBBJET2zXFLBTM';
-        
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // La configuración global y supabaseClient se inicializan en js/config.js
         
         // Variables globales
         let currentUser = null;
@@ -688,91 +631,7 @@
         
         // ==================== AUTENTICACIÓN ====================
         
-        async function handleLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('loginBtn');
-            const errorDiv = document.getElementById('loginError');
-            
-            btn.innerHTML = '<div class="loading-spinner"></div> Verificando...';
-            btn.disabled = true;
-            
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            
-            try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-                
-                if (error) throw error;
-                
-                // Verificar si es superadmin, admin o coordinador
-                const { data: profileData, error: profileError } = await supabaseClient
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', data.user.id)
-                    .in('role', ['superadmin', 'admin', 'coordinador'])
-                    .maybeSingle();
-                
-                if (profileError && profileError.code !== 'PGRST116') {
-                    console.error("Error verificando perfil:", profileError);
-                }
-                
-                if (!profileData) {
-                    throw new Error('Usuario no tiene permisos para acceder a esta área.');
-                }
-                
-                currentUser = data.user;
-                currentUserRole = profileData.role;
-                
-                // Cargar permisos
-                const { data: permData } = await supabaseClient
-                    .from('role_permissions')
-                    .select('*')
-                    .eq('role_name', currentUserRole)
-                    .maybeSingle();
-                
-                const perms = permData?.permissions || [];
-                currentUserPermissions = {
-                    can_manage_users: perms.includes('manage_users'),
-                    can_create_tasks: perms.includes('create_task'),
-                    can_edit_tasks: perms.includes('edit_task'),
-                    can_delete_tasks: perms.includes('delete_task'),
-                    can_block_tasks: perms.includes('block_task'),
-                    can_add_notes: perms.includes('add_note')
-                };
-                
-                if (currentUserRole === 'superadmin') {
-                    document.getElementById('rolesNavBtn').classList.remove('hidden');
-                }
-                
-                showDashboard();
-                
-            } catch (error) {
-                console.error('Error de login:', error);
-                errorDiv.classList.remove('hidden');
-                btn.innerHTML = '<span>Acceder al Panel Admin</span>';
-                btn.disabled = false;
-            }
-        }
-        
-        function togglePassword() {
-            const password = document.getElementById('loginPassword');
-            const eyeIcon = document.getElementById('eyeIcon');
-            if (password.type === 'password') {
-                password.type = 'text';
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
-            } else {
-                password.type = 'password';
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
-            }
-        }
-        
         function showDashboard() {
-            document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('dashboardScreen').classList.remove('hidden');
             document.getElementById('userEmail').textContent = currentUser.email;
             
@@ -1687,7 +1546,7 @@
                         .from('profiles')
                         .select('*')
                         .eq('id', session.user.id)
-                        .in('role', ['superadmin', 'admin', 'coordinador'])
+                        .in('role', ['superadmin', 'coordinador'])
                         .maybeSingle()
                         .then(({ data: profileData }) => {
                             if (profileData) {
@@ -1719,6 +1578,8 @@
                                 window.location.href = 'login.html';
                             }
                         });
+                } else {
+                    window.location.href = 'login.html';
                 }
             });
             

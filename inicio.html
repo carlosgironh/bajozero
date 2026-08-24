@@ -99,6 +99,76 @@
             color: #10b981;
             margin-right: 0.5rem;
         }
+
+        /* Dedicated Navbar Styles */
+        .bz-nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .bz-nav-menu {
+            display: none;
+            align-items: center;
+            gap: 1.75rem;
+        }
+        @media (min-width: 768px) {
+            .bz-nav-menu {
+                display: flex !important;
+            }
+        }
+        .bz-nav-link {
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.925rem;
+            padding: 0.4rem 0.6rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .bz-nav-link:hover {
+            color: #0066b2;
+            background-color: #f0f7ff;
+        }
+        .bz-btn-portal {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #004c8c 0%, #0066b2 100%);
+            color: #ffffff !important;
+            padding: 0.55rem 1.15rem;
+            border-radius: 0.75rem;
+            font-size: 0.825rem;
+            font-weight: 700;
+            letter-spacing: 0.025em;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 102, 178, 0.22);
+            transition: all 0.2s ease;
+            margin-left: 0.5rem;
+        }
+        .bz-btn-portal:hover {
+            background: linear-gradient(135deg, #003d6b 0%, #004c8c 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 102, 178, 0.35);
+        }
+        .bz-btn-portal-mobile {
+            width: 2.35rem;
+            height: 2.35rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.65rem;
+            background-color: #f0f7ff;
+            color: #0066b2;
+            border: 1px solid #bae6fd;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .bz-btn-portal-mobile:hover {
+            background-color: #0066b2;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body class="antialiased text-gray-800">
@@ -112,50 +182,53 @@
     </a>
 
     <!-- Navigation -->
-    <nav class="fixed w-full z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex justify-between items-center">
-                <a href="#" class="flex items-center space-x-2">
-                    <div class="bg-brand-primary text-white px-4 py-2 rounded-lg font-black text-2xl italic tracking-tighter">
-                        BAJO <span class="text-blue-200">ZERO</span>
+    <nav class="fixed w-full z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm top-0 left-0">
+        <div class="container mx-auto px-6 py-3.5">
+            <div class="bz-nav-container">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-3 no-underline">
+                    <div class="bg-brand-primary text-white px-3.5 py-1.5 rounded-xl font-black text-2xl italic tracking-tighter shadow-sm flex items-center">
+                        BAJO&nbsp;<span class="text-blue-200">ZERO</span>
                     </div>
-                    <div class="hidden md:flex flex-col">
-                        <span class="text-xs text-gray-500 font-semibold tracking-widest">REFRIGERACIÓN</span>
-                        <span class="text-xs text-brand-primary font-bold">PANAMÁ</span>
+                    <div class="hidden sm:flex flex-col text-left">
+                        <span class="text-[10px] text-gray-500 font-bold tracking-widest uppercase leading-none">REFRIGERACIÓN</span>
+                        <span class="text-[12px] text-brand-primary font-black tracking-wider uppercase leading-tight">PANAMÁ</span>
                     </div>
                 </a>
                 
-                <div class="hidden md:flex items-center space-x-6">
-                    <a href="#inicio" class="text-gray-700 hover:text-brand-primary font-medium transition">Inicio</a>
-                    <a href="#servicios" class="text-gray-700 hover:text-brand-primary font-medium transition">Servicios</a>
-                    <a href="#marcas" class="text-gray-700 hover:text-brand-primary font-medium transition">Marcas</a>
-                    <a href="#contacto" class="text-gray-700 hover:text-brand-primary font-medium transition">Contacto</a>
-                    <a href="login.html" class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-900 to-brand-primary hover:from-blue-800 hover:to-blue-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm" title="Acceso a Panel">
-                        <i class="fas fa-user-shield"></i>
+                <!-- Desktop Navigation Links -->
+                <div class="bz-nav-menu">
+                    <a href="#inicio" class="bz-nav-link">Inicio</a>
+                    <a href="#servicios" class="bz-nav-link">Servicios</a>
+                    <a href="#marcas" class="bz-nav-link">Marcas</a>
+                    <a href="#contacto" class="bz-nav-link">Contacto</a>
+                    <a href="login.html" class="bz-btn-portal" title="Acceso al Portal de Personal y Administración">
+                        <i class="fas fa-user-shield text-sm"></i>
                         <span>Acceso Personal</span>
                     </a>
                 </div>
                 
-                <div class="flex items-center gap-3 md:hidden">
-                    <a href="login.html" class="w-9 h-9 bg-blue-50 text-brand-primary border border-blue-200 hover:bg-brand-primary hover:text-white rounded-xl flex items-center justify-center transition shadow-sm" title="Acceso Personal">
+                <!-- Mobile Actions (Portal icon + Hamburger) -->
+                <div class="flex items-center gap-2.5 md:hidden">
+                    <a href="login.html" class="bz-btn-portal-mobile" title="Acceso Personal">
                         <i class="fas fa-user-shield text-sm"></i>
                     </a>
-                    <button class="text-gray-700 text-2xl p-1 focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-label="Menú">
+                    <button class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-brand-primary text-xl rounded-xl hover:bg-gray-100 transition focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-label="Abrir Menú">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
             </div>
         </div>
         
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 shadow-lg">
-            <div class="px-6 py-4 space-y-3">
-                <a href="#inicio" onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="block text-gray-700 hover:text-brand-primary font-medium">Inicio</a>
-                <a href="#servicios" onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="block text-gray-700 hover:text-brand-primary font-medium">Servicios</a>
-                <a href="#marcas" onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="block text-gray-700 hover:text-brand-primary font-medium">Marcas</a>
-                <a href="#contacto" onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="block text-gray-700 hover:text-brand-primary font-medium">Contacto</a>
-                <div class="pt-3 border-t border-gray-100">
-                    <a href="login.html" class="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-blue-900 to-brand-primary text-white rounded-xl font-bold text-sm shadow">
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 shadow-xl">
+            <div class="px-6 py-4 space-y-2">
+                <a href="#inicio" onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="block py-2.5 px-3 rounded-lg text-gray-700 hover:text-brand-primary hover:bg-blue-50 font-semibold text-sm transition">Inicio</a>
+                <a href="#servicios" onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="block py-2.5 px-3 rounded-lg text-gray-700 hover:text-brand-primary hover:bg-blue-50 font-semibold text-sm transition">Servicios</a>
+                <a href="#marcas" onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="block py-2.5 px-3 rounded-lg text-gray-700 hover:text-brand-primary hover:bg-blue-50 font-semibold text-sm transition">Marcas</a>
+                <a href="#contacto" onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="block py-2.5 px-3 rounded-lg text-gray-700 hover:text-brand-primary hover:bg-blue-50 font-semibold text-sm transition">Contacto</a>
+                <div class="pt-3 border-t border-gray-100 mt-2">
+                    <a href="login.html" class="flex items-center justify-center gap-2 w-full py-3 bg-brand-primary hover:bg-brand-secondary text-white rounded-xl font-bold text-sm shadow transition">
                         <i class="fas fa-user-shield"></i>
                         <span>Acceso al Portal de Personal</span>
                     </a>

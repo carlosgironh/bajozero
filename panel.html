@@ -14,7 +14,74 @@
 
     
 
-    
+    <style>
+        /* Modern Mobile Drawer Navigation */
+        .mobile-menu-drawer {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .mobile-menu-drawer.open {
+            visibility: visible;
+            opacity: 1;
+        }
+        .mobile-menu-backdrop {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .mobile-menu-drawer.open .mobile-menu-backdrop {
+            opacity: 1;
+        }
+        .mobile-menu-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 82%;
+            max-width: 320px;
+            background: #0f172a;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+        .mobile-menu-drawer.open .mobile-menu-content {
+            transform: translateX(0);
+        }
+        .mobile-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 0.85rem 1.25rem;
+            margin: 0.2rem 0.75rem;
+            border-radius: 0.75rem;
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.925rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .mobile-nav-link:hover, .mobile-nav-link.active {
+            color: #ffffff;
+            background: rgba(0, 102, 178, 0.25);
+            border-left: 3px solid #00a3ff;
+        }
+        .mobile-nav-link i {
+            width: 1.5rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
 
@@ -69,30 +136,75 @@
             </div>
         </aside>
 
-        <!-- Mobile Header -->
-        <div class="md:hidden fixed top-0 w-full bg-gray-900 text-white z-40 p-4 flex justify-between items-center">
-            <div class="font-black italic text-xl">BAJO ZERO - PERSONAL</div>
-            <button onclick="toggleMobileMenu()" class="text-2xl">
+        <!-- Mobile Header (Sticky Top) -->
+        <header class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-40 px-4 flex justify-between items-center shadow-sm">
+            <div class="flex items-center gap-2.5">
+                <div class="bg-brand-primary text-white px-2.5 py-1 rounded-lg font-black text-lg italic tracking-tight">
+                    BZ
+                </div>
+                <div>
+                    <div class="font-bold text-gray-900 text-sm leading-tight">Bajo Zero</div>
+                    <div class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Panel Personal</div>
+                </div>
+            </div>
+            <button onclick="toggleMobileMenu()" class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-brand-primary text-xl rounded-xl hover:bg-gray-100 transition focus:outline-none" aria-label="Abrir Menú">
                 <i class="fas fa-bars"></i>
             </button>
-        </div>
+        </header>
 
-        <!-- Mobile Menu -->
-        <div id="mobileMenu" class="mobile-menu fixed inset-0 z-50 bg-gray-900 text-white md:hidden">
-            <div class="p-4 flex justify-between items-center border-b border-gray-200">
-                <div class="font-black italic text-xl">BAJO ZERO - PERSONAL</div>
-                <button onclick="toggleMobileMenu()" class="text-2xl">
-                    <i class="fas fa-times"></i>
-                </button>
+        <!-- Mobile Menu Drawer (Hidden by default, slides in on click) -->
+        <div id="mobileMenu" class="mobile-menu-drawer md:hidden">
+            <!-- Backdrop -->
+            <div class="mobile-menu-backdrop" onclick="toggleMobileMenu()"></div>
+            
+            <!-- Drawer Content -->
+            <div class="mobile-menu-content">
+                <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-950">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-brand-primary text-white px-2.5 py-1 rounded-lg font-black text-lg italic">
+                            BZ
+                        </div>
+                        <div>
+                            <div class="font-bold text-white text-sm">Bajo Zero</div>
+                            <div class="text-[11px] text-slate-400">Panel Personal</div>
+                        </div>
+                    </div>
+                    <button onclick="toggleMobileMenu()" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 text-lg transition" aria-label="Cerrar Menú">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Navigation links -->
+                <nav class="p-3 flex-1 overflow-y-auto space-y-1">
+                    <a href="#" onclick="showSection('dashboard'); toggleMobileMenu()" class="mobile-nav-link active">
+                        <i class="fas fa-home"></i>
+                        <span>Mis Tareas</span>
+                    </a>
+                    <a href="#" onclick="showSection('completed'); toggleMobileMenu()" class="mobile-nav-link">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Completadas</span>
+                    </a>
+                </nav>
+
+                <!-- Bottom User Info & Actions -->
+                <div class="p-4 border-t border-slate-800 bg-slate-950 space-y-2 mt-auto">
+                    <div class="flex items-center gap-3 mb-2 px-1">
+                        <div class="w-9 h-9 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-bold shadow">
+                            <i class="fas fa-user-hard-hat"></i>
+                        </div>
+                        <div class="truncate">
+                            <div id="mobileUserName" class="font-semibold text-xs text-white truncate">Personal</div>
+                            <div id="mobileUserEmail" class="text-[11px] text-slate-400 truncate">tecnico@bajozero.net</div>
+                        </div>
+                    </div>
+                    <button onclick="openChangePasswordModal(); toggleMobileMenu()" class="w-full bg-slate-800 hover:bg-slate-700 text-blue-300 border border-slate-700 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                        <i class="fas fa-key"></i> Cambiar Mi Contraseña
+                    </button>
+                    <button onclick="logout()" class="w-full bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </button>
+                </div>
             </div>
-            <nav class="p-4">
-                <a href="#" onclick="showSection('dashboard'); toggleMobileMenu()" class="block py-4  border-b border-gray-200">Mis Tareas</a>
-                <a href="#" onclick="showSection('completed'); toggleMobileMenu()" class="block py-4  border-b border-gray-200">Completadas</a>
-                <button onclick="openChangePasswordModal(); toggleMobileMenu()" class="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2">
-                    <i class="fas fa-key"></i> Cambiar Mi Contraseña
-                </button>
-                <button onclick="logout()" class="w-full mt-2 bg-red-600 text-white py-3 rounded-lg font-semibold">Cerrar Sesión</button>
-            </nav>
         </div>
 
         <!-- Main Content -->
@@ -511,9 +623,11 @@
 
         function showDashboard() {
             document.getElementById('dashboardScreen').classList.remove('hidden');
-            document.getElementById('userName').textContent = currentTechnician.full_name;
-            document.getElementById('userEmail').textContent = currentUser.email;
-            document.getElementById('technicianName').value = currentTechnician.full_name;
+            if (document.getElementById('userName')) document.getElementById('userName').textContent = currentTechnician.full_name;
+            if (document.getElementById('userEmail')) document.getElementById('userEmail').textContent = currentUser.email;
+            if (document.getElementById('mobileUserName')) document.getElementById('mobileUserName').textContent = currentTechnician.full_name;
+            if (document.getElementById('mobileUserEmail')) document.getElementById('mobileUserEmail').textContent = currentUser.email;
+            if (document.getElementById('technicianName')) document.getElementById('technicianName').value = currentTechnician.full_name;
             
             loadAssignedInspections();
             loadCompletedInspections();
@@ -605,6 +719,13 @@
         
         function showSection(sectionName) {
             document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(`showSection('${sectionName}')`)) {
+                    item.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.mobile-nav-link').forEach(item => {
                 item.classList.remove('active');
                 if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(`showSection('${sectionName}')`)) {
                     item.classList.add('active');

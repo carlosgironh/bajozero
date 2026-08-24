@@ -100,9 +100,14 @@
                         <div id="userEmail" class="text-xs text-gray-500">admin@bajozero.net</div>
                     </div>
                 </div>
-                <button onclick="logout()" class="w-full bg-red-50 hover:bg-red-600 hover:text-white text-red-600 border border-red-200 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                </button>
+                <div class="flex flex-col gap-2">
+                    <button onclick="openChangeMyPasswordModal()" class="w-full bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 border border-blue-200 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2">
+                        <i class="fas fa-key"></i> Cambiar Mi Contraseña
+                    </button>
+                    <button onclick="logout()" class="w-full bg-red-50 hover:bg-red-600 hover:text-white text-red-600 border border-red-200 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </button>
+                </div>
             </div>
         </aside>
 
@@ -129,7 +134,10 @@
                 <a href="#" onclick="showSection('technicians'); toggleMobileMenu()" class="block py-4  border-b border-gray-200">Personal</a>
                 <a href="#" onclick="showSection('clients'); toggleMobileMenu()" class="block py-4  border-b border-gray-200">Clientes</a>
                 <a href="#" onclick="showSection('settings'); toggleMobileMenu()" class="block py-4  border-b border-gray-200">Configuración</a>
-                <button onclick="logout()" class="w-full mt-4 bg-red-600 text-white py-3 rounded-lg font-semibold">Cerrar Sesión</button>
+                <button onclick="openChangeMyPasswordModal(); toggleMobileMenu()" class="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2">
+                    <i class="fas fa-key"></i> Cambiar Mi Contraseña
+                </button>
+                <button onclick="logout()" class="w-full mt-2 bg-red-600 text-white py-3 rounded-lg font-semibold">Cerrar Sesión</button>
             </nav>
         </div>
 
@@ -533,6 +541,67 @@
             <div id="inspectionDetailContent" class="p-6">
                 <!-- Content loaded dynamically -->
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Cambiar / Restablecer Contraseña -->
+    <div id="changePasswordModal" class="fixed inset-0 z-50 bg-black/50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in">
+            <div class="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-brand-primary flex items-center justify-center text-lg">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">Cambiar Contraseña</h2>
+                        <p class="text-xs text-gray-500">Restablecer clave de acceso</p>
+                    </div>
+                </div>
+                <button onclick="closeChangePasswordModal()" class="text-gray-400 hover:text-gray-600 text-2xl transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="changePasswordForm" onsubmit="submitChangePassword(event)" class="p-6 space-y-4">
+                <input type="hidden" id="resetUserId">
+                
+                <!-- Resumen de Usuario -->
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center font-bold text-sm">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="truncate">
+                        <div id="resetUserName" class="font-bold text-gray-800 text-sm truncate">Personal</div>
+                        <div id="resetUserEmail" class="text-xs text-gray-500 truncate">usuario@bajozero.net</div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nueva Contraseña *</label>
+                    <div class="flex gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" id="newPasswordInput" required minlength="6" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none pr-10 font-mono text-sm" placeholder="Mínimo 6 caracteres">
+                            <button type="button" onclick="copyNewPassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-primary" title="Copiar contraseña">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <button type="button" onclick="generateResetPassword()" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-xs flex items-center gap-1.5 transition flex-shrink-0" title="Generar clave aleatoria">
+                            <i class="fas fa-random"></i>
+                            <span>Generar</span>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1.5">Escribe una contraseña o genera una segura y cópiala.</p>
+                </div>
+
+                <div class="pt-4 border-t flex gap-3">
+                    <button type="button" onclick="closeChangePasswordModal()" class="flex-1 px-4 py-3 border border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="submitPasswordBtn" class="flex-1 px-4 py-3 bg-brand-primary hover:bg-brand-secondary text-white rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-md">
+                        <i class="fas fa-save"></i>
+                        <span>Actualizar Clave</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1520,10 +1589,18 @@
                                     <p class="truncate"><i class="fas fa-envelope mr-2 text-brand-primary"></i>${tech.email || 'Sin correo'}</p>
                                 </div>
                             </div>
-                            <div class="pt-3 border-t border-gray-100 flex justify-end">
-                                <button onclick="toggleTechnicianStatus('${tech.id}', ${!tech.is_active})" class="text-xs font-bold text-gray-600 hover:text-brand-primary px-3 py-1.5 rounded-lg border border-gray-200 hover:border-brand-primary transition flex items-center gap-1.5">
+                            <div class="pt-3 border-t border-gray-100 flex flex-wrap gap-2">
+                                <button onclick="toggleTechnicianStatus('${tech.id}', ${!tech.is_active})" class="flex-1 min-w-[85px] text-xs font-bold text-gray-600 hover:text-brand-primary px-3 py-1.5 rounded-lg border border-gray-200 hover:border-brand-primary transition flex items-center justify-center gap-1.5">
                                     <i class="fas ${toggleIcon}"></i>
                                     <span>${toggleActionText}</span>
+                                </button>
+                                <button onclick="openChangePasswordModal('${tech.id}', '${(tech.full_name || '').replace(/'/g, "&#39;")}', '${(tech.email || '').replace(/'/g, "&#39;")}')" class="flex-1 min-w-[125px] text-xs font-bold text-blue-600 hover:text-white hover:bg-blue-600 px-3 py-1.5 rounded-lg border border-blue-200 hover:border-blue-600 transition flex items-center justify-center gap-1.5" title="Cambiar o restablecer contraseña">
+                                    <i class="fas fa-key"></i>
+                                    <span>Contraseña</span>
+                                </button>
+                                <button onclick="deleteTechnician('${tech.id}', '${(tech.full_name || '').replace(/'/g, "&#39;")}')" class="text-xs font-bold text-red-500 hover:text-white hover:bg-red-500 px-3 py-1.5 rounded-lg border border-red-200 hover:border-red-500 transition flex items-center justify-center gap-1.5" title="Eliminar usuario permanentemente">
+                                    <i class="fas fa-trash-alt"></i>
+                                    <span>Eliminar</span>
                                 </button>
                             </div>
                         </div>
@@ -1548,6 +1625,123 @@
             } catch (err) {
                 console.error('Error updating technician status:', err);
                 alert('No se pudo actualizar el estado del personal: ' + err.message);
+            }
+        }
+
+        async function deleteTechnician(techId, techName) {
+            if (!confirm(`⚠️ ADVERTENCIA: Esta acción es IRREVERSIBLE.\n\nEliminar a "${techName}" borrará permanentemente:\n• Su cuenta de acceso (email y contraseña)\n• Su perfil del sistema\n\n¿Está seguro de que desea continuar?`)) return;
+
+            try {
+                const { data: result, error: rpcError } = await supabaseClient.rpc('delete_technician', {
+                    p_technician_id: techId
+                });
+
+                if (rpcError) throw new Error(rpcError.message || 'Error al eliminar el personal');
+                if (result && result.success === false) throw new Error(result.error || 'No se pudo eliminar el personal');
+
+                alert(`✅ El personal "${techName}" ha sido eliminado del sistema.`);
+                await loadTechnicians();
+                await loadTechniciansList();
+            } catch (err) {
+                console.error('Error deleting technician:', err);
+                alert('❌ No se pudo eliminar el personal: ' + err.message);
+            }
+        }
+
+        // ==================== RESTABLECER / CAMBIAR CONTRASEÑA ====================
+
+        function openChangePasswordModal(userId, userName, userEmail) {
+            document.getElementById('resetUserId').value = userId;
+            document.getElementById('resetUserName').textContent = userName || 'Personal';
+            document.getElementById('resetUserEmail').textContent = userEmail || '';
+            document.getElementById('newPasswordInput').value = '';
+            
+            const modal = document.getElementById('changePasswordModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('newPasswordInput').focus();
+        }
+
+        function closeChangePasswordModal() {
+            const modal = document.getElementById('changePasswordModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('changePasswordForm').reset();
+        }
+
+        function generateResetPassword() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%&*';
+            let password = '';
+            for (let i = 0; i < 10; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('newPasswordInput').value = password;
+        }
+
+        function copyNewPassword() {
+            const pwd = document.getElementById('newPasswordInput').value;
+            if (!pwd) {
+                alert('Primero genera o escribe una contraseña.');
+                return;
+            }
+            navigator.clipboard.writeText(pwd).then(() => {
+                alert('📋 Contraseña copiada al portapapeles:\n' + pwd);
+            }).catch(() => {
+                prompt('Copie la contraseña manualmente:', pwd);
+            });
+        }
+
+        function openChangeMyPasswordModal() {
+            if (!currentUser) return;
+            openChangePasswordModal(currentUser.id, 'Mi Cuenta (Administrador)', currentUser.email);
+        }
+
+        async function submitChangePassword(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitPasswordBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Guardando...';
+            btn.disabled = true;
+
+            const userId = document.getElementById('resetUserId').value;
+            const userName = document.getElementById('resetUserName').textContent;
+            const newPassword = document.getElementById('newPasswordInput').value.trim();
+
+            try {
+                if (!newPassword || newPassword.length < 6) {
+                    throw new Error('La contraseña debe tener al menos 6 caracteres.');
+                }
+
+                let isSelfUpdate = (currentUser && currentUser.id === userId);
+                let updated = false;
+
+                // 1. Intentar con RPC admin_reset_password
+                const { data: result, error: rpcError } = await supabaseClient.rpc('admin_reset_password', {
+                    p_user_id: userId,
+                    p_new_password: newPassword
+                });
+
+                if (!rpcError && result && result.success !== false) {
+                    updated = true;
+                } else if (isSelfUpdate) {
+                    // Fallback para usuario propio: Supabase auth.updateUser
+                    const { error: authErr } = await supabaseClient.auth.updateUser({ password: newPassword });
+                    if (authErr) throw authErr;
+                    updated = true;
+                } else {
+                    throw new Error(rpcError?.message || result?.error || 'Error al actualizar la contraseña');
+                }
+
+                if (updated) {
+                    alert(`✅ Contraseña actualizada exitosamente para:\n👤 ${userName}\n🔑 Nueva Contraseña: ${newPassword}\n\n(Recuerda suministrar esta clave al usuario)`);
+                    closeChangePasswordModal();
+                }
+            } catch (err) {
+                console.error('Error changing password:', err);
+                alert('❌ Error al cambiar la contraseña: ' + err.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
         

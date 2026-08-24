@@ -54,6 +54,10 @@ kotlin {
         iosMain.dependencies {
             implementation("io.ktor:ktor-client-darwin:2.3.11")
         }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
     }
 }
 

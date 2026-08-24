@@ -32,17 +32,6 @@
             background: #25D366;
             box-shadow: 0 4px 20px rgba(37,211,102,0.4);
         }
-        .login-discrete {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            z-index: 50;
-            opacity: 0.3;
-            transition: opacity 0.3s;
-        }
-        .login-discrete:hover {
-            opacity: 1;
-        }
         /* Modal styles */
         .modal {
             display: none;
@@ -114,11 +103,6 @@
 </head>
 <body class="antialiased text-gray-800">
 
-    <!-- Login Discrete Access -->
-    <a href="login.html" class="login-discrete bg-gray-800 text-white p-2 rounded-full w-10 h-10 flex items-center justify-center" title="Acceso Administrativo">
-        <i class="fas fa-lock text-sm"></i>
-    </a>
-
     <!-- WhatsApp Float -->
     <a href="https://wa.me/50766721466?text=Hola%20Bajo%20Zero,%20necesito%20información%20sobre%20aire%20acondicionado" 
        target="_blank"
@@ -141,26 +125,41 @@
                     </div>
                 </a>
                 
-                <div class="hidden md:flex items-center space-x-8 pr-16">
+                <div class="hidden md:flex items-center space-x-6">
                     <a href="#inicio" class="text-gray-700 hover:text-brand-primary font-medium transition">Inicio</a>
                     <a href="#servicios" class="text-gray-700 hover:text-brand-primary font-medium transition">Servicios</a>
                     <a href="#marcas" class="text-gray-700 hover:text-brand-primary font-medium transition">Marcas</a>
                     <a href="#contacto" class="text-gray-700 hover:text-brand-primary font-medium transition">Contacto</a>
+                    <a href="login.html" class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-900 to-brand-primary hover:from-blue-800 hover:to-blue-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm" title="Acceso a Panel">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Acceso Personal</span>
+                    </a>
                 </div>
                 
-                <button class="md:hidden text-gray-700 text-2xl" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <div class="flex items-center gap-3 md:hidden">
+                    <a href="login.html" class="w-9 h-9 bg-blue-50 text-brand-primary border border-blue-200 hover:bg-brand-primary hover:text-white rounded-xl flex items-center justify-center transition shadow-sm" title="Acceso Personal">
+                        <i class="fas fa-user-shield text-sm"></i>
+                    </a>
+                    <button class="text-gray-700 text-2xl p-1 focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-label="Menú">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
             </div>
         </div>
         
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 shadow-lg">
             <div class="px-6 py-4 space-y-3">
-                <a href="#inicio" class="block text-gray-700 hover:text-brand-primary font-medium">Inicio</a>
-                <a href="#servicios" class="block text-gray-700 hover:text-brand-primary font-medium">Servicios</a>
-                <a href="#marcas" class="block text-gray-700 hover:text-brand-primary font-medium">Marcas</a>
-                <a href="#contacto" class="block text-gray-700 hover:text-brand-primary font-medium">Contacto</a>
+                <a href="#inicio" onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="block text-gray-700 hover:text-brand-primary font-medium">Inicio</a>
+                <a href="#servicios" onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="block text-gray-700 hover:text-brand-primary font-medium">Servicios</a>
+                <a href="#marcas" onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="block text-gray-700 hover:text-brand-primary font-medium">Marcas</a>
+                <a href="#contacto" onclick="document.getElementById('mobile-menu').classList.add('hidden')" class="block text-gray-700 hover:text-brand-primary font-medium">Contacto</a>
+                <div class="pt-3 border-t border-gray-100">
+                    <a href="login.html" class="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-blue-900 to-brand-primary text-white rounded-xl font-bold text-sm shadow">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Acceso al Portal de Personal</span>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>

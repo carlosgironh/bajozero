@@ -172,3 +172,58 @@ ALTER TABLE public.system_settings ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public read for system_settings" ON public.system_settings FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Admin write for system_settings" ON public.system_settings FOR UPDATE TO authenticated USING (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'administrador'));
 CREATE POLICY "Admin insert for system_settings" ON public.system_settings FOR INSERT TO authenticated WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'administrador'));
+
+-- ====================================================================
+-- FUNCIONES RPC DE ADMINISTRACIÓN (TÉCNICOS / PERSONAL)
+-- ====================================================================
+
+-- 1. Eliminar Personal / Técnico
+CREATE OR REPLACE FUNCTION public.delete_technician(p_technician_id UUID)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+    v_tech_role TEXT;
+    v_caller_role TEXT;
+BEGIN
+    SELECT role INTO v_caller_role FROM public.profiles WHERE id = auth.uid();
+    IF v_caller_role NOT IN ('superadmin', 'coordinador', 'administrador') THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Permiso denegado.');
+    END IF;
+    SELECT role INTO v_tech_role FROM public.profiles WHERE id = p_technician_id;
+    IF v_tech_role IS NULL THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Usuario no encontrado.');
+    END IF;
+    IF v_tech_role IN ('superadmin', 'coordinador', 'administrador') THEN
+        RETURN jsonb_build_object('success', false, 'error', 'No se puede eliminar a un administrador.');
+    END IF;
+    DELETE FROM auth.users WHERE id = p_technician_id;
+    RETURN jsonb_build_object('success', true);
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('success', false, 'error', SQLERRM);
+END; $$;
+REVOKE ALL ON FUNCTION public.delete_technician(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.delete_technician(UUID) TO authenticated;
+
+-- 2. Restablecer / Cambiar Contraseña de Personal
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE OR REPLACE FUNCTION public.admin_reset_password(p_user_id UUID, p_new_password TEXT)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, auth, extensions AS $$
+DECLARE
+    v_caller_role TEXT;
+    v_target_email TEXT;
+BEGIN
+    SELECT role INTO v_caller_role FROM public.profiles WHERE id = auth.uid();
+    IF auth.uid() != p_user_id AND (v_caller_role IS NULL OR v_caller_role NOT IN ('superadmin', 'coordinador', 'administrador')) THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Permiso denegado: solo administradores pueden cambiar contraseñas.');
+    END IF;
+    IF length(p_new_password) < 6 THEN
+        RETURN jsonb_build_object('success', false, 'error', 'La contraseña debe tener un mínimo de 6 caracteres.');
+    END IF;
+    UPDATE auth.users
+    SET encrypted_password = crypt(p_new_password, gen_salt('bf')), updated_at = NOW()
+    WHERE id = p_user_id;
+    RETURN jsonb_build_object('success', true);
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('success', false, 'error', SQLERRM);
+END; $$;
+REVOKE ALL ON FUNCTION public.admin_reset_password(UUID, TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.admin_reset_password(UUID, TEXT) TO authenticated;

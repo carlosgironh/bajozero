@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Servicio y Mantenimiento | Bajo Zero Panamá</title>
+    
+    <!-- Meta tags SEO / Open Graph -->
+    <meta name="description" content="Consulta el historial de trabajos, mantenimientos y próximos servicios realizados en tus aires acondicionados por Bajo Zero Panamá.">
+    <meta name="theme-color" content="#0066b2">
+    
+    <!-- Fuentes e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS y Estilos -->
+    <link rel="stylesheet" href="css/style.css?v=4">
+    
+    <!-- Librerías Externas -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --bz-primary: #0066b2;
+            --bz-secondary: #004c8c;
+            --bz-accent: #00a3ff;
+            --bz-ice: #e8f4fc;
+            --bz-dark: #0f172a;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        /* Gradient header with frost effect */
+        .hero-banner {
+            background: linear-gradient(135deg, #002244 0%, #004c8c 50%, #0066b2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        /* Glassmorphism cards */
+        .glass-card-client {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 102, 178, 0.08), 0 8px 10px -6px rgba(0, 102, 178, 0.04);
+            transition: all 0.25s ease;
+        }
+
+        .glass-card-client:hover {
+            box-shadow: 0 15px 30px -5px rgba(0, 102, 178, 0.12);
+        }
+
+        /* Maintenance pulse indicator */
+        .status-pulse {
+            position: relative;
+        }
+        .status-pulse::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 9999px;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Timeline styling */
+        .timeline-line {
+            position: absolute;
+            left: 24px;
+            top: 24px;
+            bottom: 24px;
+            width: 3px;
+            background: linear-gradient(to bottom, #00a3ff, #e2e8f0);
+            border-radius: 4px;
+        }
+
+        /* Floating action buttons */
+        .float-cta {
+            box-shadow: 0 10px 25px rgba(0, 102, 178, 0.3);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="pb-28">
+
+    <!-- Top Navigation / Brand Header -->
+    <header class="hero-banner text-white pt-8 pb-14 px-4 sm:px-6 relative shadow-lg">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <!-- Logo & Brand -->
+            <div class="flex items-center gap-3">
+                <div class="w-14 h-14 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl flex items-center justify-center text-white text-2xl font-black italic shadow-inner">
+                    <i class="fas fa-snowflake text-cyan-300 text-3xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl font-black tracking-tight text-white">BAJO ZERO</span>
+                        <span class="bg-cyan-400/20 text-cyan-200 border border-cyan-400/30 text-xs px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Panamá</span>
+                    </div>
+                    <p class="text-xs text-blue-200 font-medium">Historial Digital de Climatización & Mantenimiento</p>
+                </div>
+            </div>
+
+            <!-- Quick Contact Header Buttons -->
+            <div class="flex items-center gap-2">
+                <a href="tel:66721466" class="bg-white/15 hover:bg-white/25 backdrop-blur-sm border border-white/20 text-white text-sm font-semibold px-3.5 py-2 rounded-xl transition flex items-center gap-2">
+                    <i class="fas fa-phone-alt text-cyan-300"></i>
+                    <span>6672-1466</span>
+                </a>
+                <a id="headerWhatsappBtn" href="https://wa.me/50766721466?text=Hola%20Bajo%20Zero,%20estoy%20consultando%20el%20historial%20de%20mi%20aire%20acondicionado" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold px-3.5 py-2 rounded-xl shadow-md transition flex items-center gap-1.5">
+                    <i class="fab fa-whatsapp text-lg"></i>
+                    <span>WhatsApp</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 -mt-8 relative z-10 space-y-6">
+
+        <!-- Loading State -->
+        <div id="loadingState" class="glass-card-client p-10 text-center">
+            <div class="inline-block animate-spin text-brand-primary text-4xl mb-4">
+                <i class="fas fa-snowflake"></i>
+            </div>
+            <h2 class="text-lg font-bold text-gray-800">Cargando Historial del Equipo...</h2>
+            <p class="text-sm text-gray-500 mt-1">Obteniendo información de servicio y mantenimiento</p>
+        </div>
+
+        <!-- Error State (e.g., ID no encontrado) -->
+        <div id="errorState" class="glass-card-client p-8 text-center hidden border-red-200 bg-red-50/50">
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800" id="errorTitle">No se encontró el registro</h2>
+            <p class="text-sm text-gray-600 mt-2 max-w-md mx-auto" id="errorMessage">
+                No pudimos localizar la información del cliente o equipo con este código QR. Por favor verifique el enlace o comuníquese con soporte.
+            </p>
+            <div class="mt-6 flex justify-center gap-3">
+                <a href="tel:66721466" class="btn-primary text-sm px-6 py-2.5">
+                    <i class="fas fa-headset"></i> Contactar a Soporte
+                </a>
+            </div>
+        </div>
+
+        <!-- Client & Unit Header Card -->
+        <div id="clientInfoCard" class="glass-card-client p-6 hidden">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-5">
+                <div class="flex items-start gap-4">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-md flex-shrink-0">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h1 class="text-2xl font-black text-gray-800" id="clientName">Nombre del Cliente</h1>
+                            <span id="clientStatusBadge" class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wide flex items-center gap-1">
+                                <span class="w-2 h-2 bg-emerald-500 rounded-full status-pulse"></span>
+                                Cliente Activo
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-0.5 flex items-center gap-2 flex-wrap">
+                            <span id="clientPhone"><i class="fas fa-phone mr-1 text-brand-primary"></i>--</span>
+                            <span class="text-gray-300">•</span>
+                            <span id="clientEmail"><i class="fas fa-envelope mr-1 text-brand-primary"></i>--</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Quick Action Share / Refresh -->
+                <div class="flex items-center gap-2 self-start md:self-center">
+                    <button onclick="shareLink()" class="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-semibold transition flex items-center gap-1.5" title="Compartir este historial">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Compartir</span>
+                    </button>
+                    <button onclick="loadClientData()" class="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-semibold transition" title="Actualizar datos">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Address & Location info -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                <div class="md:col-span-2 flex items-start gap-2.5 text-sm text-gray-600 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                    <i class="fas fa-map-marker-alt text-brand-primary text-base mt-0.5"></i>
+                    <div>
+                        <span class="font-bold text-gray-700 block text-xs uppercase tracking-wider">Ubicación del Equipo:</span>
+                        <span id="clientAddress" class="text-gray-800">Dirección registrada</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between bg-blue-50/70 p-3.5 rounded-xl border border-blue-100/80">
+                    <div>
+                        <span class="font-bold text-blue-900 block text-xs uppercase tracking-wider">Total Trabajos:</span>
+                        <span id="totalServicesCount" class="text-2xl font-black text-brand-primary">0</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-brand-primary flex items-center justify-center text-lg">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Scheduled Maintenance / Service Recommendation Card -->
+        <section id="nextMaintenanceSection" class="hidden">
+            <div id="nextMaintenanceCard" class="rounded-2xl p-6 shadow-md transition border">
+                <!-- Content injected dynamically -->
+            </div>
+        </section>
+
+        <!-- Equipment Overview Section (Aires Acondicionados Registrados) -->
+        <section id="equipmentSection" class="glass-card-client p-6 hidden">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 bg-cyan-100 text-cyan-800 rounded-xl flex items-center justify-center text-base">
+                        <i class="fas fa-wind"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-800">Equipos de Aire Acondicionado</h2>
+                        <p class="text-xs text-gray-500">Unidades atendidas en esta ubicación</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="equipmentList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
+                <!-- Equipment items injected dynamically -->
+            </div>
+        </section>
+
+        <!-- Maintenance History & Recent Work Timeline -->
+        <section id="historySection" class="glass-card-client p-6 hidden">
+            <div class="flex items-center justify-between mb-6 pb-3 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 bg-blue-100 text-brand-primary rounded-xl flex items-center justify-center text-base">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-800">Historial de Trabajos y Mantenimientos</h2>
+                        <p class="text-xs text-gray-500">Detalles técnicos, reportes y verificaciones realizadas</p>
+                    </div>
+                </div>
+                
+                <span id="historyBadgeCount" class="text-xs bg-slate-100 text-slate-700 font-bold px-2.5 py-1 rounded-lg">
+                    0 Registros
+                </span>
+            </div>
+
+            <!-- Timeline of Tasks -->
+            <div id="tasksTimeline" class="space-y-4">
+                <!-- Timeline items injected dynamically -->
+            </div>
+
+            <!-- Empty history fallback -->
+            <div id="emptyHistoryMsg" class="py-10 text-center text-gray-500 hidden">
+                <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-2"></i>
+                <p class="font-medium">No se registran trabajos completados aún</p>
+                <p class="text-xs text-gray-400">Los mantenimientos e inspecciones aparecerán aquí en cuanto sean completados por el equipo técnico.</p>
+            </div>
+        </section>
+
+        <!-- Bajo Zero Guarantee & Quality Badge -->
+        <div class="bg-gradient-to-r from-blue-900 to-blue-800 text-white rounded-2xl p-5 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5 text-center sm:text-left">
+                <div class="w-12 h-12 bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-base">Garantía y Confianza Bajo Zero</h3>
+                    <p class="text-xs text-blue-200">Mano de obra certificada, limpieza profunda y repuestos de alta calidad.</p>
+                </div>
+            </div>
+            <a href="tel:66721466" class="whitespace-nowrap bg-white hover:bg-blue-50 text-blue-900 font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-xl transition shadow">
+                Llamar a Central
+            </a>
+        </div>
+
+    </main>
+
+    <!-- Bottom Floating Quick Action Bar (Optimized for Mobile) -->
+    <div class="fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur-md border-t border-gray-200 z-40 shadow-2xl">
+        <div class="max-w-4xl mx-auto flex items-center gap-2">
+            <a id="footerWhatsappBtn" href="https://wa.me/50766721466" target="_blank" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm transition transform active:scale-95">
+                <i class="fab fa-whatsapp text-lg"></i>
+                <span>Solicitar Mantenimiento</span>
+            </a>
+            <a href="tel:66721466" class="bg-blue-50 hover:bg-blue-100 text-brand-primary border border-blue-200 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm transition">
+                <i class="fas fa-phone-alt"></i>
+                <span class="hidden sm:inline">6672-1466</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Task Detail Full View Modal -->
+    <div id="detailModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in">
+            <div class="sticky top-0 bg-white border-b border-gray-100 p-5 flex justify-between items-center z-10">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-blue-100 text-brand-primary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800" id="modalTaskTitle">Detalle del Trabajo</h3>
+                </div>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-2xl transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modalTaskContent" class="p-6 space-y-6">
+                <!-- Modal content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification for Share / Copy -->
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex items-center gap-2">
+        <i class="fas fa-check-circle text-emerald-400"></i>
+        <span id="toastMsg">Enlace copiado al portapapeles</span>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // Supabase client instance
+        let currentClient = null;
+        let clientTasks = [];
+        let specificTaskId = null;
+
+        // Initialize and parse URL parameters
+        document.addEventListener('DOMContentLoaded', () => {
+            // Support query string (?id=...), hash (#id=...), and full URL parsing
+            const urlParams = new URLSearchParams(window.location.search);
+            const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+            
+            let clientId = urlParams.get('id') || urlParams.get('cliente') || urlParams.get('client_id') ||
+                           hashParams.get('id') || hashParams.get('cliente') || hashParams.get('client_id');
+            
+            let taskId = urlParams.get('task') || urlParams.get('task_id') ||
+                         hashParams.get('task') || hashParams.get('task_id');
+
+            // Fallback: check if id is passed directly in hash like #UUID
+            if (!clientId && window.location.hash && window.location.hash.length > 10 && !window.location.hash.includes('=')) {
+                clientId = window.location.hash.replace(/^#/, '');
+            }
+
+            // Fallback: check localStorage if recently opened from admin
+            if (!clientId && !taskId) {
+                const storedId = sessionStorage.getItem('bz_last_client_id');
+                if (storedId) clientId = storedId;
+            }
+
+            if (clientId) {
+                sessionStorage.setItem('bz_last_client_id', clientId);
+            }
+
+            if (!clientId && !taskId) {
+                showError('Código no especificado', 'Por favor escanee el código QR provisto en el equipo de aire acondicionado para ver su información.');
+                return;
+            }
+
+            specificTaskId = taskId;
+            loadClientData(clientId, specificTaskId);
+        });
+
+        // Load client and their work history
+        async function loadClientData(clientId, taskId) {
+            showLoading(true);
+            try {
+                // If only task ID provided, find the client_id first
+                if (!clientId && taskId) {
+                    const { data: taskData, error: taskErr } = await supabaseClient
+                        .from('tasks')
+                        .select('client_id')
+                        .eq('id', taskId)
+                        .single();
+                    
+                    if (taskErr || !taskData) {
+                        throw new Error('No se encontró el registro de la tarea especificada.');
+                    }
+                    clientId = taskData.client_id;
+                }
+
+                // 1. Fetch Client Profile
+                const { data: client, error: clientErr } = await supabaseClient
+                    .from('clients')
+                    .select('*')
+                    .eq('id', clientId)
+                    .single();
+
+                if (clientErr || !client) {
+                    throw new Error('No se encontró el cliente registrado con el código escaneado.');
+                }
+                currentClient = client;
+
+                // 2. Fetch Tasks / Work Orders for this client
+                const { data: tasks, error: tasksErr } = await supabaseClient
+                    .from('tasks')
+                    .select('*, profiles!inspector_id(full_name, phone, specialty)')
+                    .eq('client_id', clientId)
+                    .order('scheduled_date', { ascending: false });
+
+                if (tasksErr) throw tasksErr;
+                clientTasks = tasks || [];
+
+                // Render UI
+                renderClientHeader(client);
+                renderUpcomingMaintenance(client, clientTasks);
+                renderEquipmentSummary(clientTasks);
+                renderTasksTimeline(clientTasks);
+                updateContactLinks(client);
+
+                showLoading(false);
+
+                // If specific task was targeted in QR, open detail modal directly
+                if (specificTaskId) {
+                    const targetTask = clientTasks.find(t => t.id === specificTaskId);
+                    if (targetTask) {
+                        viewTaskDetails(targetTask.id);
+                    }
+                }
+
+            } catch (err) {
+                console.error('Error loading client portal:', err);
+                showError('Error al cargar información', err.message || 'No fue posible consultar los datos del servidor.');
+            }
+        }
+
+        // Render Client Info Card
+        function renderClientHeader(client) {
+            document.getElementById('clientName').textContent = client.contact_name || client.company_name || 'Cliente Bajo Zero';
+            document.getElementById('clientAddress').textContent = client.address || 'Panamá';
+            document.getElementById('clientPhone').innerHTML = client.phone ? `<i class="fas fa-phone mr-1 text-brand-primary"></i>${client.phone}` : '';
+            document.getElementById('clientEmail').innerHTML = client.email ? `<i class="fas fa-envelope mr-1 text-brand-primary"></i>${client.email}` : '';
+            
+            document.getElementById('clientInfoCard').classList.remove('hidden');
+        }
+
+        // Render Upcoming Maintenance & Recommendations
+        function renderUpcomingMaintenance(client, tasks) {
+            const container = document.getElementById('nextMaintenanceCard');
+            const section = document.getElementById('nextMaintenanceSection');
+            
+            const now = new Date();
+            // Filter future / assigned / pending tasks
+            const upcomingTasks = tasks.filter(t => t.status === 'asignada' || t.status === 'pendiente');
+            const completedTasks = tasks.filter(t => t.status === 'completada');
+
+            if (upcomingTasks.length > 0) {
+                // We have scheduled work!
+                const next = upcomingTasks[0];
+                const techName = next.profiles?.full_name || 'Técnico Asignado';
+                const formattedDate = formatFullDate(next.scheduled_date);
+
+                container.className = 'rounded-2xl p-6 shadow-md border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50';
+                container.innerHTML = `
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3.5">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-2xl shadow flex-shrink-0">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div>
+                                <span class="bg-amber-200 text-amber-900 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                                    Próximo Servicio Programado
+                                </span>
+                                <h3 class="text-xl font-bold text-gray-900 mt-1">
+                                    ${capitalize(next.task_type || 'Mantenimiento')} - ${formattedDate}
+                                </h3>
+                                <p class="text-xs text-gray-600 mt-0.5">
+                                    <i class="fas fa-clock mr-1 text-amber-600"></i>${next.scheduled_time ? next.scheduled_time : 'Horario a coordinar'} 
+                                    <span class="mx-1 text-gray-300">•</span>
+                                    <i class="fas fa-user-hard-hat mr-1 text-amber-600"></i>${techName}
+                                </p>
+                            </div>
+                        </div>
+
+                        <a href="https://wa.me/50766721466?text=Hola%20Bajo%20Zero,%20tengo%20una%20consulta%20sobre%20mi%20servicio%20programado%20${next.task_number}%20para%20el%20${next.scheduled_date}" target="_blank" class="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow">
+                            <i class="fab fa-whatsapp text-base"></i> Confirmar Cita
+                        </a>
+                    </div>
+                `;
+            } else {
+                // No scheduled task. Compute smart maintenance recommendation based on last completed service
+                let lastServiceDate = null;
+                let recommendedDateStr = 'Próximamente';
+                let monthsRemaining = 3;
+
+                if (completedTasks.length > 0) {
+                    const last = completedTasks[0];
+                    const dateStr = last.completion_date || last.completed_at || last.scheduled_date;
+                    if (dateStr) {
+                        lastServiceDate = new Date(dateStr);
+                        // Standard recommendation: 4 months after last service
+                        const targetDate = new Date(lastServiceDate);
+                        targetDate.setMonth(targetDate.getMonth() + 4);
+                        
+                        const diffTime = targetDate.getTime() - now.getTime();
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        
+                        recommendedDateStr = formatFullDate(targetDate.toISOString().split('T')[0]);
+
+                        if (diffDays <= 0) {
+                            monthsRemaining = 0;
+                        } else {
+                            monthsRemaining = Math.max(1, Math.round(diffDays / 30));
+                        }
+                    }
+                }
+
+                const isDue = monthsRemaining === 0;
+
+                container.className = isDue 
+                    ? 'rounded-2xl p-6 shadow-md border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50'
+                    : 'rounded-2xl p-6 shadow-md border border-blue-100 bg-gradient-to-r from-blue-50/90 to-cyan-50/80';
+
+                container.innerHTML = `
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3.5">
+                            <div class="w-12 h-12 rounded-2xl ${isDue ? 'bg-orange-500' : 'bg-brand-primary'} text-white flex items-center justify-center text-2xl shadow flex-shrink-0">
+                                <i class="fas ${isDue ? 'fa-bell' : 'fa-snowflake'}"></i>
+                            </div>
+                            <div>
+                                <span class="${isDue ? 'bg-orange-200 text-orange-900' : 'bg-blue-200 text-blue-900'} text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                                    ${isDue ? 'Mantenimiento Preventivo Sugerido' : 'Estado de Climatización Óptimo'}
+                                </span>
+                                <h3 class="text-xl font-bold text-gray-900 mt-1">
+                                    ${isDue ? 'Es momento de tu próximo mantenimiento' : `Próximo Mantenimiento Recomendado: ${recommendedDateStr}`}
+                                </h3>
+                                <p class="text-xs text-gray-600 mt-0.5">
+                                    ${lastServiceDate ? `Último servicio realizado el ${formatDate(lastServiceDate.toISOString().split('T')[0])}. ` : ''}
+                                    Un mantenimiento periódico previene fugas de gas, malos olores y reduce hasta 30% el consumo eléctrico.
+                                </p>
+                            </div>
+                        </div>
+
+                        <a href="https://wa.me/50766721466?text=Hola%20Bajo%20Zero,%20deseo%20agendar%20mantenimiento%20preventivo%20para%20mis%20aires%20acondicionados.%20Cliente:%20${encodeURIComponent(client.contact_name || '')}%20-%20${encodeURIComponent(client.address || '')}" target="_blank" class="w-full sm:w-auto ${isDue ? 'bg-orange-600 hover:bg-orange-700' : 'bg-brand-primary hover:bg-brand-secondary'} text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow">
+                            <i class="fab fa-whatsapp text-base"></i> Agendar Servicio
+                        </a>
+                    </div>
+                `;
+            }
+
+            section.classList.remove('hidden');
+        }
+
+        // Render Equipment Summary Cards
+        function renderEquipmentSummary(tasks) {
+            const container = document.getElementById('equipmentList');
+            const section = document.getElementById('equipmentSection');
+            
+            // Extract distinct equipment from tasks
+            const equipmentMap = new Map();
+
+            tasks.forEach(t => {
+                const key = `${t.equipment_type || 'split'}_${t.equipment_brand || ''}_${t.equipment_capacity || ''}`;
+                if (!equipmentMap.has(key)) {
+                    equipmentMap.set(key, {
+                        type: t.equipment_type || 'Aire Acondicionado',
+                        brand: t.equipment_brand || 'Marca General',
+                        model: t.equipment_model || '',
+                        capacity: t.equipment_capacity || 'Capacidad estándar',
+                        lastDate: t.completion_date || t.scheduled_date
+                    });
+                }
+
+                // Also check technical_data.modelos if present
+                if (t.technical_data && Array.isArray(t.technical_data.modelos)) {
+                    t.technical_data.modelos.forEach(m => {
+                        if (m.modelo && m.modelo.trim()) {
+                            const mKey = `mod_${m.modelo.trim()}`;
+                            if (!equipmentMap.has(mKey)) {
+                                equipmentMap.set(mKey, {
+                                    type: 'Split / A/A',
+                                    brand: t.equipment_brand || 'Unidad',
+                                    model: m.modelo,
+                                    capacity: t.equipment_capacity || '',
+                                    lastDate: t.completion_date || t.scheduled_date
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+            if (equipmentMap.size === 0) {
+                // Fallback standard unit
+                equipmentMap.set('default', {
+                    type: 'Aire Acondicionado',
+                    brand: 'Unidad de Climatización',
+                    model: 'Residencial / Comercial',
+                    capacity: 'Inverter',
+                    lastDate: ''
+                });
+            }
+
+            container.innerHTML = '';
+            equipmentMap.forEach(eq => {
+                container.innerHTML += `
+                    <div class="bg-slate-50 hover:bg-blue-50/50 p-4 rounded-xl border border-slate-200 transition">
+                        <div class="flex items-center justify-between text-xs text-brand-primary font-bold mb-1 uppercase tracking-wider">
+                            <span><i class="fas fa-wind mr-1"></i>${eq.type}</span>
+                            ${eq.capacity ? `<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded">${eq.capacity}</span>` : ''}
+                        </div>
+                        <h4 class="font-bold text-gray-900 text-sm">${eq.brand} ${eq.model ? '- ' + eq.model : ''}</h4>
+                        ${eq.lastDate ? `<p class="text-xs text-gray-500 mt-1"><i class="fas fa-history mr-1"></i>Último servicio: ${formatDate(eq.lastDate)}</p>` : ''}
+                    </div>
+                `;
+            });
+
+            section.classList.remove('hidden');
+        }
+
+        // Render Completed Tasks / Work History Timeline
+        function renderTasksTimeline(tasks) {
+            const container = document.getElementById('tasksTimeline');
+            const emptyMsg = document.getElementById('emptyHistoryMsg');
+            const countBadge = document.getElementById('historyBadgeCount');
+            const totalCountEl = document.getElementById('totalServicesCount');
+            const section = document.getElementById('historySection');
+
+            const completedTasks = tasks.filter(t => t.status === 'completada');
+            totalCountEl.textContent = completedTasks.length;
+            countBadge.textContent = `${completedTasks.length} Registros`;
+
+            if (completedTasks.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                container.innerHTML = '';
+                section.classList.remove('hidden');
+                return;
+            }
+
+            emptyMsg.classList.add('hidden');
+            container.innerHTML = '';
+
+            completedTasks.forEach((task, index) => {
+                const dateStr = formatDate(task.completion_date || task.completed_at || task.scheduled_date);
+                const techName = task.profiles?.full_name || 'Técnico Certificado';
+                const td = task.technical_data || {};
+                const models = td.modelos || [];
+                const taskType = task.task_type || 'mantenimiento';
+
+                // Badge color based on task type
+                let badgeClass = 'bg-blue-100 text-blue-800';
+                let iconClass = 'fa-tools';
+                if (taskType === 'mantenimiento') {
+                    badgeClass = 'bg-emerald-100 text-emerald-800';
+                    iconClass = 'fa-wrench';
+                } else if (taskType === 'instalacion') {
+                    badgeClass = 'bg-indigo-100 text-indigo-800';
+                    iconClass = 'fa-plus-circle';
+                } else if (taskType === 'inspeccion') {
+                    badgeClass = 'bg-cyan-100 text-cyan-800';
+                    iconClass = 'fa-clipboard-check';
+                }
+
+                container.innerHTML += `
+                    <div class="bg-white rounded-xl border border-gray-200 p-5 hover:border-brand-primary hover:shadow-md transition">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-3 mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl ${badgeClass} flex items-center justify-center text-lg flex-shrink-0">
+                                    <i class="fas ${iconClass}"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-mono font-bold text-gray-900 text-sm">${task.task_number || 'BZ-2026'}</span>
+                                        <span class="text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${badgeClass}">
+                                            ${capitalize(taskType)}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-0.5">
+                                        <i class="fas fa-calendar-alt mr-1"></i>Realizado: <strong>${dateStr}</strong> 
+                                        ${task.completion_time ? 'a las ' + task.completion_time : ''}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <button onclick="viewTaskDetails('${task.id}')" class="bg-slate-100 hover:bg-brand-primary hover:text-white text-gray-700 px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 self-start sm:self-center">
+                                <i class="fas fa-search-plus"></i>
+                                <span>Ver Informe Técnico</span>
+                            </button>
+                        </div>
+
+                        <!-- Quick Summary Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                            <div class="bg-slate-50 p-2.5 rounded-lg">
+                                <span class="text-gray-400 block uppercase font-bold text-[10px]">Equipo:</span>
+                                <span class="font-semibold text-gray-800">${task.equipment_brand || 'Split'} ${task.equipment_capacity ? '(' + task.equipment_capacity + ')' : ''}</span>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-lg">
+                                <span class="text-gray-400 block uppercase font-bold text-[10px]">Técnico:</span>
+                                <span class="font-semibold text-gray-800">${techName}</span>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-lg">
+                                <span class="text-gray-400 block uppercase font-bold text-[10px]">Estado:</span>
+                                <span class="font-bold text-emerald-700 flex items-center gap-1">
+                                    <i class="fas fa-check-circle text-emerald-500"></i> Completado
+                                </span>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-lg">
+                                <span class="text-gray-400 block uppercase font-bold text-[10px]">Evidencias:</span>
+                                <span class="font-semibold text-gray-800">${td.fotos ? Object.keys(td.fotos).length + ' Fotos' : 'Verificadas'}</span>
+                            </div>
+                        </div>
+
+                        ${td.observaciones || task.technician_notes ? `
+                            <div class="mt-3 text-xs text-gray-600 bg-blue-50/50 border border-blue-100 p-2.5 rounded-lg flex items-start gap-2">
+                                <i class="fas fa-info-circle text-brand-primary mt-0.5"></i>
+                                <div>
+                                    <strong class="text-blue-900">Observaciones Técnicas:</strong>
+                                    <span>${td.observaciones || task.technician_notes}</span>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            section.classList.remove('hidden');
+        }
+
+        // Open Full Technical Detail Modal
+        function viewTaskDetails(taskId) {
+            const task = clientTasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            const modal = document.getElementById('detailModal');
+            const title = document.getElementById('modalTaskTitle');
+            const content = document.getElementById('modalTaskContent');
+
+            title.textContent = `Reporte de Trabajo - ${task.task_number || 'BZ'}`;
+            const td = task.technical_data || {};
+            const techName = task.profiles?.full_name || 'Técnico Certificado';
+            const dateStr = formatDate(task.completion_date || task.completed_at || task.scheduled_date);
+            const models = td.modelos || [];
+
+            content.innerHTML = `
+                <!-- Service Meta Card -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+                    <div>
+                        <span class="text-gray-400 block uppercase font-bold text-[10px]">N° de Tarea</span>
+                        <span class="font-bold text-brand-primary text-sm">${task.task_number || '--'}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 block uppercase font-bold text-[10px]">Fecha del Trabajo</span>
+                        <span class="font-bold text-gray-800 text-sm">${dateStr}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 block uppercase font-bold text-[10px]">Tipo de Servicio</span>
+                        <span class="font-bold text-gray-800 text-sm uppercase">${task.task_type || 'Mantenimiento'}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 block uppercase font-bold text-[10px]">Técnico Responsable</span>
+                        <span class="font-bold text-gray-800 text-sm">${techName}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 block uppercase font-bold text-[10px]">Equipo Atendido</span>
+                        <span class="font-bold text-gray-800 text-sm">${task.equipment_brand || 'Split'} ${task.equipment_capacity || ''}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 block uppercase font-bold text-[10px]">Estado Final</span>
+                        <span class="font-bold text-emerald-600 text-sm">Operativo / Óptimo</span>
+                    </div>
+                </div>
+
+                <!-- Models & Installation Technical Specs Table -->
+                ${models.length > 0 ? `
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
+                            <i class="fas fa-cogs text-brand-primary"></i> Detalle por Unidad / Modelo
+                        </h4>
+                        <div class="overflow-x-auto border border-gray-200 rounded-xl">
+                            <table class="w-full text-xs text-center border-collapse">
+                                <thead class="bg-blue-50 text-blue-900 font-bold border-b border-gray-200">
+                                    <tr>
+                                        <th class="p-2 text-left">Modelo</th>
+                                        <th class="p-2">Inst. Básica</th>
+                                        <th class="p-2">Inst. Manga</th>
+                                        <th class="p-2">Recorrido</th>
+                                        <th class="p-2">Pies Tub.</th>
+                                        <th class="p-2">Cable 4x14</th>
+                                        <th class="p-2">Cable 3x12</th>
+                                        <th class="p-2">Soporte</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    ${models.map(m => `
+                                        <tr>
+                                            <td class="p-2 text-left font-bold text-gray-800">${m.modelo || '-'}</td>
+                                            <td class="p-2">${m.inst_basica || '-'}</td>
+                                            <td class="p-2">${m.inst_manga || '-'}</td>
+                                            <td class="p-2">${m.inst_recorrido || '-'}</td>
+                                            <td class="p-2 font-mono">${m.pies_tuberia || '-'}</td>
+                                            <td class="p-2">${m.cable_4x14 || '-'}</td>
+                                            <td class="p-2">${m.cable_3x12 || '-'}</td>
+                                            <td class="p-2">${m.soporte || '-'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                ` : ''}
+
+                <!-- Technical Checklist Matrix -->
+                <div>
+                    <h4 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
+                        <i class="fas fa-check-double text-brand-primary"></i> Verificaciones Técnicas y Parámetros
+                    </h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100 flex justify-between">
+                            <span class="text-gray-600">Manga Obstruida:</span>
+                            <strong class="${td.manga_obstruida === 'SI' ? 'text-red-600' : 'text-emerald-600'}">${td.manga_obstruida || 'NO'}</strong>
+                        </div>
+                        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100 flex justify-between">
+                            <span class="text-gray-600">Corriente Eléctrica:</span>
+                            <strong class="text-emerald-600">${td.corriente || 'ADECUADA'}</strong>
+                        </div>
+                        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100 flex justify-between">
+                            <span class="text-gray-600">Salida de Desagüe:</span>
+                            <strong class="text-blue-900">${td.salida_desague || 'A NIVEL'}</strong>
+                        </div>
+                        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100 flex justify-between">
+                            <span class="text-gray-600">Hueco en Pared:</span>
+                            <strong class="text-gray-800">${td.hueco_pared || 'SI'}</strong>
+                        </div>
+                        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100 flex justify-between">
+                            <span class="text-gray-600">Tubería de Desagüe:</span>
+                            <strong class="text-gray-800">${td.pie_desague || 'OK'}</strong>
+                        </div>
+                        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100 flex justify-between">
+                            <span class="text-gray-600">Inst. Segura:</span>
+                            <strong class="text-emerald-600">${td.inst_peligrosa === 'SI' ? 'OBSERVACIÓN' : 'SI'}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observations -->
+                ${td.observaciones || task.technician_notes ? `
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                        <h4 class="font-bold text-blue-900 text-xs uppercase mb-1">Observaciones y Recomendaciones:</h4>
+                        <p class="text-xs text-gray-700 leading-relaxed">${td.observaciones || task.technician_notes}</p>
+                    </div>
+                ` : ''}
+
+                <!-- Customer Signature Badge -->
+                ${td.firma_cliente ? `
+                    <div class="border-t pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <span class="text-xs font-bold text-gray-700 block">Firma de Conformidad del Cliente:</span>
+                            <span class="text-[10px] text-gray-400">Trabajo recibido a satisfacción</span>
+                        </div>
+                        <img src="${td.firma_cliente}" alt="Firma del cliente" class="h-16 max-w-[200px] border border-gray-200 rounded-lg p-1 bg-white">
+                    </div>
+                ` : ''}
+
+                <!-- Modal Actions -->
+                <div class="pt-4 border-t flex gap-3">
+                    <button onclick="closeDetailModal()" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl font-bold text-xs text-gray-700 hover:bg-gray-50 transition">
+                        Cerrar
+                    </button>
+                    <a href="https://wa.me/50766721466?text=Hola%20Bajo%20Zero,%20tengo%20una%20consulta%20sobre%20el%20informe%20técnico%20${task.task_number}" target="_blank" class="flex-1 bg-brand-primary hover:bg-brand-secondary text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
+                        <i class="fab fa-whatsapp text-sm"></i> Consultar a Soporte
+                    </a>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDetailModal() {
+            const modal = document.getElementById('detailModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Update WhatsApp & Contact links with current client context
+        function updateContactLinks(client) {
+            const clientContext = encodeURIComponent(`Hola Bajo Zero, estoy consultando el historial de mi A/A. Cliente: ${client.contact_name || ''} (${client.address || ''})`);
+            const waUrl = `https://wa.me/50766721466?text=${clientContext}`;
+            
+            const headBtn = document.getElementById('headerWhatsappBtn');
+            const footBtn = document.getElementById('footerWhatsappBtn');
+            if (headBtn) headBtn.href = waUrl;
+            if (footBtn) footBtn.href = waUrl;
+        }
+
+        // UI Helpers
+        function showLoading(show) {
+            const loading = document.getElementById('loadingState');
+            if (loading) loading.style.display = show ? 'block' : 'none';
+        }
+
+        function showError(title, msg) {
+            showLoading(false);
+            document.getElementById('errorTitle').textContent = title;
+            document.getElementById('errorMessage').textContent = msg;
+            document.getElementById('errorState').classList.remove('hidden');
+        }
+
+        function shareLink() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Historial de Servicio | Bajo Zero Panamá',
+                    text: `Historial de mantenimiento de ${currentClient?.contact_name || 'Aires Acondicionados'}`,
+                    url: window.location.href
+                }).catch(() => copyToClipboard());
+            } else {
+                copyToClipboard();
+            }
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                showToast('¡Enlace del historial copiado al portapapeles!');
+            }).catch(() => {
+                showToast('URL: ' + window.location.href);
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.textContent = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2500);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '--';
+            const parts = dateStr.split('T')[0].split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            return dateStr;
+        }
+
+        function formatFullDate(dateStr) {
+            if (!dateStr) return '--';
+            const date = new Date(dateStr + 'T12:00:00');
+            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            return `${days[date.getDay()]}, ${date.getDate()} de ${months[date.getMonth()]} de ${date.getFullYear()}`;
+        }
+
+        function capitalize(str) {
+            if (!str) return '';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+    </script>
+</body>
+</html>

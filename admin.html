@@ -11,11 +11,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
-    <!-- Tailwind CSS -->  
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
-
-    
+    <style>
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            #printLabelWrapper, #printLabelWrapper * {
+                visibility: visible !important;
+            }
+            #printLabelWrapper {
+                position: fixed !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                box-shadow: none !important;
+                border: 2px solid #004c8c !important;
+                display: block !important;
+                z-index: 99999 !important;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
 
@@ -432,10 +453,10 @@
 
             <!-- Clients Section -->
             <div id="clientsSection" class="section hidden animate-fade-in">
-                <div class="flex justify-between items-center mb-8">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-800">Clientes</h1>
-                        <p class="text-gray-600 mt-1">Gestión de clientes registrados</p>
+                        <h1 class="text-3xl font-bold text-gray-800">Clientes & Códigos QR</h1>
+                        <p class="text-gray-600 mt-1">Gestión de clientes y emisión de etiquetas QR para equipos de aire acondicionado</p>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="openClientModal()" class="bg-brand-primary hover:bg-brand-secondary text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition flex items-center gap-2">
@@ -447,6 +468,18 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Search & Filters for Clients -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="relative w-full sm:w-96">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="clientSearchInput" oninput="filterClientsList()" placeholder="Buscar cliente por nombre, teléfono, dirección..." class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none">
+                    </div>
+                    <div id="clientsCountBadge" class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg self-end sm:self-center">
+                        Cargando clientes...
+                    </div>
+                </div>
+
                 <div id="clientsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Clients loaded dynamically -->
                 </div>
@@ -614,6 +647,119 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Generador de Código QR y Etiqueta de Aire Acondicionado -->
+    <div id="qrModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full max-h-[95vh] overflow-y-auto shadow-2xl animate-fade-in">
+            <div class="sticky top-0 bg-white border-b border-gray-100 p-5 flex justify-between items-center z-10">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-blue-100 text-brand-primary rounded-xl flex items-center justify-center text-lg">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">Etiqueta QR para Aire Acondicionado</h2>
+                        <p class="text-xs text-gray-500">Imprime o descarga el adhesivo para pegar en el equipo</p>
+                    </div>
+                </div>
+                <button onclick="closeQRModal()" class="text-gray-400 hover:text-gray-600 text-2xl transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <!-- Customization Controls -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-gray-700 uppercase tracking-wider">Identificador del Equipo en la Etiqueta:</span>
+                        <span class="text-gray-400">Opcional</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-gray-600 font-semibold mb-1">Nombre / Ubicación del Equipo:</label>
+                            <input type="text" id="qrEquipmentName" oninput="updateStickerPreview()" placeholder="Ej: Split Sala / Recámara Principal" class="w-full px-3 py-2 bg-white rounded-lg border border-gray-300 text-xs focus:border-brand-primary outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 font-semibold mb-1">Marca / Capacidad BTU:</label>
+                            <input type="text" id="qrEquipmentCapacity" oninput="updateStickerPreview()" placeholder="Ej: Panasonic Inverter 18,000 BTU" class="w-full px-3 py-2 bg-white rounded-lg border border-gray-300 text-xs focus:border-brand-primary outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Printable Label Wrapper Preview -->
+                <div class="flex justify-center">
+                    <div id="printLabelWrapper" class="bg-white border-2 border-blue-900 rounded-2xl overflow-hidden shadow-xl max-w-[340px] w-full text-center" style="font-family: 'Inter', system-ui, sans-serif;">
+                        <!-- Top Header -->
+                        <div class="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 text-white p-3.5 relative">
+                            <div class="flex items-center justify-center gap-2">
+                                <i class="fas fa-snowflake text-cyan-300 text-lg"></i>
+                                <span class="font-black tracking-wider text-base uppercase">BAJO ZERO</span>
+                            </div>
+                            <p class="text-[10px] text-cyan-200 font-semibold uppercase tracking-widest mt-0.5">Climatización & Mantenimiento</p>
+                            <div class="mt-1.5 text-[11px] font-bold text-white bg-blue-950/70 border border-blue-700/50 py-0.5 px-2.5 rounded-full inline-block">
+                                <i class="fas fa-phone-alt mr-1 text-cyan-300"></i>6672-1466
+                            </div>
+                        </div>
+
+                        <!-- QR Code Container -->
+                        <div class="p-4 bg-white flex flex-col items-center justify-center">
+                            <div id="qrCanvasContainer" class="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-inner inline-block min-w-[170px] min-h-[170px] flex items-center justify-center"></div>
+                            
+                            <p class="text-[10px] font-black text-blue-900 mt-2.5 max-w-[270px] leading-tight uppercase tracking-tight">
+                                ESCANEE CON SU CELULAR PARA VER HISTORIAL Y PRÓXIMOS MANTENIMIENTOS
+                            </p>
+                        </div>
+
+                        <!-- Bottom Meta / Client info -->
+                        <div class="bg-slate-50 border-t border-slate-200 p-3.5 text-left text-[11px] space-y-1">
+                            <div class="flex justify-between items-start gap-1">
+                                <span class="text-gray-500 font-bold text-[10px]">CLIENTE:</span>
+                                <span id="stickerClientName" class="font-bold text-gray-900 text-right truncate">--</span>
+                            </div>
+                            <div class="flex justify-between items-start gap-1">
+                                <span class="text-gray-500 font-bold text-[10px]">UBICACIÓN:</span>
+                                <span id="stickerClientAddress" class="text-gray-700 text-right truncate text-[10px]">--</span>
+                            </div>
+                            <div id="stickerEquipmentRow" class="flex justify-between items-start gap-1 text-brand-primary font-bold text-[10px]">
+                                <span>EQUIPO:</span>
+                                <span id="stickerEquipmentText" class="text-right truncate">Equipo General</span>
+                            </div>
+                            <div class="pt-1.5 border-t border-slate-200 flex justify-between items-center text-[9px] text-gray-400 font-medium">
+                                <span>PANAMÁ • BAJO ZERO</span>
+                                <span id="stickerEmissionDate">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Link & Quick Copy -->
+                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 flex items-center justify-between gap-2">
+                    <div class="truncate text-xs text-gray-600 font-mono" id="qrPublicUrlDisplay">
+                        https://...
+                    </div>
+                    <button onclick="copyQRLink()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-xs font-bold transition flex items-center gap-1 flex-shrink-0">
+                        <i class="fas fa-copy"></i>
+                        <span>Copiar</span>
+                    </button>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                    <button onclick="printSticker()" class="bg-brand-primary hover:bg-brand-secondary text-white py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-lg">
+                        <i class="fas fa-print text-sm"></i>
+                        <span>Imprimir Etiqueta</span>
+                    </button>
+                    <button onclick="downloadStickerPNG()" class="bg-slate-800 hover:bg-slate-900 text-white py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-md">
+                        <i class="fas fa-download text-sm"></i>
+                        <span>Descargar PNG</span>
+                    </button>
+                    <button onclick="openClientPortalPreview()" class="bg-cyan-600 hover:bg-cyan-700 text-white py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-md">
+                        <i class="fas fa-external-link-alt text-sm"></i>
+                        <span>Ver Portal Web</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1012,8 +1158,16 @@
             }
         }
         
+        let allClientsCache = [];
+        let currentQRClient = null;
+        let qrCodeInstance = null;
+
         async function loadClientsList() {
             try {
+                const badge = document.getElementById('clientsCountBadge');
+                if (badge) badge.textContent = 'Cargando clientes...';
+
+                // Fetch clients and their tasks count
                 const { data: clients, error } = await supabaseClient
                     .from('clients')
                     .select('*')
@@ -1021,30 +1175,265 @@
                     
                 if (error) throw error;
                 
-                const container = document.getElementById('clientsList');
-                container.innerHTML = '';
-                
-                clients.forEach(client => {
-                    container.innerHTML += `
-                        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                            <div class="flex items-center gap-4 mb-4">
-                                <div class="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center text-white text-xl">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-gray-800">${client.contact_name}</h3>
-                                    <p class="text-sm text-gray-500">${client.phone}</p>
-                                </div>
-                            </div>
-                            ${client.email ? `<p class="text-sm text-gray-600 mb-2"><i class="fas fa-envelope mr-2 text-brand-primary"></i>${client.email}</p>` : ''}
-                            ${client.address ? `<p class="text-sm text-gray-600"><i class="fas fa-map-marker-alt mr-2 text-brand-primary"></i>${client.address}</p>` : ''}
-                        </div>
-                    `;
-                });
+                allClientsCache = clients || [];
+                renderClientsGrid(allClientsCache);
+
+                if (badge) badge.textContent = `${allClientsCache.length} Clientes Registrados`;
                 
             } catch (error) {
                 console.error('Error loading clients list:', error);
+                const container = document.getElementById('clientsList');
+                if (container) container.innerHTML = `<div class="col-span-full text-center text-red-500 py-6">Error al cargar clientes: ${error.message}</div>`;
             }
+        }
+
+        function filterClientsList() {
+            const query = (document.getElementById('clientSearchInput')?.value || '').toLowerCase().trim();
+            const badge = document.getElementById('clientsCountBadge');
+            
+            if (!query) {
+                renderClientsGrid(allClientsCache);
+                if (badge) badge.textContent = `${allClientsCache.length} Clientes Registrados`;
+                return;
+            }
+
+            const filtered = allClientsCache.filter(c => {
+                const name = (c.contact_name || c.company_name || '').toLowerCase();
+                const phone = (c.phone || '').toLowerCase();
+                const address = (c.address || '').toLowerCase();
+                const email = (c.email || '').toLowerCase();
+                return name.includes(query) || phone.includes(query) || address.includes(query) || email.includes(query);
+            });
+
+            renderClientsGrid(filtered);
+            if (badge) badge.textContent = `Encontrados: ${filtered.length} de ${allClientsCache.length}`;
+        }
+
+        function renderClientsGrid(clients) {
+            const container = document.getElementById('clientsList');
+            if (!container) return;
+
+            if (clients.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-white rounded-2xl border border-gray-100 p-8">
+                        <i class="fas fa-users-slash text-4xl text-gray-300 mb-3"></i>
+                        <p class="font-bold text-gray-700">No se encontraron clientes</p>
+                        <p class="text-xs text-gray-400 mt-1">Prueba con otro término de búsqueda o crea un nuevo cliente.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            clients.forEach(client => {
+                const clientName = client.contact_name || client.company_name || 'Sin Nombre';
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-brand-primary to-cyan-500 rounded-2xl flex items-center justify-center text-white text-xl shadow-md flex-shrink-0">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="truncate">
+                                    <h3 class="font-bold text-gray-800 text-base truncate" title="${clientName}">${clientName}</h3>
+                                    <p class="text-sm text-gray-500"><i class="fas fa-phone mr-1.5 text-brand-primary text-xs"></i>${client.phone || '--'}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-1.5 text-xs text-gray-600 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                ${client.email ? `<p class="truncate"><i class="fas fa-envelope mr-2 text-brand-primary"></i>${client.email}</p>` : ''}
+                                ${client.address ? `<p class="line-clamp-2"><i class="fas fa-map-marker-alt mr-2 text-brand-primary"></i>${client.address}</p>` : '<p class="text-gray-400 italic">Sin dirección registrada</p>'}
+                            </div>
+                        </div>
+
+                        <!-- Action Toolbar -->
+                        <div class="pt-3 border-t border-gray-100 flex flex-col gap-2">
+                            <button onclick="openClientQRModal('${client.id}')" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-md">
+                                <i class="fas fa-qrcode text-base"></i>
+                                <span>Generar QR / Etiqueta A/A</span>
+                            </button>
+                            <a href="cliente.html?id=${client.id}#id=${client.id}" target="_blank" onclick="sessionStorage.setItem('bz_last_client_id', '${client.id}')" class="w-full bg-slate-100 hover:bg-blue-50 text-gray-700 hover:text-brand-primary py-2 px-3 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5">
+                                <i class="fas fa-external-link-alt text-xs"></i>
+                                <span>Ver Portal del Cliente</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // ==================== GENERADOR DE CÓDIGO QR Y ETIQUETAS ====================
+
+        function getClientPublicUrl(clientId, taskId = null) {
+            const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+            const origin = window.location.origin;
+            let url = `${origin}${basePath}/cliente.html?id=${clientId}#id=${clientId}`;
+            if (taskId) {
+                url += `&task=${taskId}`;
+            }
+            return url;
+        }
+
+        async function openClientQRModal(clientId, defaultEquipment = '') {
+            try {
+                const client = allClientsCache.find(c => c.id === clientId);
+                if (!client) {
+                    const { data, error } = await supabaseClient
+                        .from('clients')
+                        .select('*')
+                        .eq('id', clientId)
+                        .single();
+                    if (error) throw error;
+                    currentQRClient = data;
+                } else {
+                    currentQRClient = client;
+                }
+
+                // Fill custom equipment input
+                document.getElementById('qrEquipmentName').value = defaultEquipment || '';
+                document.getElementById('qrEquipmentCapacity').value = '';
+
+                // Build public URL
+                const publicUrl = getClientPublicUrl(currentQRClient.id);
+                document.getElementById('qrPublicUrlDisplay').textContent = publicUrl;
+
+                // Render QR code
+                renderQRCodeCanvas(publicUrl);
+
+                // Update sticker text
+                updateStickerPreview();
+
+                // Open modal
+                const modal = document.getElementById('qrModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+
+            } catch (err) {
+                console.error('Error opening QR modal:', err);
+                alert('No se pudo generar el código QR: ' + err.message);
+            }
+        }
+
+        async function openTaskQRModal(taskId, clientId) {
+            try {
+                const { data: task, error } = await supabaseClient
+                    .from('tasks')
+                    .select('*, clients(*)')
+                    .eq('id', taskId)
+                    .single();
+
+                if (error) throw error;
+
+                currentQRClient = task.clients || { id: clientId, contact_name: 'Cliente' };
+                
+                // Pre-fill equipment info from task
+                let eqName = `${task.equipment_type || 'Split'} ${task.equipment_brand ? '- ' + task.equipment_brand : ''}`;
+                let eqCap = task.equipment_capacity || task.equipment_model || '';
+
+                document.getElementById('qrEquipmentName').value = eqName.trim();
+                document.getElementById('qrEquipmentCapacity').value = eqCap.trim();
+
+                const publicUrl = getClientPublicUrl(currentQRClient.id, task.id);
+                document.getElementById('qrPublicUrlDisplay').textContent = publicUrl;
+
+                renderQRCodeCanvas(publicUrl);
+                updateStickerPreview();
+
+                const modal = document.getElementById('qrModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+
+            } catch (err) {
+                console.error('Error opening task QR modal:', err);
+                alert('Error al generar QR de la tarea: ' + err.message);
+            }
+        }
+
+        function renderQRCodeCanvas(text) {
+            const container = document.getElementById('qrCanvasContainer');
+            container.innerHTML = '';
+            
+            qrCodeInstance = new QRCode(container, {
+                text: text,
+                width: 160,
+                height: 160,
+                colorDark: "#001a33",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        function updateStickerPreview() {
+            if (!currentQRClient) return;
+
+            const nameEl = document.getElementById('stickerClientName');
+            const addrEl = document.getElementById('stickerClientAddress');
+            const eqTextEl = document.getElementById('stickerEquipmentText');
+            const dateEl = document.getElementById('stickerEmissionDate');
+
+            const eqName = (document.getElementById('qrEquipmentName')?.value || '').trim();
+            const eqCap = (document.getElementById('qrEquipmentCapacity')?.value || '').trim();
+
+            nameEl.textContent = currentQRClient.contact_name || currentQRClient.company_name || 'Cliente';
+            addrEl.textContent = currentQRClient.address || 'Panamá';
+            
+            let combinedEq = 'Equipo General';
+            if (eqName && eqCap) {
+                combinedEq = `${eqName} (${eqCap})`;
+            } else if (eqName) {
+                combinedEq = eqName;
+            } else if (eqCap) {
+                combinedEq = eqCap;
+            }
+            eqTextEl.textContent = combinedEq;
+
+            const now = new Date();
+            dateEl.textContent = `Emisión: ${now.toLocaleDateString('es-PA')}`;
+        }
+
+        function closeQRModal() {
+            const modal = document.getElementById('qrModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function printSticker() {
+            window.print();
+        }
+
+        async function downloadStickerPNG() {
+            try {
+                const element = document.getElementById('printLabelWrapper');
+                const clientNameClean = (currentQRClient?.contact_name || 'Cliente').replace(/[^a-zA-Z0-9]/g, '_');
+                
+                const canvas = await html2canvas(element, {
+                    scale: 3, // High resolution for print
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                });
+
+                const link = document.createElement('a');
+                link.download = `Etiqueta_QR_BajoZero_${clientNameClean}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (err) {
+                console.error('Error downloading sticker:', err);
+                alert('No se pudo descargar la imagen: ' + err.message);
+            }
+        }
+
+        function copyQRLink() {
+            const url = document.getElementById('qrPublicUrlDisplay').textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('¡Enlace del portal copiado al portapapeles!\n' + url);
+            }).catch(() => {
+                prompt('Copie el siguiente enlace:', url);
+            });
+        }
+
+        function openClientPortalPreview() {
+            const url = document.getElementById('qrPublicUrlDisplay').textContent;
+            window.open(url, '_blank');
         }
         
         // ==================== Personal ====================
@@ -1271,6 +1660,11 @@
                             </button>
                         `;
                     }
+                    actionsHtml += `
+                        <button onclick="openTaskQRModal('${inspection.id}', '${inspection.client_id}')" class="text-emerald-600 hover:text-emerald-800 mx-1" title="Generar QR del Equipo">
+                            <i class="fas fa-qrcode"></i>
+                        </button>
+                    `;
 
                     tbody.innerHTML += `
                         <tr class="hover:bg-gray-50 ${inspection.is_blocked ? 'bg-red-50 opacity-75' : ''}">
@@ -1340,6 +1734,13 @@
                             <p class="text-gray-600 bg-gray-50 p-3 rounded-lg">${inspection.technician_notes}</p>
                         </div>
                         ` : ''}
+
+                        <div class="border-t pt-4 flex gap-3">
+                            <button onclick="openTaskQRModal('${inspection.id}', '${inspection.client_id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow">
+                                <i class="fas fa-qrcode text-base"></i>
+                                <span>Generar Etiqueta QR para este Aire Acondicionado</span>
+                            </button>
+                        </div>
                     </div>
                 `;
                 

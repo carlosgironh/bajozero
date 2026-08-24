@@ -51,6 +51,9 @@ ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Usuarios autenticados pueden ver clientes" 
 ON public.clients FOR SELECT TO authenticated USING (true);
 
+CREATE POLICY "Permitir lectura publica de clientes para QR" 
+ON public.clients FOR SELECT TO anon USING (true);
+
 CREATE POLICY "Admin/Secre pueden insertar clientes" 
 ON public.clients FOR INSERT TO authenticated 
 WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('administrador', 'secretaria')));

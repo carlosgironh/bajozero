@@ -1443,17 +1443,18 @@
                 const { data: technicians, error } = await supabaseClient
                     .from('profiles')
                     .select('*')
-                    .eq('role', 'tecnico')
+                    .in('role', ['tecnico', 'supervisor', 'asistente'])
                     .eq('is_active', true)
                     .order('full_name');
                     
                 if (error) throw error;
                 
                 const select = document.getElementById('assignedTechnician');
+                if (!select) return;
                 select.innerHTML = '<option value="">Seleccionar personal...</option>';
                 
-                technicians.forEach(tech => {
-                    select.innerHTML += `<option value="${tech.id}">${tech.full_name} - ${tech.specialty || 'Técnico'}</option>`;
+                (technicians || []).forEach(tech => {
+                    select.innerHTML += `<option value="${tech.id}">${tech.full_name} (${tech.role.toUpperCase()}) - ${tech.specialty || 'General'}</option>`;
                 });
                 
             } catch (error) {
@@ -1466,32 +1467,64 @@
                 const { data: technicians, error } = await supabaseClient
                     .from('profiles')
                     .select('*')
-                    .eq('role', 'tecnico')
+                    .in('role', ['tecnico', 'supervisor', 'asistente'])
                     .order('full_name');
                     
                 if (error) throw error;
                 
                 const container = document.getElementById('techniciansList');
+                if (!container) return;
                 container.innerHTML = '';
                 
+                if (!technicians || technicians.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full text-center py-12 bg-white rounded-2xl border border-gray-100 p-8">
+                            <i class="fas fa-user-slash text-4xl text-gray-300 mb-3"></i>
+                            <p class="font-bold text-gray-700">No hay personal registrado</p>
+                            <p class="text-xs text-gray-400 mt-1">Haz clic en "Nuevo Personal" para registrar técnicos o supervisores.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
                 technicians.forEach(tech => {
+                    const roleColor = tech.role === 'supervisor' ? 'bg-purple-100 text-purple-700' :
+                                      tech.role === 'asistente' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700';
+                    const activeColor = tech.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+                    const activeText = tech.is_active ? 'Activo' : 'Inactivo';
+                    const toggleActionText = tech.is_active ? 'Desactivar' : 'Activar';
+                    const toggleIcon = tech.is_active ? 'fa-user-slash text-red-500' : 'fa-user-check text-green-500';
+
                     container.innerHTML += `
-                        <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                            <div class="flex items-center gap-4 mb-4">
-                                <div class="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center text-white text-xl">
-                                    <i class="fas fa-user-hard-hat"></i>
+                        <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all border border-gray-100 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-brand-primary to-blue-600 rounded-2xl flex items-center justify-center text-white text-xl shadow-md">
+                                            <i class="fas fa-user-hard-hat"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-bold text-gray-800 text-base">${tech.full_name || 'Sin Nombre'}</h3>
+                                            <p class="text-xs text-gray-500">${tech.specialty || 'Técnico General'}</p>
+                                        </div>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${roleColor}">
+                                        ${tech.role || 'tecnico'}
+                                    </span>
                                 </div>
-                                <div>
-                                    <h3 class="font-bold text-gray-800">${tech.full_name}</h3>
-                                    <p class="text-sm text-gray-500">${tech.specialty || 'Técnico General'}</p>
+                                <div class="flex gap-2 text-xs text-gray-600 mb-3">
+                                    <span class="px-2.5 py-1 rounded-full font-semibold ${activeColor}">${activeText}</span>
+                                </div>
+                                <div class="space-y-1 text-xs text-gray-600 bg-slate-50 p-3 rounded-xl border border-slate-100 mb-4">
+                                    <p><i class="fas fa-phone mr-2 text-brand-primary"></i>${tech.phone || 'Sin teléfono'}</p>
+                                    <p class="truncate"><i class="fas fa-envelope mr-2 text-brand-primary"></i>${tech.email || 'Sin correo'}</p>
                                 </div>
                             </div>
-                            <div class="flex gap-2 text-sm text-gray-600">
-                                <span class="px-3 py-1 bg-gray-100 rounded-full">${tech.is_active ? 'Activo' : 'Inactivo'}</span>
-                            </div>
-                            <div class="mt-4 pt-4 border-t border-gray-100">
-                                <p class="text-sm text-gray-600"><i class="fas fa-phone mr-2 text-brand-primary"></i>${tech.phone || 'N/A'}</p>
-                                <p class="text-sm text-gray-600 mt-1"><i class="fas fa-envelope mr-2 text-brand-primary"></i>${tech.email || 'N/A'}</p>
+                            <div class="pt-3 border-t border-gray-100 flex justify-end">
+                                <button onclick="toggleTechnicianStatus('${tech.id}', ${!tech.is_active})" class="text-xs font-bold text-gray-600 hover:text-brand-primary px-3 py-1.5 rounded-lg border border-gray-200 hover:border-brand-primary transition flex items-center gap-1.5">
+                                    <i class="fas ${toggleIcon}"></i>
+                                    <span>${toggleActionText}</span>
+                                </button>
                             </div>
                         </div>
                     `;
@@ -1499,6 +1532,22 @@
                 
             } catch (error) {
                 console.error('Error loading technicians list:', error);
+            }
+        }
+
+        async function toggleTechnicianStatus(techId, newActiveStatus) {
+            try {
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({ is_active: newActiveStatus })
+                    .eq('id', techId);
+
+                if (error) throw error;
+                loadTechnicians();
+                loadTechniciansList();
+            } catch (err) {
+                console.error('Error updating technician status:', err);
+                alert('No se pudo actualizar el estado del personal: ' + err.message);
             }
         }
         
@@ -1548,21 +1597,22 @@
                 }
                 
                 // 2. Save task
+                const assignedTech = document.getElementById('assignedTechnician').value;
                 const taskData = {
                     task_number: document.getElementById('inspectionNumber').value,
-                    task_type: document.getElementById('taskType').value,
+                    task_type: document.getElementById('taskType').value || 'inspeccion',
                     client_id: clientId,
                     scheduled_date: document.getElementById('scheduledDate').value,
-                    scheduled_time: document.getElementById('scheduledTime').value,
-                    equipment_type: document.getElementById('equipmentType').value,
-                    equipment_brand: document.getElementById('equipmentBrand').value,
-                    equipment_model: document.getElementById('equipmentModel').value,
-                    equipment_capacity: document.getElementById('equipmentCapacity').value,
-                    inspector_id: document.getElementById('assignedTechnician').value,
-                    priority: document.getElementById('priority').value,
-                    technician_notes: document.getElementById('technicianNotes').value,
-                    status: 'asignada',
-                    created_by: currentUser.id
+                    scheduled_time: document.getElementById('scheduledTime').value || null,
+                    equipment_type: document.getElementById('equipmentType').value || 'split',
+                    equipment_brand: document.getElementById('equipmentBrand').value || '',
+                    equipment_model: document.getElementById('equipmentModel').value || '',
+                    equipment_capacity: document.getElementById('equipmentCapacity').value || '',
+                    inspector_id: assignedTech ? assignedTech : null,
+                    priority: document.getElementById('priority').value || 'normal',
+                    technician_notes: document.getElementById('technicianNotes').value || '',
+                    status: assignedTech ? 'asignada' : 'pendiente',
+                    created_by: currentUser ? currentUser.id : null
                 };
                 
                 if (currentEditTaskId) {
@@ -1583,12 +1633,14 @@
                         .insert(taskData);
                         
                     if (taskError) throw taskError;
-                    alert('Tarea creada y asignada exitosamente');
+                    alert('Tarea creada exitosamente');
                 }
                 
                 // Reset form and generate new number
                 document.getElementById('inspectionForm').reset();
                 generateInspectionNumber();
+                showSection('inspections');
+                loadAllInspections();
                 showSection('inspections');
                 
             } catch (error) {
@@ -1793,59 +1845,55 @@
             document.getElementById('techPassword').value = password;
         }
         
-        // Crear Personal (llamada a Edge Function con JWT verification)
+        // Crear Personal (llamada a función RPC segura en PostgreSQL)
         async function saveTechnician(e) {
             e.preventDefault();
             const btn = document.getElementById('saveTechBtn');
             const originalText = btn.innerHTML;
-            btn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Verificando...';
+            btn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Guardando...';
             btn.disabled = true;
 
-            const email = document.getElementById('techEmail').value;
+            const email = (document.getElementById('techEmail').value || '').trim();
+            const password = document.getElementById('techPassword').value;
+            const fullName = (document.getElementById('techFullName').value || '').trim();
+            const phone = (document.getElementById('techPhone').value || '').trim();
+            const specialty = (document.getElementById('techSpecialty').value || '').trim();
+            const role = document.getElementById('techRole').value || 'tecnico';
+            const reqPwChange = document.getElementById('techRequirePasswordChange').checked;
 
             try {
-                // Obtener sesión actual
-                const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
-                
-                if (sessionError || !sessionData.session) {
-                    throw new Error('No hay sesión activa. Por favor inicie sesión nuevamente.');
+                if (!email || !password || !fullName) {
+                    throw new Error('Por favor complete todos los campos obligatorios (*).');
                 }
 
-                // Verificar primero si el email ya existe en perfiles
-                const { data: existingInspector, error: searchError } = await supabaseClient
-                    .from('profiles')
-                    .select('id, email, full_name, is_active')
-                    .eq('email', email)
-                    .maybeSingle();
-
-                if (existingInspector) {
-                    throw new Error(`Ya existe un usuario con este email: ${existingInspector.full_name}. Use otro email.`);
-                }
-
-                // Llamar a RPC en lugar de Edge Function
+                // Llamar a RPC create_technician
                 const { data: result, error: rpcError } = await supabaseClient.rpc('create_technician', {
                     p_email: email,
-                    p_password: document.getElementById('techPassword').value,
-                    p_full_name: document.getElementById('techFullName').value,
-                    p_phone: document.getElementById('techPhone').value,
-                    p_specialty: document.getElementById('techSpecialty').value,
-                    p_role: document.getElementById('techRole').value,
-                    p_require_password_change: document.getElementById('techRequirePasswordChange').checked
+                    p_password: password,
+                    p_full_name: fullName,
+                    p_phone: phone,
+                    p_specialty: specialty,
+                    p_role: role,
+                    p_require_password_change: reqPwChange
                 });
 
                 if (rpcError) {
                     throw new Error(rpcError.message || 'Error al Crear Personal');
                 }
 
-                alert(`✅ Personal creado exitosamente.\n\n📧 Email: ${email}\n🔑 Contraseña: ${document.getElementById('techPassword').value}`);
+                if (result && result.success === false) {
+                    throw new Error(result.error || 'Error al registrar personal');
+                }
+
+                alert(`✅ Personal registrado exitosamente.\n\n👤 Nombre: ${fullName}\n📧 Email: ${email}\n🔑 Contraseña: ${password}\n🎭 Rol: ${role.toUpperCase()}`);
                 
                 closeTechnicianModal();
-                loadTechnicians();
-                loadTechniciansList();
+                await loadTechnicians();
+                await loadTechniciansList();
 
             } catch (error) {
                 console.error('Error creating technician:', error);
-                alert('❌ Error: ' + error.message);
+                alert('❌ Error al crear personal: ' + error.message);
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;

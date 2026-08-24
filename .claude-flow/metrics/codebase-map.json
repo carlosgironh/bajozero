@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-08-24T02:58:48.591Z",
+  "projectRoot": "C:\\Proyectos_Git\\bajozero",
+  "structure": {
+    "hasPackageJson": true,
+    "hasTsConfig": false,
+    "hasClaudeConfig": true,
+    "hasClaudeFlow": true
+  },
+  "scannedAt": 1787540328591
+}

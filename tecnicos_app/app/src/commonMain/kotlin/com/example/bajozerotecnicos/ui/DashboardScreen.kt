@@ -196,22 +196,25 @@ fun InspectionCard(inspection: Inspection, onClick: () -> Unit) {
                 color = Color(0xFF1F2937)
             )
             
-            if (!inspection.client?.phone.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "Tel: ${inspection.client?.phone}", 
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF6B7280)
-                )
-            }
-            
-            if (!inspection.client?.address.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "Dir: ${inspection.client?.address}", 
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF6B7280)
-                )
+            val client = inspection.client
+            if (client != null) {
+                if (!client.phone.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Tel: ${client.phone}", 
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF6B7280)
+                    )
+                }
+                
+                if (!client.address.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Dir: ${client.address}", 
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF6B7280)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))

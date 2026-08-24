@@ -93,13 +93,16 @@ fun InspectionFormScreen(
                         style = MaterialTheme.typography.titleMedium,
                         color = Color(0xFF0F172A)
                     )
-                    if (!inspection.client?.phone.isNullOrBlank()) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text("Teléfono: ${inspection.client?.phone}", color = Color.Gray, style = MaterialTheme.typography.bodyMedium)
-                    }
-                    if (!inspection.client?.address.isNullOrBlank()) {
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text("Dirección: ${inspection.client?.address}", color = Color.Gray, style = MaterialTheme.typography.bodyMedium)
+                    val client = inspection.client
+                    if (client != null) {
+                        if (!client.phone.isNullOrBlank()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text("Teléfono: ${client.phone}", color = Color.Gray, style = MaterialTheme.typography.bodyMedium)
+                        }
+                        if (!client.address.isNullOrBlank()) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text("Dirección: ${client.address}", color = Color.Gray, style = MaterialTheme.typography.bodyMedium)
+                        }
                     }
                 }
             }

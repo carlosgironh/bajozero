@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -16,7 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.bajozerotecnicos.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -30,8 +31,8 @@ fun SignaturePad(onSignatureCaptured: (String?) -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
-                .background(Color.White, shape = RoundedCornerShape(12.dp))
-                .border(1.5.dp, if (hasSignature) MaterialTheme.colorScheme.primary else Color(0xFFE2E8F0), shape = RoundedCornerShape(12.dp))
+                .background(SurfaceLight, shape = AppInputShape)
+                .border(1.5.dp, if (hasSignature) BrandPrimary else BorderSubtle, shape = AppInputShape)
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
@@ -43,7 +44,7 @@ fun SignaturePad(onSignatureCaptured: (String?) -> Unit) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 lines.forEach { line ->
                     drawLine(
-                        color = Color(0xFF0F172A),
+                        color = TextDark,
                         start = line.start,
                         end = line.end,
                         strokeWidth = 5f,
@@ -54,15 +55,15 @@ fun SignaturePad(onSignatureCaptured: (String?) -> Unit) {
 
             if (lines.isEmpty()) {
                 Text(
-                    text = "Dibuje la firma del cliente aquí",
-                    color = Color.LightGray,
+                    text = "Dibuje la firma del cliente aquí con el dedo o lápiz...",
+                    color = TextPlaceholder,
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
         }
         
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -75,9 +76,9 @@ fun SignaturePad(onSignatureCaptured: (String?) -> Unit) {
                     onSignatureCaptured(null)
                 },
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(10.dp)
+                shape = AppButtonShape
             ) {
-                Text("Limpiar Firma")
+                Text("Limpiar Firma", color = TextMuted, fontWeight = FontWeight.SemiBold)
             }
             
             Button(
@@ -90,11 +91,14 @@ fun SignaturePad(onSignatureCaptured: (String?) -> Unit) {
                     }
                 },
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(10.dp),
+                shape = AppButtonShape,
                 enabled = lines.isNotEmpty(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = BrandPrimary,
+                    disabledContainerColor = BrandPrimary.copy(alpha = 0.5f)
+                )
             ) {
-                Text("Confirmar Firma")
+                Text("Confirmar Firma", fontWeight = FontWeight.Bold, color = Color.White)
             }
         }
     }

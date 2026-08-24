@@ -1,6 +1,7 @@
 package com.example.bajozerotecnicos.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.List
@@ -13,7 +14,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.bajozerotecnicos.supabase
+import com.example.bajozerotecnicos.theme.*
 import io.github.jan.supabase.gotrue.auth
 import kotlinx.coroutines.launch
 
@@ -40,9 +43,14 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(selectedItem.title, fontWeight = FontWeight.Bold) },
+                title = { 
+                    Column {
+                        Text(selectedItem.title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text("Administración Bajo Zero", fontSize = 11.sp, color = Color(0xFFBAE6FD))
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = BrandPrimary,
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 ),
@@ -63,19 +71,21 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
         },
         bottomBar = {
             NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
+                containerColor = SurfaceLight,
                 tonalElevation = 8.dp
             ) {
                 items.forEach { item ->
                     NavigationBarItem(
                         icon = { Icon(item.icon, contentDescription = item.title) },
-                        label = { Text(item.title) },
+                        label = { Text(item.title, fontWeight = if (selectedItem == item) FontWeight.Bold else FontWeight.Normal) },
                         selected = selectedItem == item,
                         onClick = { selectedItem = item },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MaterialTheme.colorScheme.primary,
-                            selectedTextColor = MaterialTheme.colorScheme.primary,
-                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                            selectedIconColor = BrandPrimary,
+                            selectedTextColor = BrandPrimary,
+                            indicatorColor = BrandLight,
+                            unselectedIconColor = TextMuted,
+                            unselectedTextColor = TextMuted
                         )
                     )
                 }
@@ -85,9 +95,15 @@ fun AdminDashboardScreen(onLogout: () -> Unit) {
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
             when (selectedItem) {
                 BottomNavItem.Dashboard -> AdminDashboardContent()
-                BottomNavItem.Tareas -> Text("Gestión de Tareas", modifier = Modifier.align(Alignment.Center))
-                BottomNavItem.Personal -> Text("Gestión de Personal Técnico", modifier = Modifier.align(Alignment.Center))
-                BottomNavItem.Clientes -> Text("Directorio de Clientes", modifier = Modifier.align(Alignment.Center))
+                BottomNavItem.Tareas -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Gestión de Tareas y Asignaciones", color = TextMuted, fontWeight = FontWeight.Medium)
+                }
+                BottomNavItem.Personal -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Gestión de Personal Técnico y Accesos", color = TextMuted, fontWeight = FontWeight.Medium)
+                }
+                BottomNavItem.Clientes -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Directorio Central de Clientes", color = TextMuted, fontWeight = FontWeight.Medium)
+                }
             }
         }
     }
@@ -102,15 +118,23 @@ fun AdminDashboardContent() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.Dashboard,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(64.dp)
-        )
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            color = BrandLight,
+            modifier = Modifier.size(80.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Default.Dashboard,
+                    contentDescription = null,
+                    tint = BrandPrimary,
+                    modifier = Modifier.size(44.dp)
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Panel Administrativo Bajo Zero", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Text("Panel Administrativo Bajo Zero", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = TextDark)
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Sistema centralizado de climatización y mantenimiento", color = Color.Gray, style = MaterialTheme.typography.bodyMedium)
+        Text("Control y supervisión centralizada en tiempo real", color = TextMuted, style = MaterialTheme.typography.bodyMedium)
     }
 }

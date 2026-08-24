@@ -7,8 +7,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,8 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.bajozerotecnicos.models.Inspection
 import com.example.bajozerotecnicos.supabase
+import com.example.bajozerotecnicos.theme.*
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
@@ -61,9 +67,14 @@ fun DashboardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Panel de Tareas del Técnico", fontWeight = FontWeight.Bold) },
+                title = { 
+                    Column {
+                        Text("Mis Tareas", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text("Portal Técnico Bajo Zero", fontSize = 11.sp, color = Color(0xFFBAE6FD))
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = BrandPrimary,
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 ),
@@ -85,40 +96,66 @@ fun DashboardScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            TabRow(selectedTabIndex = selectedTab) {
+            TabRow(
+                selectedTabIndex = selectedTab,
+                containerColor = SurfaceLight,
+                contentColor = BrandPrimary
+            ) {
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("Asignadas / Pendientes", fontWeight = FontWeight.SemiBold) }
+                    text = { 
+                        Text(
+                            "Asignadas / Pendientes", 
+                            fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium,
+                            color = if (selectedTab == 0) BrandPrimary else TextMuted
+                        ) 
+                    }
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text("Completadas", fontWeight = FontWeight.SemiBold) }
+                    text = { 
+                        Text(
+                            "Completadas", 
+                            fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium,
+                            color = if (selectedTab == 1) BrandPrimary else TextMuted
+                        ) 
+                    }
                 )
             }
 
             if (isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    CircularProgressIndicator(color = BrandPrimary)
                 }
             } else if (errorMessage != null) {
                 Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
-                    Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = StatusErrorBg),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = "Error: $errorMessage", 
+                            color = StatusError,
+                            modifier = Modifier.padding(16.dp),
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
             } else if (inspections.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.List,
+                            imageVector = Icons.AutoMirrored.Filled.Assignment,
                             contentDescription = null,
-                            tint = Color.LightGray,
+                            tint = TextPlaceholder,
                             modifier = Modifier.size(64.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = if (selectedTab == 0) "No tienes tareas asignadas pendientes." else "Aún no hay tareas completadas.",
-                            color = Color.Gray,
+                            color = TextMuted,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -143,86 +180,100 @@ fun DashboardScreen(
 
 @Composable
 fun InspectionCard(inspection: Inspection, onClick: () -> Unit) {
+    val isCompleted = inspection.status == "completada"
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+        shape = AppCardShape,
+        colors = CardDefaults.cardColors(containerColor = SurfaceLight),
+        border = BorderStroke(1.dp, BorderSubtle),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.List,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
+                // Número de Tarea
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = BrandLight
+                ) {
                     Text(
-                        text = inspection.inspectionNumber ?: "BZ-2026-N/A",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
+                        text = inspection.inspectionNumber ?: "BZ-TAREA",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        color = BrandPrimary,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                     )
                 }
 
+                // Badge de Estado
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = if (inspection.status == "completada") Color(0xFFDCFCE7) else Color(0xFFFEF3C7)
+                    color = if (isCompleted) StatusSuccessBg else StatusWarningBg
                 ) {
                     Text(
                         text = (inspection.status ?: "pendiente").uppercase(),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                        color = if (inspection.status == "completada") Color(0xFF166534) else Color(0xFF92400E)
+                        color = if (isCompleted) StatusSuccess else StatusWarning
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             
             Text(
                 text = inspection.client?.contactName ?: "Cliente General", 
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF1F2937)
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = TextDark
             )
             
             val client = inspection.client
             if (client != null) {
                 if (!client.phone.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = "Tel: ${client.phone}", 
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF6B7280)
-                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Phone, contentDescription = null, tint = BrandPrimary, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = client.phone, 
+                            style = MaterialTheme.typography.bodySmall,
+                            color = TextBody
+                        )
+                    }
                 }
                 
                 if (!client.address.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = "Dir: ${client.address}", 
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF6B7280)
-                    )
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.LocationOn, contentDescription = null, tint = BrandPrimary, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = client.address, 
+                            style = MaterialTheme.typography.bodySmall,
+                            color = TextBody
+                        )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Fecha programada: ${inspection.scheduledDate ?: "Sin fecha"}", 
-                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
-                color = MaterialTheme.colorScheme.primary
-            )
+            if (!inspection.scheduledDate.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(6.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.CalendarToday, contentDescription = null, tint = BrandPrimary, modifier = Modifier.size(14.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "Programada: ${inspection.scheduledDate}", 
+                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                        color = BrandPrimary
+                    )
+                }
+            }
         }
     }
 }

@@ -16,10 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.bajozerotecnicos.models.Inspection
 import com.example.bajozerotecnicos.models.ModeloRow
 import com.example.bajozerotecnicos.models.TechnicalData
 import com.example.bajozerotecnicos.supabase
+import com.example.bajozerotecnicos.theme.*
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
 
@@ -56,9 +58,15 @@ fun InspectionFormScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Inspección ${inspection.inspectionNumber ?: ""}", fontWeight = FontWeight.Bold) },
+                title = { 
+                    Text(
+                        "Inspección ${inspection.inspectionNumber ?: ""}", 
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    ) 
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = BrandPrimary,
                     titleContentColor = Color.White,
                     navigationIconContentColor = Color.White
                 ),
@@ -81,9 +89,9 @@ fun InspectionFormScreen(
             // Cabecera Cliente
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                shape = AppCardShape,
+                colors = CardDefaults.cardColors(containerColor = SurfaceLight),
+                border = BorderStroke(1.dp, BorderSubtle),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -91,17 +99,17 @@ fun InspectionFormScreen(
                         text = "Cliente: ${inspection.client?.contactName ?: "General"}", 
                         fontWeight = FontWeight.Bold, 
                         style = MaterialTheme.typography.titleMedium,
-                        color = Color(0xFF0F172A)
+                        color = TextDark
                     )
                     val client = inspection.client
                     if (client != null) {
                         if (!client.phone.isNullOrBlank()) {
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text("Teléfono: ${client.phone}", color = Color.Gray, style = MaterialTheme.typography.bodyMedium)
+                            Text("Teléfono: ${client.phone}", color = TextMuted, style = MaterialTheme.typography.bodyMedium)
                         }
                         if (!client.address.isNullOrBlank()) {
                             Spacer(modifier = Modifier.height(2.dp))
-                            Text("Dirección: ${client.address}", color = Color.Gray, style = MaterialTheme.typography.bodyMedium)
+                            Text("Dirección: ${client.address}", color = TextMuted, style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }
@@ -110,9 +118,9 @@ fun InspectionFormScreen(
             // Sección de Modelos de Equipos
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                shape = AppCardShape,
+                colors = CardDefaults.cardColors(containerColor = SurfaceLight),
+                border = BorderStroke(1.dp, BorderSubtle),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -120,7 +128,7 @@ fun InspectionFormScreen(
                         text = "Equipos / Modelos Atendidos", 
                         style = MaterialTheme.typography.titleMedium, 
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        color = BrandPrimary
                     )
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -147,11 +155,15 @@ fun InspectionFormScreen(
                     OutlinedButton(
                         onClick = { modelos = modelos + ModeloRow("", "", "", "", "", "", "", "", "") },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = AppInputShape,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = BrandPrimary
+                        ),
+                        border = BorderStroke(1.dp, BrandPrimary)
                     ) {
                         Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Agregar Otro Equipo")
+                        Text("Agregar Otro Equipo", fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -159,74 +171,95 @@ fun InspectionFormScreen(
             // Checklist de Verificaciones
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                shape = AppCardShape,
+                colors = CardDefaults.cardColors(containerColor = SurfaceLight),
+                border = BorderStroke(1.dp, BorderSubtle),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(
                         text = "Verificaciones Técnicas", 
                         style = MaterialTheme.typography.titleMedium, 
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        color = BrandPrimary
                     )
 
                     OutlinedTextField(
                         value = mangaObstruida, 
                         onValueChange = { mangaObstruida = it }, 
-                        label = { Text("Manga Obstruida (SI / NO / N/A)") },
+                        label = { Text("Manga Obstruida") },
+                        placeholder = { Text("SI / NO / N/A", color = TextPlaceholder) },
+                        textStyle = AppInputTextStyle,
+                        colors = appTextFieldColors(),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = AppInputShape
                     )
 
                     OutlinedTextField(
                         value = pieDesague, 
                         onValueChange = { pieDesague = it }, 
-                        label = { Text("Pie de Tubería de Desagüe (SI / NO)") },
+                        label = { Text("Pie de Tubería de Desagüe") },
+                        placeholder = { Text("SI / NO", color = TextPlaceholder) },
+                        textStyle = AppInputTextStyle,
+                        colors = appTextFieldColors(),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = AppInputShape
                     )
 
                     OutlinedTextField(
                         value = huecoPared, 
                         onValueChange = { huecoPared = it }, 
-                        label = { Text("Hueco en Pared (SI / NO)") },
+                        label = { Text("Hueco en Pared") },
+                        placeholder = { Text("SI / NO", color = TextPlaceholder) },
+                        textStyle = AppInputTextStyle,
+                        colors = appTextFieldColors(),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = AppInputShape
                     )
 
                     OutlinedTextField(
                         value = instPeligrosa, 
                         onValueChange = { instPeligrosa = it }, 
-                        label = { Text("Instalación Peligrosa (SI / NO)") },
+                        label = { Text("Instalación Peligrosa") },
+                        placeholder = { Text("SI / NO", color = TextPlaceholder) },
+                        textStyle = AppInputTextStyle,
+                        colors = appTextFieldColors(),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = AppInputShape
                     )
 
                     OutlinedTextField(
                         value = corriente, 
                         onValueChange = { corriente = it }, 
-                        label = { Text("Corriente Adecuada (SI / NO)") },
+                        label = { Text("Corriente Adecuada") },
+                        placeholder = { Text("SI / NO", color = TextPlaceholder) },
+                        textStyle = AppInputTextStyle,
+                        colors = appTextFieldColors(),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = AppInputShape
                     )
 
                     OutlinedTextField(
                         value = salidaDesague, 
                         onValueChange = { salidaDesague = it }, 
-                        label = { Text("Salida de Desagüe (A NIVEL / ARRIBA)") },
+                        label = { Text("Salida de Desagüe") },
+                        placeholder = { Text("A NIVEL / ARRIBA", color = TextPlaceholder) },
+                        textStyle = AppInputTextStyle,
+                        colors = appTextFieldColors(),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = AppInputShape
                     )
 
                     OutlinedTextField(
                         value = observaciones, 
                         onValueChange = { observaciones = it }, 
                         label = { Text("Observaciones del Técnico") }, 
+                        placeholder = { Text("Detalles adicionales, recomendaciones, etc.", color = TextPlaceholder) },
+                        textStyle = AppInputTextStyle,
+                        colors = appTextFieldColors(),
                         minLines = 3, 
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = AppInputShape
                     )
                 }
             }
@@ -234,9 +267,9 @@ fun InspectionFormScreen(
             // Firma Digital del Cliente
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                shape = AppCardShape,
+                colors = CardDefaults.cardColors(containerColor = SurfaceLight),
+                border = BorderStroke(1.dp, BorderSubtle),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -244,7 +277,7 @@ fun InspectionFormScreen(
                         text = "Firma de Conformidad del Cliente *", 
                         style = MaterialTheme.typography.titleMedium, 
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        color = BrandPrimary
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     SignaturePad(onSignatureCaptured = { signatureBase64 = it })
@@ -252,11 +285,19 @@ fun InspectionFormScreen(
             }
             
             if (submitError != null) {
-                Text(
-                    text = submitError!!,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = StatusErrorBg),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = submitError!!,
+                        color = StatusError,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
             }
 
             Button(
@@ -309,14 +350,23 @@ fun InspectionFormScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = AppButtonShape,
                 enabled = !isSubmitting && !signatureBase64.isNullOrBlank(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = BrandPrimary,
+                    disabledContainerColor = BrandPrimary.copy(alpha = 0.5f)
+                ),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
             ) {
                 if (isSubmitting) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
                 } else {
-                    Text("Completar y Guardar Inspección", fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(
+                        "Completar y Guardar Inspección", 
+                        fontWeight = FontWeight.Bold, 
+                        fontSize = 15.sp,
+                        color = Color.White
+                    )
                 }
             }
         }
@@ -332,19 +382,24 @@ fun ModeloInputForm(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
-        border = BorderStroke(1.dp, Color(0xFFE2E8F0))
+        shape = AppInputShape,
+        colors = CardDefaults.cardColors(containerColor = BackgroundLight),
+        border = BorderStroke(1.dp, BorderSubtle)
     ) {
-        Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Equipo #$index", fontWeight = FontWeight.Bold, color = Color(0xFF334155), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "Equipo #$index", 
+                    fontWeight = FontWeight.Bold, 
+                    color = TextDark, 
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
-                    Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = Color.Red, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = StatusError, modifier = Modifier.size(18.dp))
                 }
             }
 
@@ -352,8 +407,11 @@ fun ModeloInputForm(
                 value = modelo.modelo, 
                 onValueChange = { onUpdate(modelo.copy(modelo = it)) }, 
                 label = { Text("Modelo / Capacidad BTU") }, 
+                placeholder = { Text("Ej. LG 12000 BTU Inverter", color = TextPlaceholder) },
+                textStyle = AppInputTextStyle,
+                colors = appTextFieldColors(containerColor = SurfaceLight),
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(10.dp)
             )
             
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -361,15 +419,21 @@ fun ModeloInputForm(
                     value = modelo.instBasica, 
                     onValueChange = { onUpdate(modelo.copy(instBasica = it)) }, 
                     label = { Text("Inst. Básica") }, 
+                    placeholder = { Text("SI / NO", color = TextPlaceholder) },
+                    textStyle = AppInputTextStyle,
+                    colors = appTextFieldColors(containerColor = SurfaceLight),
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(10.dp)
                 )
                 OutlinedTextField(
                     value = modelo.piesTuberia, 
                     onValueChange = { onUpdate(modelo.copy(piesTuberia = it)) }, 
                     label = { Text("Pies Tubería") }, 
+                    placeholder = { Text("Ej. 10 ft", color = TextPlaceholder) },
+                    textStyle = AppInputTextStyle,
+                    colors = appTextFieldColors(containerColor = SurfaceLight),
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(10.dp)
                 )
             }
 
@@ -377,16 +441,22 @@ fun ModeloInputForm(
                 OutlinedTextField(
                     value = modelo.cable4x14, 
                     onValueChange = { onUpdate(modelo.copy(cable4x14 = it)) }, 
-                    label = { Text("Cable Señal 4x14") }, 
+                    label = { Text("Cable 4x14") }, 
+                    placeholder = { Text("Ej. 15 ft", color = TextPlaceholder) },
+                    textStyle = AppInputTextStyle,
+                    colors = appTextFieldColors(containerColor = SurfaceLight),
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(10.dp)
                 )
                 OutlinedTextField(
                     value = modelo.soporte, 
                     onValueChange = { onUpdate(modelo.copy(soporte = it)) }, 
                     label = { Text("Soporte Cond.") }, 
+                    placeholder = { Text("Piso / Pared", color = TextPlaceholder) },
+                    textStyle = AppInputTextStyle,
+                    colors = appTextFieldColors(containerColor = SurfaceLight),
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(10.dp)
                 )
             }
         }

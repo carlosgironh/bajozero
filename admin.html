@@ -147,6 +147,13 @@
                     <i class="fas fa-users w-5"></i>
                     <span>Clientes</span>
                 </a>
+                <a href="#" onclick="showSection('inbox')" class="nav-item flex items-center justify-between" id="inboxNavBtn">
+                    <div class="flex items-center gap-3">
+                        <i class="fab fa-whatsapp text-emerald-500 w-5 text-lg"></i>
+                        <span>Bandeja WhatsApp</span>
+                    </div>
+                    <span id="inboxPendingBadge" class="bg-emerald-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full hidden shadow-sm">0</span>
+                </a>
                 <a href="#" onclick="showSection('roles')" id="rolesNavBtn" class="nav-item flex items-center gap-3   hidden">
                     <i class="fas fa-user-shield w-5"></i>
                     <span>Roles y Permisos</span>
@@ -237,6 +244,13 @@
                     <a href="#" onclick="showSection('clients'); toggleMobileMenu()" class="mobile-nav-link">
                         <i class="fas fa-users"></i>
                         <span>Clientes</span>
+                    </a>
+                    <a href="#" onclick="showSection('inbox'); toggleMobileMenu()" class="mobile-nav-link flex items-center justify-between" id="inboxMobileNavBtn">
+                        <div class="flex items-center gap-3">
+                            <i class="fab fa-whatsapp text-emerald-400"></i>
+                            <span>Bandeja WhatsApp</span>
+                        </div>
+                        <span id="inboxMobilePendingBadge" class="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
                     </a>
                     <a href="#" onclick="showSection('roles'); toggleMobileMenu()" id="rolesMobileNavBtn" class="mobile-nav-link hidden">
                         <i class="fas fa-user-shield"></i>
@@ -483,6 +497,13 @@
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Notas para el Personal</label>
                             <textarea id="technicianNotes" rows="3" class="input-field" placeholder="Instrucciones especiales, ubicación específica, etc."></textarea>
                         </div>
+                        <div class="mt-4 flex items-center gap-2.5 bg-emerald-50 p-3.5 rounded-xl border border-emerald-200">
+                            <input type="checkbox" id="sendWhatsAppNotification" checked class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 cursor-pointer">
+                            <label for="sendWhatsAppNotification" class="text-sm font-semibold text-emerald-800 flex items-center gap-2 cursor-pointer select-none">
+                                <i class="fab fa-whatsapp text-emerald-600 text-lg"></i>
+                                <span>Enviar notificación de WhatsApp al personal asignado</span>
+                            </label>
+                        </div>
                     </div>
 
                     <!-- Actions -->
@@ -654,6 +675,112 @@
                 </div>
             </div>
 
+            <!-- WhatsApp Inbox Section -->
+            <div id="inboxSection" class="section hidden animate-fade-in">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-sm">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-3xl font-bold text-gray-800">Bandeja de Entrada WhatsApp</h1>
+                                <p class="text-gray-600 text-sm">Gestión de solicitudes, quejas y consultas recibidas por WhatsApp</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <button onclick="loadInboxMessages()" class="px-4 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl font-semibold shadow-sm transition flex items-center gap-2 text-sm">
+                            <i class="fas fa-sync-alt text-emerald-600"></i>
+                            <span>Actualizar</span>
+                        </button>
+                        <button onclick="showSection('newInspection')" class="px-5 py-2.5 bg-brand-primary hover:bg-brand-secondary text-white rounded-xl font-semibold shadow-md transition flex items-center gap-2 text-sm">
+                            <i class="fas fa-plus"></i>
+                            <span>Nueva Tarea</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Inbox Stats Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl flex-shrink-0">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-black text-gray-800" id="inboxTotalCount">0</div>
+                            <div class="text-xs text-gray-500 font-semibold uppercase">Total Recibidos</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl flex-shrink-0">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-black text-amber-600" id="inboxPendingCount">0</div>
+                            <div class="text-xs text-gray-500 font-semibold uppercase">Por Revisar</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl flex-shrink-0">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-black text-blue-600" id="inboxConvertedCount">0</div>
+                            <div class="text-xs text-gray-500 font-semibold uppercase">Tareas Creadas</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl flex-shrink-0">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-black text-purple-600" id="inboxFeedbackCount">0</div>
+                            <div class="text-xs text-gray-500 font-semibold uppercase">Quejas / Sugerencias</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters & Search Bar -->
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                    <!-- Filter Tabs -->
+                    <div class="flex flex-wrap gap-2" id="inboxFilterTabs">
+                        <button onclick="setInboxFilter('all')" data-filter="all" class="inbox-tab-btn active px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-brand-primary text-white">
+                            Todos
+                        </button>
+                        <button onclick="setInboxFilter('pendiente')" data-filter="pendiente" class="inbox-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            ⏳ Pendientes
+                        </button>
+                        <button onclick="setInboxFilter('solicitud_servicio')" data-filter="solicitud_servicio" class="inbox-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            🔧 Solicitudes de Servicio
+                        </button>
+                        <button onclick="setInboxFilter('queja_sugerencia')" data-filter="queja_sugerencia" class="inbox-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            💬 Quejas / Sugerencias
+                        </button>
+                        <button onclick="setInboxFilter('consulta_general')" data-filter="consulta_general" class="inbox-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            ℹ️ Consultas
+                        </button>
+                        <button onclick="setInboxFilter('descartada')" data-filter="descartada" class="inbox-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            🗑️ Descartados / Spam
+                        </button>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="relative min-w-[240px]">
+                        <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="text" id="inboxSearchInput" oninput="filterInboxList()" placeholder="Buscar teléfono o mensaje..." class="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 text-xs focus:border-brand-primary outline-none">
+                    </div>
+                </div>
+
+                <!-- Messages Grid/List -->
+                <div id="inboxMessagesContainer" class="space-y-4">
+                    <div class="p-12 text-center text-gray-400 bg-white rounded-2xl border border-gray-100">
+                        <i class="fas fa-spinner fa-spin text-3xl mb-3 text-emerald-500"></i>
+                        <p class="font-medium">Cargando bandeja de WhatsApp...</p>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -669,6 +796,92 @@
             <div id="inspectionDetailContent" class="p-6">
                 <!-- Content loaded dynamically -->
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Responder WhatsApp -->
+    <div id="replyWhatsAppModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[92vh] overflow-y-auto shadow-2xl animate-fade-in">
+            <div class="sticky top-0 bg-white border-b border-gray-100 p-5 flex justify-between items-center z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl shadow-sm">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">Responder por WhatsApp</h2>
+                        <p class="text-xs text-gray-500">Envío directo mediante WhatsApp Cloud API</p>
+                    </div>
+                </div>
+                <button onclick="closeWhatsAppReplyModal()" class="text-gray-400 hover:text-gray-600 text-2xl transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="replyWhatsAppForm" onsubmit="submitWhatsAppReply(event)" class="p-6 space-y-4">
+                <input type="hidden" id="replyInboxId">
+                <input type="hidden" id="replyRecipientPhone">
+
+                <!-- Destinatario Card -->
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div id="replyRecipientName" class="font-bold text-gray-800 text-sm">Cliente</div>
+                            <div id="replyRecipientPhoneDisplay" class="text-xs text-gray-500 font-mono">+507 ...</div>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                        WhatsApp Verificado
+                    </span>
+                </div>
+
+                <!-- Mensaje Original Recibido -->
+                <div class="bg-emerald-50/60 border border-emerald-100 rounded-xl p-3 text-xs text-gray-700">
+                    <span class="font-bold text-emerald-800 block mb-1">📩 Mensaje Recibido:</span>
+                    <p id="replyOriginalMessage" class="italic text-gray-600">"..."</p>
+                </div>
+
+                <!-- Plantillas Rápidas -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Respuestas Rápidas Sugeridas</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="insertQuickReply('cita')" class="p-2 bg-gray-50 hover:bg-emerald-50 hover:border-emerald-300 border border-gray-200 rounded-xl text-left text-xs font-semibold text-gray-700 transition flex items-center gap-2">
+                            <i class="fas fa-calendar-check text-emerald-600"></i>
+                            <span>📅 Coordinar Cita</span>
+                        </button>
+                        <button type="button" onclick="insertQuickReply('precios')" class="p-2 bg-gray-50 hover:bg-emerald-50 hover:border-emerald-300 border border-gray-200 rounded-xl text-left text-xs font-semibold text-gray-700 transition flex items-center gap-2">
+                            <i class="fas fa-tags text-blue-600"></i>
+                            <span>💰 Precios y Tarifas</span>
+                        </button>
+                        <button type="button" onclick="insertQuickReply('urgente')" class="p-2 bg-gray-50 hover:bg-emerald-50 hover:border-emerald-300 border border-gray-200 rounded-xl text-left text-xs font-semibold text-gray-700 transition flex items-center gap-2">
+                            <i class="fas fa-bolt text-amber-600"></i>
+                            <span>⚡ Atención Urgente</span>
+                        </button>
+                        <button type="button" onclick="insertQuickReply('gracias')" class="p-2 bg-gray-50 hover:bg-emerald-50 hover:border-emerald-300 border border-gray-200 rounded-xl text-left text-xs font-semibold text-gray-700 transition flex items-center gap-2">
+                            <i class="fas fa-heart text-purple-600"></i>
+                            <span>❤️ Agradecimiento</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mensaje a Enviar -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Tu Mensaje de Respuesta *</label>
+                    <textarea id="replyMessageText" rows="4" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none text-sm" placeholder="Escribe el mensaje que recibirá el cliente en su WhatsApp..."></textarea>
+                </div>
+
+                <!-- Actions -->
+                <div class="pt-3 border-t flex gap-3">
+                    <button type="button" onclick="closeWhatsAppReplyModal()" class="flex-1 px-4 py-3 border border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition text-sm">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="submitWhatsAppReplyBtn" class="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-md text-sm">
+                        <i class="fab fa-whatsapp text-lg"></i>
+                        <span>Enviar a WhatsApp</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1024,6 +1237,7 @@
             });
             
             if (sectionName === 'dashboard') loadDashboardData();
+            if (sectionName === 'inbox') loadInboxMessages();
             if (sectionName === 'inspections') loadAllInspections();
             if (sectionName === 'technicians') loadTechniciansList();
             if (sectionName === 'clients') loadClientsList();
@@ -1286,6 +1500,9 @@
                 document.getElementById('pendingInspections').textContent = pendiente;
                 document.getElementById('assignedInspections').textContent = asignada;
                 document.getElementById('completedInspections').textContent = completada;
+                
+                // Actualizar contadores de bandeja WhatsApp
+                updateInboxBadgeCounters();
                 
                 // Load recent inspections
                 const recentList = document.getElementById('recentInspectionsList');
@@ -1965,6 +2182,11 @@
                     if (taskError) throw taskError;
                     alert('Tarea creada exitosamente');
                 }
+
+                // 3. Disparar notificación por WhatsApp si está habilitado
+                if (document.getElementById('sendWhatsAppNotification')?.checked && assignedTech) {
+                    sendTaskWhatsAppNotification(taskData.task_number, clientId, assignedTech, taskData);
+                }
                 
                 // Reset form and generate new number
                 document.getElementById('inspectionForm').reset();
@@ -2046,6 +2268,9 @@
                         <button onclick="openTaskQRModal('${inspection.id}', '${inspection.client_id}')" class="text-emerald-600 hover:text-emerald-800 mx-1" title="Generar QR del Equipo">
                             <i class="fas fa-qrcode"></i>
                         </button>
+                        <button onclick="resendWhatsAppForTask('${inspection.id}')" class="text-emerald-500 hover:text-emerald-700 mx-1" title="Notificar por WhatsApp">
+                            <i class="fab fa-whatsapp text-base"></i>
+                        </button>
                     `;
 
                     tbody.innerHTML += `
@@ -2067,6 +2292,153 @@
                 
             } catch (error) {
                 console.error('Error loading inspections:', error);
+        }
+
+        // ==================== NOTIFICACIONES WHATSAPP CLOUD API ====================
+
+        async function sendTaskWhatsAppNotification(taskNumber, clientId, technicianId, taskDetails) {
+            try {
+                if (!technicianId) return;
+
+                // 1. Obtener datos y teléfono del técnico
+                const { data: tech, error: techErr } = await supabaseClient
+                    .from('profiles')
+                    .select('full_name, phone')
+                    .eq('id', technicianId)
+                    .single();
+
+                if (techErr || !tech || !tech.phone) {
+                    console.warn('El técnico asignado no tiene teléfono registrado para WhatsApp:', tech?.full_name);
+                    return;
+                }
+
+                // 2. Obtener datos del cliente
+                let clientName = 'Cliente General';
+                let clientPhone = 'N/A';
+                let clientAddress = 'N/A';
+
+                if (clientId) {
+                    const { data: client } = await supabaseClient
+                        .from('clients')
+                        .select('contact_name, phone, address')
+                        .eq('id', clientId)
+                        .single();
+
+                    if (client) {
+                        clientName = client.contact_name || clientName;
+                        clientPhone = client.phone || clientPhone;
+                        clientAddress = client.address || clientAddress;
+                    }
+                }
+
+                const payload = {
+                    to: tech.phone,
+                    task_data: {
+                        task_number: taskNumber,
+                        client_name: clientName,
+                        client_phone: clientPhone,
+                        client_address: clientAddress,
+                        scheduled_date: taskDetails.scheduled_date || '',
+                        scheduled_time: taskDetails.scheduled_time || '',
+                        equipment_type: taskDetails.equipment_type || '',
+                        equipment_capacity: taskDetails.equipment_capacity || '',
+                        notes: taskDetails.technician_notes || ''
+                    }
+                };
+
+                const resp = await fetch('https://jqiqeyopvjsnutyihczh.supabase.co/functions/v1/whatsapp-send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const resJson = await resp.json();
+                if (resJson.success) {
+                    console.log(`📲 WhatsApp enviado exitosamente a ${tech.full_name} (${tech.phone})`);
+                } else {
+                    console.warn('Respuesta de WhatsApp API:', resJson);
+                }
+            } catch (err) {
+                console.error('Error al enviar WhatsApp:', err);
+            }
+        }
+
+        async function resendWhatsAppForTask(taskId) {
+            try {
+                const { data: task, error } = await supabaseClient
+                    .from('tasks')
+                    .select('*, clients(contact_name, phone, address), profiles!inspector_id(id, full_name, phone)')
+                    .eq('id', taskId)
+                    .single();
+
+                if (error || !task) throw new Error('No se encontró la tarea especificada');
+
+                if (!task.profiles || !task.profiles.phone) {
+                    const customPhone = prompt(`El técnico (${task.profiles?.full_name || 'Sin asignar'}) no tiene teléfono registrado.\nIngresa el número de WhatsApp para notificar:`, '50761563502');
+                    if (!customPhone) return;
+
+                    const payload = {
+                        to: customPhone,
+                        task_data: {
+                            task_number: task.task_number,
+                            client_name: task.clients?.contact_name || 'Cliente General',
+                            client_phone: task.clients?.phone || 'N/A',
+                            client_address: task.clients?.address || 'N/A',
+                            scheduled_date: task.scheduled_date || '',
+                            scheduled_time: task.scheduled_time || '',
+                            equipment_type: task.equipment_type || '',
+                            equipment_capacity: task.equipment_capacity || '',
+                            notes: task.technician_notes || ''
+                        }
+                    };
+
+                    const resp = await fetch('https://jqiqeyopvjsnutyihczh.supabase.co/functions/v1/whatsapp-send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const resJson = await resp.json();
+                    if (resJson.success) {
+                        alert(`✅ Notificación de WhatsApp enviada a ${customPhone}`);
+                    } else {
+                        alert(`❌ Error al enviar WhatsApp: ${resJson.error || 'Error desconocido'}`);
+                    }
+                    return;
+                }
+
+                // Enviar al teléfono del perfil
+                const payload = {
+                    to: task.profiles.phone,
+                    task_data: {
+                        task_number: task.task_number,
+                        client_name: task.clients?.contact_name || 'Cliente General',
+                        client_phone: task.clients?.phone || 'N/A',
+                        client_address: task.clients?.address || 'N/A',
+                        scheduled_date: task.scheduled_date || '',
+                        scheduled_time: task.scheduled_time || '',
+                        equipment_type: task.equipment_type || '',
+                        equipment_capacity: task.equipment_capacity || '',
+                        notes: task.technician_notes || ''
+                    }
+                };
+
+                const resp = await fetch('https://jqiqeyopvjsnutyihczh.supabase.co/functions/v1/whatsapp-send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const resJson = await resp.json();
+                if (resJson.success) {
+                    alert(`✅ Notificación de WhatsApp enviada exitosamente a:\n👤 ${task.profiles.full_name}\n📞 ${task.profiles.phone}`);
+                } else {
+                    alert(`❌ Error al enviar WhatsApp: ${resJson.error || 'Error desconocido'}`);
+                }
+
+            } catch (err) {
+                console.error('Error in resendWhatsAppForTask:', err);
+                alert('Error al enviar WhatsApp: ' + err.message);
             }
         }
         
@@ -2302,6 +2674,417 @@
             }
         }
         
+        // ==================== BANDEJA DE ENTRADA WHATSAPP ====================
+
+        let allInboxMessagesCache = [];
+        let currentInboxFilter = 'all';
+
+        async function loadInboxMessages() {
+            try {
+                const container = document.getElementById('inboxMessagesContainer');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="p-12 text-center text-gray-400 bg-white rounded-2xl border border-gray-100">
+                            <i class="fas fa-spinner fa-spin text-3xl mb-3 text-emerald-500"></i>
+                            <p class="font-medium">Cargando bandeja de WhatsApp...</p>
+                        </div>
+                    `;
+                }
+
+                const { data: messages, error } = await supabaseClient
+                    .from('whatsapp_inbox')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allInboxMessagesCache = messages || [];
+                updateInboxStats(allInboxMessagesCache);
+                filterInboxList();
+
+            } catch (err) {
+                console.error('Error loading WhatsApp inbox:', err);
+                const container = document.getElementById('inboxMessagesContainer');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="p-8 text-center text-red-500 bg-white rounded-2xl border border-red-100">
+                            <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+                            <p class="font-bold">Error al cargar mensajes: ${err.message}</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        async function updateInboxBadgeCounters() {
+            try {
+                const { count, error } = await supabaseClient
+                    .from('whatsapp_inbox')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'pendiente');
+
+                if (!error) {
+                    const badge = document.getElementById('inboxPendingBadge');
+                    const mobileBadge = document.getElementById('inboxMobilePendingBadge');
+                    const countVal = count || 0;
+
+                    if (badge) {
+                        badge.textContent = countVal;
+                        badge.classList.toggle('hidden', countVal === 0);
+                    }
+                    if (mobileBadge) {
+                        mobileBadge.textContent = countVal;
+                        mobileBadge.classList.toggle('hidden', countVal === 0);
+                    }
+                }
+            } catch (e) {
+                console.warn('Error updating badge counters:', e);
+            }
+        }
+
+        function updateInboxStats(messages) {
+            const total = messages.length;
+            const pending = messages.filter(m => m.status === 'pendiente').length;
+            const converted = messages.filter(m => m.status === 'convertida_a_tarea').length;
+            const feedback = messages.filter(m => m.category === 'queja_sugerencia').length;
+
+            if (document.getElementById('inboxTotalCount')) document.getElementById('inboxTotalCount').textContent = total;
+            if (document.getElementById('inboxPendingCount')) document.getElementById('inboxPendingCount').textContent = pending;
+            if (document.getElementById('inboxConvertedCount')) document.getElementById('inboxConvertedCount').textContent = converted;
+            if (document.getElementById('inboxFeedbackCount')) document.getElementById('inboxFeedbackCount').textContent = feedback;
+
+            // Actualizar badges globales
+            const badge = document.getElementById('inboxPendingBadge');
+            const mobileBadge = document.getElementById('inboxMobilePendingBadge');
+            if (badge) {
+                badge.textContent = pending;
+                badge.classList.toggle('hidden', pending === 0);
+            }
+            if (mobileBadge) {
+                mobileBadge.textContent = pending;
+                mobileBadge.classList.toggle('hidden', pending === 0);
+            }
+        }
+
+        function setInboxFilter(filter) {
+            currentInboxFilter = filter;
+            document.querySelectorAll('#inboxFilterTabs .inbox-tab-btn').forEach(btn => {
+                if (btn.getAttribute('data-filter') === filter) {
+                    btn.classList.add('bg-brand-primary', 'text-white');
+                    btn.classList.remove('bg-gray-100', 'text-gray-600');
+                } else {
+                    btn.classList.remove('bg-brand-primary', 'text-white');
+                    btn.classList.add('bg-gray-100', 'text-gray-600');
+                }
+            });
+            filterInboxList();
+        }
+
+        function filterInboxList() {
+            const query = (document.getElementById('inboxSearchInput')?.value || '').toLowerCase().trim();
+            let filtered = [...allInboxMessagesCache];
+
+            // Filtro por categoría o estado
+            if (currentInboxFilter === 'pendiente') {
+                filtered = filtered.filter(m => m.status === 'pendiente');
+            } else if (currentInboxFilter === 'descartada') {
+                filtered = filtered.filter(m => m.status === 'descartada' || m.category === 'descartado');
+            } else if (currentInboxFilter !== 'all') {
+                filtered = filtered.filter(m => m.category === currentInboxFilter && m.status !== 'descartada');
+            } else {
+                // 'all' oculta descartadas por defecto a menos que se busque específicamente
+                if (!query) {
+                    filtered = filtered.filter(m => m.status !== 'descartada');
+                }
+            }
+
+            // Filtro por texto de búsqueda
+            if (query) {
+                filtered = filtered.filter(m => {
+                    const phone = (m.sender_phone || '').toLowerCase();
+                    const name = (m.sender_name || '').toLowerCase();
+                    const text = (m.message_text || '').toLowerCase();
+                    return phone.includes(query) || name.includes(query) || text.includes(query);
+                });
+            }
+
+            renderInboxMessages(filtered);
+        }
+
+        function renderInboxMessages(messages) {
+            const container = document.getElementById('inboxMessagesContainer');
+            if (!container) return;
+
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="p-12 text-center bg-white rounded-2xl border border-gray-100 shadow-sm">
+                        <div class="w-16 h-16 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-base">No hay mensajes en este filtro</h3>
+                        <p class="text-xs text-gray-500 mt-1">Los mensajes entrantes recibidos por WhatsApp aparecerán aquí automáticamente.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+
+            messages.forEach(msg => {
+                const dateObj = new Date(msg.created_at);
+                const formattedTime = dateObj.toLocaleTimeString('es-PA', { hour: '2-digit', minute: '2-digit' });
+                const formattedDate = dateObj.toLocaleDateString('es-PA', { day: '2-digit', month: 'short' });
+
+                // Categoría badge
+                let catBadgeClass = 'bg-blue-100 text-blue-800';
+                let catName = '🔧 Solicitud de Servicio';
+                if (msg.category === 'queja_sugerencia') {
+                    catBadgeClass = 'bg-purple-100 text-purple-800';
+                    catName = '💬 Queja / Sugerencia';
+                } else if (msg.category === 'consulta_general') {
+                    catBadgeClass = 'bg-cyan-100 text-cyan-800';
+                    catName = 'ℹ️ Consulta General';
+                } else if (msg.category === 'descartado') {
+                    catBadgeClass = 'bg-gray-100 text-gray-600';
+                    catName = '🗑️ Descartado / Spam';
+                }
+
+                // Estado badge
+                let statusBadgeClass = 'bg-amber-100 text-amber-800';
+                let statusName = 'Pendiente';
+                if (msg.status === 'convertida_a_tarea') {
+                    statusBadgeClass = 'bg-emerald-100 text-emerald-800';
+                    statusName = '✅ Convertida a Tarea';
+                } else if (msg.status === 'atendida') {
+                    statusBadgeClass = 'bg-blue-100 text-blue-800';
+                    statusName = 'Resuelto / Atendido';
+                } else if (msg.status === 'descartada') {
+                    statusBadgeClass = 'bg-gray-200 text-gray-600';
+                    statusName = 'Descartada';
+                }
+
+                const safeName = (msg.sender_name || 'Cliente WhatsApp').replace(/'/g, "&#39;");
+                const safeMsg = (msg.message_text || '').replace(/'/g, "&#39;");
+                const safePhone = (msg.sender_phone || '').replace(/'/g, "&#39;");
+
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div class="flex items-start gap-4 flex-1">
+                            <!-- Avatar -->
+                            <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-white text-xl shadow-md flex-shrink-0">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <!-- Content -->
+                            <div class="space-y-1.5 flex-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h3 class="font-bold text-gray-900 text-base">${msg.sender_name || 'Cliente WhatsApp'}</h3>
+                                    <span class="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md font-semibold">+${msg.sender_phone}</span>
+                                    <span class="text-xs px-2.5 py-0.5 rounded-full font-bold ${catBadgeClass}">${catName}</span>
+                                    <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold ${statusBadgeClass}">${statusName}</span>
+                                </div>
+
+                                <!-- Mensaje Bubble -->
+                                <div class="bg-slate-50 border border-slate-100 p-3.5 rounded-xl text-sm text-gray-800 leading-relaxed font-medium">
+                                    "${msg.message_text}"
+                                </div>
+
+                                <div class="flex items-center gap-4 text-xs text-gray-400 font-medium">
+                                    <span><i class="far fa-clock mr-1"></i>${formattedDate}, ${formattedTime}</span>
+                                    ${msg.admin_notes ? `<span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-semibold"><i class="fas fa-info-circle mr-1"></i>${msg.admin_notes}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions Bar -->
+                        <div class="flex flex-wrap md:flex-col items-stretch gap-2 w-full md:w-auto flex-shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-gray-100">
+                            <button onclick="convertInboxToTask('${msg.id}')" class="px-4 py-2 bg-brand-primary hover:bg-brand-secondary text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm" title="Crear orden de trabajo a partir de este mensaje">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Crear Tarea</span>
+                            </button>
+
+                            <button onclick="openWhatsAppReplyModal('${msg.id}', '${safePhone}', '${safeName}', '${safeMsg}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm" title="Responder directamente a su WhatsApp">
+                                <i class="fab fa-whatsapp text-sm"></i>
+                                <span>Responder</span>
+                            </button>
+
+                            <div class="flex gap-1.5">
+                                <button onclick="updateInboxStatus('${msg.id}', 'atendida', null)" class="flex-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1" title="Marcar como atendido">
+                                    <i class="fas fa-check"></i>
+                                    <span>Atendido</span>
+                                </button>
+                                <button onclick="updateInboxStatus('${msg.id}', 'descartada', 'descartado')" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1" title="Descartar / Marcar como basura">
+                                    <i class="fas fa-trash-alt"></i>
+                                    <span>Descartar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // ==================== ACCIONES DE LA BANDEJA ====================
+
+        async function convertInboxToTask(inboxId) {
+            const msg = allInboxMessagesCache.find(m => m.id === inboxId);
+            if (!msg) return;
+
+            // 1. Pre-cargar el formulario de nueva tarea
+            showSection('newInspection');
+
+            // Nombre y teléfono del cliente
+            document.getElementById('clientName').value = msg.sender_name || '';
+            document.getElementById('clientPhone').value = msg.sender_phone || '';
+            
+            // Descripción del problema en notas
+            document.getElementById('technicianNotes').value = `[Solicitud vía WhatsApp]: ${msg.message_text}`;
+
+            // Marcar en la base de datos como convertida
+            await supabaseClient
+                .from('whatsapp_inbox')
+                .update({ 
+                    status: 'convertida_a_tarea',
+                    admin_notes: 'Convertida a tarea técnica' 
+                })
+                .eq('id', inboxId);
+
+            updateInboxBadgeCounters();
+        }
+
+        function openWhatsAppReplyModal(inboxId, phone, name, messageText) {
+            document.getElementById('replyInboxId').value = inboxId;
+            document.getElementById('replyRecipientPhone').value = phone;
+            document.getElementById('replyRecipientName').textContent = name;
+            document.getElementById('replyRecipientPhoneDisplay').textContent = '+' + phone;
+            document.getElementById('replyOriginalMessage').textContent = `"${messageText}"`;
+            document.getElementById('replyMessageText').value = '';
+
+            const modal = document.getElementById('replyWhatsAppModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeWhatsAppReplyModal() {
+            const modal = document.getElementById('replyWhatsAppModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('replyWhatsAppForm').reset();
+        }
+
+        function insertQuickReply(type) {
+            const name = document.getElementById('replyRecipientName').textContent || 'Estimado cliente';
+            const textarea = document.getElementById('replyMessageText');
+
+            if (type === 'cita') {
+                textarea.value = `Hola *${name}*, gracias por comunicarte con *Bajo Zero Panamá* ❄️.\n\nCon gusto podemos coordinar la visita técnica para tu equipo. ¿Qué día y horario te resulta más conveniente para agendar a nuestro personal?`;
+            } else if (type === 'precios') {
+                textarea.value = `Hola *${name}*, un gusto saludarte de parte de *Bajo Zero* ❄️.\n\nNuestros servicios de mantenimiento preventivo incluyen limpieza profunda con hidrolavadora, desinfección de serpentín y revisión de presiones de gas refrigerante. ¿Qué tipo de equipo deseas atender (Split, Central, Piso Techo)?`;
+            } else if (type === 'urgente') {
+                textarea.value = `Hola *${name}*, hemos recibido tu reporte de urgencia ⚡.\n\nEstamos asignando a nuestro técnico de guardia para atender la novedad a la mayor brevedad. Por favor confírmanos la dirección exacta y un número de contacto secundario.`;
+            } else if (type === 'gracias') {
+                textarea.value = `Hola *${name}*, ¡muchas gracias por tus amables comentarios! ❤️\n\nEn *Bajo Zero* nos esforzamos por brindarte la mejor climatización y servicio profesional. Recuerda que puedes consultar tu historial técnico siempre desde el código QR en tu equipo.`;
+            }
+        }
+
+        async function submitWhatsAppReply(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitWhatsAppReplyBtn');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Enviando...';
+            btn.disabled = true;
+
+            const inboxId = document.getElementById('replyInboxId').value;
+            const phone = document.getElementById('replyRecipientPhone').value;
+            const replyText = document.getElementById('replyMessageText').value.trim();
+
+            try {
+                if (!replyText) throw new Error('Escribe un mensaje de respuesta.');
+
+                // Llamar a la Edge Function whatsapp-send
+                const resp = await fetch('https://jqiqeyopvjsnutyihczh.supabase.co/functions/v1/whatsapp-send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: phone,
+                        message: replyText
+                    })
+                });
+
+                const result = await resp.json();
+                if (!result.success) throw new Error(result.error || 'Error al despachar el mensaje por WhatsApp API');
+
+                // Marcar solicitud como atendida en la base de datos
+                if (inboxId) {
+                    await supabaseClient
+                        .from('whatsapp_inbox')
+                        .update({ 
+                            status: 'atendida',
+                            admin_notes: 'Respondido vía WhatsApp el ' + new Date().toLocaleDateString('es-PA')
+                        })
+                        .eq('id', inboxId);
+                }
+
+                alert('✅ Mensaje enviado exitosamente a WhatsApp');
+                closeWhatsAppReplyModal();
+                loadInboxMessages();
+
+            } catch (err) {
+                console.error('Error enviando respuesta WhatsApp:', err);
+                alert('❌ Error al enviar mensaje: ' + err.message);
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        }
+
+        async function updateInboxStatus(inboxId, newStatus, newCategory) {
+            try {
+                const updateData = { status: newStatus };
+                if (newCategory) updateData.category = newCategory;
+
+                const { error } = await supabaseClient
+                    .from('whatsapp_inbox')
+                    .update(updateData)
+                    .eq('id', inboxId);
+
+                if (error) throw error;
+
+                // Actualizar caché local
+                const item = allInboxMessagesCache.find(m => m.id === inboxId);
+                if (item) {
+                    item.status = newStatus;
+                    if (newCategory) item.category = newCategory;
+                }
+
+                updateInboxStats(allInboxMessagesCache);
+                filterInboxList();
+
+            } catch (err) {
+                console.error('Error actualizando estado de mensaje:', err);
+                alert('Error al actualizar: ' + err.message);
+            }
+        }
+
+        async function deleteInboxMessage(inboxId) {
+            if (!confirm('¿Desea eliminar definitivamente este mensaje de la bandeja?')) return;
+            try {
+                const { error } = await supabaseClient
+                    .from('whatsapp_inbox')
+                    .delete()
+                    .eq('id', inboxId);
+
+                if (error) throw error;
+
+                allInboxMessagesCache = allInboxMessagesCache.filter(m => m.id !== inboxId);
+                updateInboxStats(allInboxMessagesCache);
+                filterInboxList();
+
+            } catch (err) {
+                console.error('Error eliminando mensaje:', err);
+                alert('Error al eliminar: ' + err.message);
+            }
+        }
+
         // ==================== UTILIDADES ====================
         
         function formatDate(dateString) {

@@ -158,9 +158,11 @@
 
                 const roleConfig = {
                     'superadmin': { icon: '👑', text: 'Super Administrador', color: '#f59e0b' },
-                    'coordinador': { icon: '👩‍💼', text: 'Coordinador(a)', color: '#8b5cf6' },
+                    'admin': { icon: '🛡️', text: 'Administrador', color: '#6366f1' },
+                    'coordinador': { icon: '👩‍💼', text: 'Coordinador(a)', color: '#06b6d4' },
                     'supervisor': { icon: '👁️', text: 'Supervisor', color: '#10b981' },
-                    'tecnico': { icon: '🔧', text: 'Técnico', color: '#3b82f6' }
+                    'tecnico': { icon: '🔧', text: 'Técnico', color: '#3b82f6' },
+                    'asistente': { icon: '📋', text: 'Asistente', color: '#f59e0b' }
                 };
 
                 const config = roleConfig[profile.role] || { icon: '👤', text: 'Usuario', color: '#64748b' };
@@ -173,9 +175,11 @@
                 setTimeout(() => {
                     const routes = {
                         'superadmin': 'admin.html',
+                        'admin': 'admin.html',
                         'coordinador': 'admin.html',
                         'supervisor': 'panel.html',
-                        'tecnico': 'panel.html'
+                        'tecnico': 'panel.html',
+                        'asistente': 'panel.html'
                     };
                     window.location.href = routes[profile.role] || 'inicio.html';
                 }, 1500);

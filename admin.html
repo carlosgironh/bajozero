@@ -974,10 +974,12 @@
                         <input type="tel" id="techPhone" class="input-field" placeholder="6000-0000">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Rol</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Rol *</label>
                         <select id="techRole" class="input-field bg-white">
-                            <option value="supervisor">Supervisor</option>
-                            <option value="tecnico">Técnico</option>
+                            <option value="admin">Administrador (Control Total)</option>
+                            <option value="coordinador">Coordinador(a)</option>
+                            <option value="supervisor">Supervisor de Campo</option>
+                            <option value="tecnico" selected>Técnico de Climatización</option>
                             <option value="asistente">Asistente</option>
                         </select>
                     </div>
@@ -1867,7 +1869,7 @@
                 const { data: technicians, error } = await supabaseClient
                     .from('profiles')
                     .select('*')
-                    .in('role', ['tecnico', 'supervisor', 'asistente'])
+                    .in('role', ['tecnico', 'supervisor', 'asistente', 'coordinador', 'admin'])
                     .eq('is_active', true)
                     .order('full_name');
                     
@@ -1891,7 +1893,7 @@
                 const { data: technicians, error } = await supabaseClient
                     .from('profiles')
                     .select('*')
-                    .in('role', ['tecnico', 'supervisor', 'asistente'])
+                    .order('role', { ascending: false })
                     .order('full_name');
                     
                 if (error) throw error;
@@ -1905,15 +1907,39 @@
                         <div class="col-span-full text-center py-12 bg-white rounded-2xl border border-gray-100 p-8">
                             <i class="fas fa-user-slash text-4xl text-gray-300 mb-3"></i>
                             <p class="font-bold text-gray-700">No hay personal registrado</p>
-                            <p class="text-xs text-gray-400 mt-1">Haz clic en "Nuevo Personal" para registrar técnicos o supervisores.</p>
+                            <p class="text-xs text-gray-400 mt-1">Haz clic en "Nuevo Personal" para registrar administradores o técnicos.</p>
                         </div>
                     `;
                     return;
                 }
 
                 technicians.forEach(tech => {
-                    const roleColor = tech.role === 'supervisor' ? 'bg-purple-100 text-purple-700' :
-                                      tech.role === 'asistente' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700';
+                    let roleColor = 'bg-blue-100 text-blue-700 border border-blue-200';
+                    let roleIcon = 'fa-user-hard-hat';
+                    let roleLabel = 'Técnico';
+
+                    if (tech.role === 'superadmin') {
+                        roleColor = 'bg-amber-100 text-amber-800 border border-amber-300 font-black';
+                        roleIcon = 'fa-crown';
+                        roleLabel = 'Super Admin';
+                    } else if (tech.role === 'admin') {
+                        roleColor = 'bg-indigo-100 text-indigo-700 border border-indigo-300 font-bold';
+                        roleIcon = 'fa-user-shield';
+                        roleLabel = 'Administrador';
+                    } else if (tech.role === 'coordinador') {
+                        roleColor = 'bg-cyan-100 text-cyan-700 border border-cyan-200';
+                        roleIcon = 'fa-user-tie';
+                        roleLabel = 'Coordinador';
+                    } else if (tech.role === 'supervisor') {
+                        roleColor = 'bg-purple-100 text-purple-700 border border-purple-200';
+                        roleIcon = 'fa-user-check';
+                        roleLabel = 'Supervisor';
+                    } else if (tech.role === 'asistente') {
+                        roleColor = 'bg-orange-100 text-orange-700 border border-orange-200';
+                        roleIcon = 'fa-clipboard-user';
+                        roleLabel = 'Asistente';
+                    }
+
                     const activeColor = tech.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
                     const activeText = tech.is_active ? 'Activo' : 'Inactivo';
                     const toggleActionText = tech.is_active ? 'Desactivar' : 'Activar';
@@ -1925,15 +1951,15 @@
                                 <div class="flex items-center justify-between mb-4">
                                     <div class="flex items-center gap-3">
                                         <div class="w-12 h-12 bg-gradient-to-br from-brand-primary to-blue-600 rounded-2xl flex items-center justify-center text-white text-xl shadow-md">
-                                            <i class="fas fa-user-hard-hat"></i>
+                                            <i class="fas ${roleIcon}"></i>
                                         </div>
                                         <div>
                                             <h3 class="font-bold text-gray-800 text-base">${tech.full_name || 'Sin Nombre'}</h3>
-                                            <p class="text-xs text-gray-500">${tech.specialty || 'Técnico General'}</p>
+                                            <p class="text-xs text-gray-500">${tech.specialty || 'General'}</p>
                                         </div>
                                     </div>
                                     <span class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${roleColor}">
-                                        ${tech.role || 'tecnico'}
+                                        ${roleLabel}
                                     </span>
                                 </div>
                                 <div class="flex gap-2 text-xs text-gray-600 mb-3">
@@ -3111,7 +3137,7 @@
                         .from('profiles')
                         .select('*')
                         .eq('id', session.user.id)
-                        .in('role', ['superadmin', 'coordinador'])
+                        .in('role', ['superadmin', 'admin', 'coordinador'])
                         .maybeSingle()
                         .then(({ data: profileData }) => {
                             if (profileData) {
@@ -3133,8 +3159,10 @@
                                             can_block_tasks: perms.includes('block_task'),
                                             can_add_notes: perms.includes('add_note')
                                         };
-                                        if (currentUserRole === 'superadmin') {
+                                        if (currentUserRole === 'superadmin' || currentUserRole === 'admin') {
                                             document.getElementById('rolesNavBtn').classList.remove('hidden');
+                                            const mobileRoles = document.getElementById('rolesMobileNavBtn');
+                                            if (mobileRoles) mobileRoles.classList.remove('hidden');
                                         }
                                         showDashboard();
                                     });
